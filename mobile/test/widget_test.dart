@@ -1,30 +1,29 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
-import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-
 import 'package:mobile/main.dart';
+import 'package:mobile/features/splash/presentation/pages/splash_screen.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  testWidgets('SplashScreen renders correctly', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: ForenShieldApp(),
+      ),
+    );
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+    // Verify the splash screen widget is rendered as the initial route
+    expect(find.byType(SplashScreen), findsOneWidget);
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // Drain all pending timers created by splash animations:
+    // 1. LoadingBar: Future.delayed(1500ms) to start animation
+    await tester.pump(const Duration(milliseconds: 1600));
+    // 2. RadarSweep: Future.delayed(800ms) — already elapsed
+    // 3. LoadingBar: AnimationController(3000ms) runs the progress bar
+    await tester.pump(const Duration(milliseconds: 3100));
+    // 4. _onLoadingComplete: Future.delayed(500ms) for navigation delay
+    //    This calls context.go() which navigates away from splash
+    await tester.pump(const Duration(milliseconds: 600));
+    // 5. Final frame to settle
+    await tester.pump(const Duration(milliseconds: 100));
   });
 }

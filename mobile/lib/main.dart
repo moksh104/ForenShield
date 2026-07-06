@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'core/theme/app_theme.dart';
+import 'routes/app_router.dart';
 
 void main() {
-  runApp(const ForenShieldApp());
+  runApp(
+    const ProviderScope(
+      child: ForenShieldApp(),
+    ),
+  );
 }
 
 class ForenShieldApp extends StatelessWidget {
@@ -9,13 +16,11 @@ class ForenShieldApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp.router(
+      title: 'ForenShield',
       debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: Center(
-          child: Text('ForenShield'),
-        ),
-      ),
+      theme: AppTheme.darkTheme,
+      routerConfig: appRouter,
     );
   }
 }
