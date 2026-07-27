@@ -1,26 +1,14 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
+import '../theme/foren_theme.dart';
 import 'app_button.dart';
 
 /// A reusable error state widget to display API failures, network issues, or internal errors.
-/// 
-/// Includes a prominent error icon, context text, and an integrated retry mechanism.
 class AppErrorState extends StatelessWidget {
-  /// The primary heading explaining the error.
   final String title;
-
-  /// The secondary text providing context on what failed.
   final String description;
-
-  /// The callback executed when the user taps the primary retry button.
   final VoidCallback onRetry;
-
-  /// An optional secondary action button (e.g., "Cancel", "Return to Home").
   final Widget? secondaryAction;
-
-  /// The icon representing the error. Defaults to [Icons.error_outline].
   final IconData errorIcon;
 
   const AppErrorState({
@@ -34,6 +22,10 @@ class AppErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final errorColor = foren.critical.t500;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -48,24 +40,24 @@ class AppErrorState extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.error.withValues(alpha: 0.1),
+                  color: errorColor.withValues(alpha: 0.1),
                 ),
-                child: Icon(
-                  errorIcon,
-                  size: 64,
-                  color: AppColors.error,
-                ),
+                child: Icon(errorIcon, size: 64, color: errorColor),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 title,
-                style: AppTypography.headlineSmall.copyWith(color: AppColors.textPrimary),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 description,
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),

@@ -1,17 +1,5 @@
-import 'package:flutter/material.dart';
+import '../presentation/pages/profile_screen.dart' as p;
 
-class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+export '../presentation/pages/profile_screen.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profile'),
-      ),
-      body: const Center(
-        child: Text('ProfileScreen'),
-      ),
-    );
-  }
-}
+typedef ProfileScreen = p.ProfileScreen;

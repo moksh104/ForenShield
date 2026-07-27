@@ -1,11 +1,11 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_radius.dart';
+import '../theme/foren_theme.dart';
 
 /// A card component that applies a frosted glass effect to its background.
-/// 
+///
 /// Used for overlapping UI elements to maintain context of what's behind them.
 class GlassCard extends StatelessWidget {
   /// The content of the card.
@@ -38,6 +38,8 @@ class GlassCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
     final effectiveRadius = borderRadius ?? AppRadius.borderMd;
 
     return ClipRRect(
@@ -47,10 +49,13 @@ class GlassCard extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: AppColors.surface.withValues(alpha: opacity),
+            color: theme.colorScheme.surface.withValues(alpha: opacity),
             borderRadius: effectiveRadius,
-            border: hasBorder 
-                ? Border.all(color: AppColors.outline.withValues(alpha: opacity + 0.1), width: 1)
+            border: hasBorder
+                ? Border.all(
+                    color: foren.borderSubtle.withValues(alpha: opacity + 0.1),
+                    width: 1,
+                  )
                 : null,
           ),
           child: child,

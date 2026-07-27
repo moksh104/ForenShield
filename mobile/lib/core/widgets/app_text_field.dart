@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_radius.dart';
+import '../theme/foren_theme.dart';
 
 /// A highly configurable, base text input component for ForenShield.
-/// 
-/// It acts as the foundational root for all other specific field types.
 class AppTextField extends StatefulWidget {
   final String? label;
   final String? hint;
@@ -69,7 +66,8 @@ class _AppTextFieldState extends State<AppTextField> {
   late TextEditingController _internalController;
   late FocusNode _internalFocusNode;
 
-  TextEditingController get _controller => widget.controller ?? _internalController;
+  TextEditingController get _controller =>
+      widget.controller ?? _internalController;
   FocusNode get _focusNode => widget.focusNode ?? _internalFocusNode;
 
   bool _hasText = false;
@@ -77,8 +75,12 @@ class _AppTextFieldState extends State<AppTextField> {
   @override
   void initState() {
     super.initState();
-    if (widget.controller == null) _internalController = TextEditingController();
-    if (widget.focusNode == null) _internalFocusNode = FocusNode();
+    if (widget.controller == null) {
+      _internalController = TextEditingController();
+    }
+    if (widget.focusNode == null) {
+      _internalFocusNode = FocusNode();
+    }
 
     _hasText = _controller.text.isNotEmpty;
     _controller.addListener(_onTextChanged);
@@ -91,7 +93,9 @@ class _AppTextFieldState extends State<AppTextField> {
     if (oldWidget.controller != widget.controller) {
       if (oldWidget.controller == null) _internalController.dispose();
       if (widget.controller == null) {
-        _internalController = TextEditingController(text: oldWidget.controller?.text);
+        _internalController = TextEditingController(
+          text: oldWidget.controller?.text,
+        );
         _internalController.addListener(_onTextChanged);
       } else {
         widget.controller!.addListener(_onTextChanged);
@@ -107,7 +111,7 @@ class _AppTextFieldState extends State<AppTextField> {
     } else {
       widget.controller!.removeListener(_onTextChanged);
     }
-    
+
     if (widget.focusNode == null) {
       _internalFocusNode.removeListener(_onFocusChanged);
       _internalFocusNode.dispose();
@@ -125,7 +129,7 @@ class _AppTextFieldState extends State<AppTextField> {
   }
 
   void _onFocusChanged() {
-    setState(() {}); // Rebuild for focused states if needed
+    setState(() {});
   }
 
   void _clearText() {
@@ -136,8 +140,14 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final effectiveSuffix = _buildSuffix();
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final effectiveSuffix = _buildSuffix(foren);
     final effectiveBorderRadius = AppRadius.borderMd;
+
+    final primaryColor = theme.colorScheme.primary;
+    final errorColor = foren.critical.t500;
+    final successColor = foren.success.t500;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -146,8 +156,10 @@ class _AppTextFieldState extends State<AppTextField> {
         if (widget.label != null) ...[
           Text(
             widget.label!,
-            style: AppTypography.labelLarge.copyWith(
-              color: widget.enabled ? AppColors.textPrimary : AppColors.textDisabled,
+            style: theme.textTheme.labelLarge?.copyWith(
+              color: widget.enabled
+                  ? theme.colorScheme.onSurface
+                  : foren.textDisabled,
             ),
           ),
           const SizedBox(height: AppSpacing.xs),
@@ -168,62 +180,74 @@ class _AppTextFieldState extends State<AppTextField> {
           onFieldSubmitted: widget.onSubmitted,
           onTap: widget.onTap,
           validator: widget.validator,
-          style: AppTypography.bodyLarge.copyWith(
-            color: widget.enabled ? AppColors.textPrimary : AppColors.textDisabled,
+          style: theme.textTheme.bodyLarge?.copyWith(
+            color: widget.enabled
+                ? theme.colorScheme.onSurface
+                : foren.textDisabled,
           ),
-          cursorColor: AppColors.primary,
+          cursorColor: primaryColor,
           buildCounter: _buildCounter,
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: AppTypography.bodyLarge.copyWith(color: AppColors.textDisabled),
+            hintStyle: theme.textTheme.bodyLarge?.copyWith(
+              color: foren.textDisabled,
+            ),
             helperText: widget.helperText,
-            helperStyle: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+            helperStyle: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+            ),
             prefixIcon: widget.prefixIcon,
             suffixIcon: effectiveSuffix,
             filled: true,
-            fillColor: widget.enabled ? AppColors.surfaceVariant : AppColors.surface,
+            fillColor: widget.enabled
+                ? foren.surfaceRaised1
+                : theme.colorScheme.surface,
             contentPadding: const EdgeInsets.symmetric(
               horizontal: AppSpacing.md,
               vertical: AppSpacing.md,
             ),
             border: OutlineInputBorder(
               borderRadius: effectiveBorderRadius,
-              borderSide: const BorderSide(color: AppColors.outline),
+              borderSide: BorderSide(color: foren.borderSubtle),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: effectiveBorderRadius,
               borderSide: BorderSide(
-                color: widget.isSuccess ? AppColors.success : AppColors.outline,
+                color: widget.isSuccess ? successColor : foren.borderSubtle,
                 width: widget.isSuccess ? 1.5 : 1.0,
               ),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: effectiveBorderRadius,
               borderSide: BorderSide(
-                color: widget.isSuccess ? AppColors.success : AppColors.primary,
+                color: widget.isSuccess ? successColor : primaryColor,
                 width: 2.0,
               ),
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: effectiveBorderRadius,
-              borderSide: const BorderSide(color: AppColors.error, width: 1.5),
+              borderSide: BorderSide(color: errorColor, width: 1.5),
             ),
             focusedErrorBorder: OutlineInputBorder(
               borderRadius: effectiveBorderRadius,
-              borderSide: const BorderSide(color: AppColors.error, width: 2.0),
+              borderSide: BorderSide(color: errorColor, width: 2.0),
             ),
             disabledBorder: OutlineInputBorder(
               borderRadius: effectiveBorderRadius,
-              borderSide: BorderSide(color: AppColors.outline.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                color: foren.borderSubtle.withValues(alpha: 0.5),
+              ),
             ),
-            errorStyle: AppTypography.bodySmall.copyWith(color: AppColors.error),
+            errorStyle: theme.textTheme.bodySmall?.copyWith(
+              color: errorColor,
+            ),
           ),
         ),
       ],
     );
   }
 
-  Widget? _buildSuffix() {
+  Widget? _buildSuffix(ForenColors foren) {
     final List<Widget> suffixes = [];
 
     if (widget.isLoading) {
@@ -239,18 +263,21 @@ class _AppTextFieldState extends State<AppTextField> {
       );
     } else if (widget.isSuccess) {
       suffixes.add(
-        const Padding(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-          child: Icon(Icons.check_circle, color: AppColors.success),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
+          child: Icon(Icons.check_circle, color: foren.success.t500),
         ),
       );
     }
 
-    if (widget.showClearButton && _hasText && widget.enabled && !widget.readOnly) {
+    if (widget.showClearButton &&
+        _hasText &&
+        widget.enabled &&
+        !widget.readOnly) {
       suffixes.add(
         IconButton(
           icon: const Icon(Icons.clear, size: 20),
-          color: AppColors.textSecondary,
+          color: foren.textSecondary,
           onPressed: _clearText,
           splashRadius: 20,
         ),
@@ -279,10 +306,12 @@ class _AppTextFieldState extends State<AppTextField> {
     required bool isFocused,
   }) {
     if (!widget.showCounter || maxLength == null) return null;
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
     return Text(
       '$currentLength / $maxLength',
-      style: AppTypography.labelSmall.copyWith(
-        color: isFocused ? AppColors.textPrimary : AppColors.textSecondary,
+      style: theme.textTheme.labelSmall?.copyWith(
+        color: isFocused ? theme.colorScheme.onSurface : foren.textSecondary,
       ),
     );
   }

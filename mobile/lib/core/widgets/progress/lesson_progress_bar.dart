@@ -33,9 +33,11 @@ class LessonProgressBar extends StatelessWidget {
               duration: AppMotion.normal,
               height: 6,
               decoration: BoxDecoration(
-                color: isCompleted 
-                    ? AppColors.primary 
-                    : (isCurrent ? AppColors.primary.withValues(alpha: 0.5) : AppColors.surfaceVariant),
+                color: isCompleted
+                    ? AppColors.primary
+                    : (isCurrent
+                          ? AppColors.primary.withValues(alpha: 0.5)
+                          : AppColors.surfaceVariant),
                 borderRadius: BorderRadius.circular(3),
               ),
             ),

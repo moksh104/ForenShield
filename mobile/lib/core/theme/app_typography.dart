@@ -1,143 +1,93 @@
+/// ForenShield Design System v1.0 — Typography
+///
+/// One family: Inter. One scale. Mapped directly onto Flutter's
+/// Material 3 TextTheme so it can be dropped into ThemeData as-is.
+///
+/// Category -> Material3 style mapping (for the product team's
+/// mental model — "Display / Heading / Title / Body / Caption"):
+///   Display  -> displayLarge / displayMedium / displaySmall
+///   Heading  -> headlineLarge / headlineMedium / headlineSmall
+///   Title    -> titleLarge / titleMedium / titleSmall
+///   Body     -> bodyLarge / bodyMedium / bodySmall
+///   Caption  -> labelLarge / labelMedium / labelSmall
+library;
+
 import 'package:flutter/material.dart';
-import 'app_colors.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-/// ForenShield Typography System - Geist font with Material 3 type scale
-class AppTypography {
-  AppTypography._();
+const String forenFontFamily = 'Inter';
 
-  static const String fontFamily = 'Geist';
+class ForenTypography {
+  ForenTypography._();
 
-  // Display Styles
-  static const TextStyle displayLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 57,
-    fontWeight: FontWeight.w700,
-    height: 1.12,
-    letterSpacing: -0.25,
-    color: AppColors.textPrimary,
-  );
+  /// Build a TextTheme for the given base text color (pass
+  /// ForenNeutralDark.textPrimary or ForenNeutralLight.textPrimary).
+  /// Secondary-color styles (e.g. captions) are lightened by the
+  /// caller via TextStyle.copyWith(color: ...) where needed.
+  static TextTheme buildTextTheme(Color baseColor) {
+    TextStyle s(double size, double height, FontWeight weight) {
+      return GoogleFonts.inter(
+        color: baseColor,
+        fontSize: size,
+        height: height / size,
+        fontWeight: weight,
+      );
+    }
 
-  static const TextStyle displayMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 45,
-    fontWeight: FontWeight.w700,
-    height: 1.16,
-    color: AppColors.textPrimary,
-  );
+    return TextTheme(
+      // Display
+      displayLarge: s(40, 48, FontWeight.w700),
+      displayMedium: s(34, 40, FontWeight.w700),
+      displaySmall: s(28, 34, FontWeight.w700),
 
-  static const TextStyle displaySmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 36,
-    fontWeight: FontWeight.w600,
-    height: 1.22,
-    color: AppColors.textPrimary,
-  );
+      // Heading
+      headlineLarge: s(24, 32, FontWeight.w700),
+      headlineMedium: s(20, 28, FontWeight.w600),
+      headlineSmall: s(18, 24, FontWeight.w600),
 
-  // Headline Styles
-  static const TextStyle headlineLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 32,
-    fontWeight: FontWeight.w600,
-    height: 1.25,
-    color: AppColors.textPrimary,
-  );
+      // Title
+      titleLarge: s(18, 24, FontWeight.w600),
+      titleMedium: s(16, 22, FontWeight.w600),
+      titleSmall: s(14, 20, FontWeight.w600),
 
-  static const TextStyle headlineMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 28,
-    fontWeight: FontWeight.w600,
-    height: 1.29,
-    color: AppColors.textPrimary,
-  );
+      // Body
+      bodyLarge: s(16, 24, FontWeight.w400),
+      bodyMedium: s(14, 20, FontWeight.w400),
+      bodySmall: s(12, 16, FontWeight.w400),
 
-  static const TextStyle headlineSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 24,
-    fontWeight: FontWeight.w600,
-    height: 1.33,
-    color: AppColors.textPrimary,
-  );
+      // Caption (Material3 label* styles)
+      labelLarge: s(13, 18, FontWeight.w600),
+      labelMedium: s(12, 16, FontWeight.w600),
+      labelSmall: s(11, 14, FontWeight.w600),
+    );
+  }
+}
 
-  // Title Styles
-  static const TextStyle titleLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 22,
-    fontWeight: FontWeight.w500,
-    height: 1.27,
-    color: AppColors.textPrimary,
-  );
+/// Backwards-compatibility wrapper for legacy AppTypography references.
+abstract class AppTypography {
+  static const String fontFamily = forenFontFamily;
 
-  static const TextStyle titleMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w500,
-    height: 1.5,
-    letterSpacing: 0.15,
-    color: AppColors.textPrimary,
-  );
+  static const FontWeight wLight = FontWeight.w300;
+  static const FontWeight wRegular = FontWeight.w400;
+  static const FontWeight wMedium = FontWeight.w500;
+  static const FontWeight wSemiBold = FontWeight.w600;
+  static const FontWeight wBold = FontWeight.w700;
 
-  static const TextStyle titleSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    height: 1.43,
-    letterSpacing: 0.1,
-    color: AppColors.textPrimary,
-  );
+  static const TextStyle displayLarge = TextStyle(fontSize: 40, fontWeight: wBold, fontFamily: fontFamily);
+  static const TextStyle displayMedium = TextStyle(fontSize: 34, fontWeight: wBold, fontFamily: fontFamily);
+  static const TextStyle displaySmall = TextStyle(fontSize: 28, fontWeight: wBold, fontFamily: fontFamily);
+  static const TextStyle headlineLarge = TextStyle(fontSize: 24, fontWeight: wBold, fontFamily: fontFamily);
+  static const TextStyle headlineMedium = TextStyle(fontSize: 20, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle headlineSmall = TextStyle(fontSize: 18, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle titleLarge = TextStyle(fontSize: 18, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle titleMedium = TextStyle(fontSize: 16, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle titleSmall = TextStyle(fontSize: 14, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle bodyLarge = TextStyle(fontSize: 16, fontWeight: wRegular, fontFamily: fontFamily);
+  static const TextStyle bodyMedium = TextStyle(fontSize: 14, fontWeight: wRegular, fontFamily: fontFamily);
+  static const TextStyle bodySmall = TextStyle(fontSize: 12, fontWeight: wRegular, fontFamily: fontFamily);
+  static const TextStyle labelLarge = TextStyle(fontSize: 13, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle labelMedium = TextStyle(fontSize: 12, fontWeight: wSemiBold, fontFamily: fontFamily);
+  static const TextStyle labelSmall = TextStyle(fontSize: 11, fontWeight: wSemiBold, fontFamily: fontFamily);
 
-  // Body Styles
-  static const TextStyle bodyLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 16,
-    fontWeight: FontWeight.w400,
-    height: 1.5,
-    letterSpacing: 0.5,
-    color: AppColors.textPrimary,
-  );
-
-  static const TextStyle bodyMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w400,
-    height: 1.43,
-    letterSpacing: 0.25,
-    color: AppColors.textPrimary,
-  );
-
-  static const TextStyle bodySmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 12,
-    fontWeight: FontWeight.w400,
-    height: 1.33,
-    letterSpacing: 0.4,
-    color: AppColors.textSecondary,
-  );
-
-  // Label Styles
-  static const TextStyle labelLarge = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 14,
-    fontWeight: FontWeight.w500,
-    height: 1.43,
-    letterSpacing: 0.1,
-    color: AppColors.textPrimary,
-  );
-
-  static const TextStyle labelMedium = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 12,
-    fontWeight: FontWeight.w500,
-    height: 1.33,
-    letterSpacing: 0.5,
-    color: AppColors.textPrimary,
-  );
-
-  static const TextStyle labelSmall = TextStyle(
-    fontFamily: fontFamily,
-    fontSize: 11,
-    fontWeight: FontWeight.w500,
-    height: 1.45,
-    letterSpacing: 0.5,
-    color: AppColors.textSecondary,
-  );
+  static TextTheme getTextTheme({required Color textColor}) => ForenTypography.buildTextTheme(textColor);
 }

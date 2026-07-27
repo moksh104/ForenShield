@@ -1,24 +1,30 @@
-class AppSpacing {
-  AppSpacing._();
+/// Defines the spacing scale for the ForenShield application.
+/// Ensures consistent margins and paddings across the app without magic numbers.
+abstract class AppSpacing {
+  /// 2.0 pixels
+  static const double xxxs = 2.0;
 
-  /// 2.0 dp - Extra extra small spacing (tight inline gaps)
-  static const double xxs = 2.0;
+  /// 4.0 pixels
+  static const double xxs = 4.0;
 
-  /// 4.0 dp - Extra small spacing
-  static const double xs = 4.0;
+  /// 8.0 pixels
+  static const double xs = 8.0;
 
-  /// 8.0 dp - Small spacing (standard small gap)
-  static const double sm = 8.0;
+  /// 12.0 pixels
+  static const double sm = 12.0;
 
-  /// 16.0 dp - Medium spacing (standard padding/margin)
+  /// 16.0 pixels (Base spacing)
   static const double md = 16.0;
 
-  /// 24.0 dp - Large spacing (major section padding)
+  /// 24.0 pixels
   static const double lg = 24.0;
 
-  /// 32.0 dp - Extra large spacing
+  /// 32.0 pixels
   static const double xl = 32.0;
 
-  /// 48.0 dp - Extra extra large spacing (screen edges, major dividers)
+  /// 48.0 pixels
   static const double xxl = 48.0;
+
+  /// 64.0 pixels
+  static const double xxxl = 64.0;
 }

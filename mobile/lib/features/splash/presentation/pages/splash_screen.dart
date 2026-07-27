@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/providers/app_preferences_provider.dart';
 import '../../../../routes/route_constants.dart';
 import '../widgets/background_grid.dart';
 import '../widgets/splash_logo.dart';
@@ -7,29 +9,26 @@ import '../widgets/radar_sweep.dart';
 import '../widgets/loading_modules.dart';
 import '../widgets/loading_bar.dart';
 
-class SplashScreen extends StatefulWidget {
+class SplashScreen extends ConsumerStatefulWidget {
   const SplashScreen({super.key});
 
   @override
-  State<SplashScreen> createState() => _SplashScreenState();
+  ConsumerState<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> {
-  // Temporary constant for first launch check
-  // TODO: Replace with SharedPreferences in future sprint
-  static const bool isFirstLaunch = true;
+class _SplashScreenState extends ConsumerState<SplashScreen> {
+  Future<void> _onLoadingComplete() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    if (!mounted) return;
 
-  void _onLoadingComplete() {
-    Future.delayed(const Duration(milliseconds: 500), () {
-      if (mounted) {
-        // Navigate based on onboarding status
-        if (isFirstLaunch) {
-          context.go(RouteConstants.onboarding);
-        } else {
-          context.go(RouteConstants.login);
-        }
+    final hasSeenOnboarding = await ref.read(hasSeenOnboardingProvider.future);
+    if (mounted) {
+      if (hasSeenOnboarding) {
+        context.go(RouteConstants.login);
+      } else {
+        context.go(RouteConstants.onboarding);
       }
-    });
+    }
   }
 
   @override
@@ -43,9 +42,7 @@ class _SplashScreenState extends State<SplashScreen> {
       body: Stack(
         children: [
           // Background grid with subtle parallax
-          const Positioned.fill(
-            child: BackgroundGrid(),
-          ),
+          const Positioned.fill(child: BackgroundGrid()),
 
           // Main content
           SafeArea(
@@ -66,7 +63,9 @@ class _SplashScreenState extends State<SplashScreen> {
                         children: [
                           SizedBox(
                             width: isTablet ? 400 : (isSmallScreen ? 250 : 300),
-                            height: isTablet ? 400 : (isSmallScreen ? 250 : 300),
+                            height: isTablet
+                                ? 400
+                                : (isSmallScreen ? 250 : 300),
                             child: const RadarSweep(),
                           ),
                           const SplashLogo(),
@@ -81,9 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       const SizedBox(height: 40),
 
                       // Loading bar with status
-                      LoadingBar(
-                        onComplete: _onLoadingComplete,
-                      ),
+                      LoadingBar(onComplete: _onLoadingComplete),
 
                       SizedBox(height: size.height * 0.15),
                     ],

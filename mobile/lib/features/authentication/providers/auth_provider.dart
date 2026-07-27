@@ -1,11 +1,13 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_constants.dart';
-import '../../../core/network/api_exception.dart';
-import '../../../core/providers/providers.dart';
+import '../../../core/exceptions/app_exceptions.dart';
+import '../../../core/providers/core_providers.dart';
 import '../../../core/storage/storage_service.dart';
-import '../../../core/utils/logger.dart';
+import '../../../core/constants/storage_keys.dart';
+import '../../../core/logger/app_logger.dart';
 import '../../../models/user_model.dart';
-import '../data/auth_repository.dart';
+import '../data/repository/auth_repository.dart';
+import 'auth_providers.dart';
 
 /// Auth state
 class AuthState {
@@ -34,20 +36,14 @@ class AuthState {
       error: error,
     );
   }
-}
-
-/// Auth repository provider
-final authRepositoryProvider = Provider<AuthRepository>((ref) {
-  return AuthRepository(ref.read(apiClientProvider));
-});
+}  
 
 /// Auth state notifier
 class AuthNotifier extends StateNotifier<AuthState> {
   final AuthRepository _authRepository;
   final StorageService _storage;
 
-  AuthNotifier(this._authRepository, this._storage)
-      : super(const AuthState()) {
+  AuthNotifier(this._authRepository, this._storage) : super(const AuthState()) {
     _checkAuthStatus();
   }
 
@@ -56,62 +52,71 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true);
 
     try {
-      final token = await _storage.read(AppConstants.keyAccessToken);
-      
+      final token = await _storage.getAccessToken();
+
       if (token != null && token.isNotEmpty) {
-        final user = await _authRepository.getCurrentUser();
-        state = AuthState(
-          user: user,
-          isAuthenticated: true,
-          isLoading: false,
+        final result = await _authRepository.getCurrentUser();
+        result.when(
+          success: (user) {
+            state = AuthState(
+              user: user,
+              isAuthenticated: true,
+              isLoading: false,
+            );
+          },
+          failure: (exception) {
+            AppLogger.error('Auth restore failed', error: exception);
+            state = const AuthState(isLoading: false);
+          },
         );
       } else {
         state = const AuthState(isLoading: false);
       }
     } catch (e) {
       AppLogger.error('Auth check failed', error: e);
-      await _storage.deleteAll();
+      await _storage.clearSession();
       state = const AuthState(isLoading: false);
     }
   }
 
   /// Login
-  Future<void> login({
-    required String email,
-    required String password,
-  }) async {
+  Future<void> login({required String email, required String password}) async {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final response = await _authRepository.login(
+      final result = await _authRepository.login(
         email: email,
         password: password,
       );
 
-      // Save tokens
-      await _storage.write(AppConstants.keyAccessToken, response.accessToken);
-      await _storage.write(AppConstants.keyRefreshToken, response.refreshToken);
-      await _storage.write(AppConstants.keyUserId, response.user.id);
+      result.when(
+        success: (response) async {
+          await _storage.saveAccessToken(response.accessToken);
+          await _storage.saveRefreshToken(response.refreshToken);
+          await _storage.write(StorageKeys.userId, response.user.id);
 
-      state = AuthState(
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-      );
+          state = AuthState(
+            user: response.user,
+            isAuthenticated: true,
+            isLoading: false,
+          );
 
-      AppLogger.info('Login successful');
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.userMessage,
+          AppLogger.info('Login successful');
+        },
+        failure: (exception) {
+          final message = exception is AppException
+              ? exception.userMessage
+              : AppConstants.errorGeneric;
+          state = state.copyWith(isLoading: false, error: message);
+          AppLogger.error('Login failed', error: exception);
+        },
       );
-      AppLogger.error('Login failed', error: e);
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
         error: AppConstants.errorGeneric,
       );
-      AppLogger.error('Login failed', error: e);
+      AppLogger.error('Login failed', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -124,36 +129,40 @@ class AuthNotifier extends StateNotifier<AuthState> {
     state = state.copyWith(isLoading: true, error: null);
 
     try {
-      final response = await _authRepository.register(
+      final result = await _authRepository.register(
         email: email,
         password: password,
         displayName: displayName,
       );
 
-      // Save tokens
-      await _storage.write(AppConstants.keyAccessToken, response.accessToken);
-      await _storage.write(AppConstants.keyRefreshToken, response.refreshToken);
-      await _storage.write(AppConstants.keyUserId, response.user.id);
+      result.when(
+        success: (response) async {
+          await _storage.saveAccessToken(response.accessToken);
+          await _storage.saveRefreshToken(response.refreshToken);
+          await _storage.write(StorageKeys.userId, response.user.id);
 
-      state = AuthState(
-        user: response.user,
-        isAuthenticated: true,
-        isLoading: false,
-      );
+          state = AuthState(
+            user: response.user,
+            isAuthenticated: true,
+            isLoading: false,
+          );
 
-      AppLogger.info('Registration successful');
-    } on ApiException catch (e) {
-      state = state.copyWith(
-        isLoading: false,
-        error: e.userMessage,
+          AppLogger.info('Registration successful');
+        },
+        failure: (exception) {
+          final message = exception is AppException
+              ? exception.userMessage
+              : AppConstants.errorGeneric;
+          state = state.copyWith(isLoading: false, error: message);
+          AppLogger.error('Registration failed', error: exception);
+        },
       );
-      AppLogger.error('Registration failed', error: e);
-    } catch (e) {
+    } catch (e, stackTrace) {
       state = state.copyWith(
         isLoading: false,
         error: AppConstants.errorGeneric,
       );
-      AppLogger.error('Registration failed', error: e);
+      AppLogger.error('Registration failed', error: e, stackTrace: stackTrace);
     }
   }
 
@@ -165,7 +174,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
       AppLogger.warning('Logout API call failed', error: e);
     }
 
-    await _storage.deleteAll();
+    await _storage.clearSession();
     state = const AuthState();
     AppLogger.info('Logout successful');
   }

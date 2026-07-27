@@ -1,36 +1,40 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_typography.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_radius.dart';
+import '../../theme/foren_theme.dart';
 
-/// Predefined difficulty levels for cases and modules.
 enum DifficultyLevel { beginner, intermediate, advanced, expert }
 
-/// A semantic chip that visually communicates the difficulty level of an activity.
 class DifficultyChip extends StatelessWidget {
-  /// The difficulty level to display.
   final DifficultyLevel level;
 
   const DifficultyChip({super.key, required this.level});
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
+        color: foren.surfaceRaised2,
         borderRadius: AppRadius.borderMd,
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: foren.borderSubtle),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildBars(),
+          _buildBars(foren),
           const SizedBox(width: AppSpacing.xs),
           Text(
             _getLabel(),
-            style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary),
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: foren.textSecondary,
+            ),
           ),
         ],
       ),
@@ -39,33 +43,37 @@ class DifficultyChip extends StatelessWidget {
 
   String _getLabel() {
     switch (level) {
-      case DifficultyLevel.beginner: return 'Beginner';
-      case DifficultyLevel.intermediate: return 'Intermediate';
-      case DifficultyLevel.advanced: return 'Advanced';
-      case DifficultyLevel.expert: return 'Expert';
+      case DifficultyLevel.beginner:
+        return 'Beginner';
+      case DifficultyLevel.intermediate:
+        return 'Intermediate';
+      case DifficultyLevel.advanced:
+        return 'Advanced';
+      case DifficultyLevel.expert:
+        return 'Expert';
     }
   }
 
-  Widget _buildBars() {
+  Widget _buildBars(ForenColors foren) {
     int activeBars = 1;
-    Color color = AppColors.success;
+    Color color = foren.success.t500;
 
     switch (level) {
       case DifficultyLevel.beginner:
         activeBars = 1;
-        color = AppColors.success;
+        color = foren.success.t500;
         break;
       case DifficultyLevel.intermediate:
         activeBars = 2;
-        color = AppColors.info;
+        color = foren.info.t500;
         break;
       case DifficultyLevel.advanced:
         activeBars = 3;
-        color = AppColors.warning;
+        color = foren.warning.t500;
         break;
       case DifficultyLevel.expert:
         activeBars = 4;
-        color = AppColors.error;
+        color = foren.critical.t500;
         break;
     }
 
@@ -77,9 +85,9 @@ class DifficultyChip extends StatelessWidget {
         return Container(
           margin: const EdgeInsets.only(right: 2),
           width: 4,
-          height: 6.0 + (index * 2), // Ascending heights
+          height: 6.0 + (index * 2),
           decoration: BoxDecoration(
-            color: isActive ? color : AppColors.surfaceVariant,
+            color: isActive ? color : foren.surfaceRaised1,
             borderRadius: BorderRadius.circular(1),
           ),
         );

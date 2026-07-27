@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'app_text_field.dart';
 
 /// A specialized text field optimized for long-form content.
-/// 
+///
 /// Automatically grows within the [minLines] and [maxLines] constraints
 /// and natively supports character counters.
 class MultilineField extends StatelessWidget {

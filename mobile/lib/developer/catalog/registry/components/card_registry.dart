@@ -4,7 +4,6 @@ import '../../../../core/widgets/app_card.dart';
 import '../../../../core/widgets/section_card.dart';
 import '../../../../core/widgets/glass_card.dart';
 import '../../../../core/widgets/info_card.dart';
-import '../../../../core/theme/app_colors.dart';
 
 final List<ComponentDefinition> cardComponents = [
   ComponentDefinition(
@@ -30,10 +29,10 @@ final List<ComponentDefinition> cardComponents = [
     ],
     builder: (context, props) {
       return AppCard(
-        title: props['title'] as String,
-        subtitle: props['subtitle'] as String,
-        elevation: (props['elevation'] as num).toDouble(),
-        hasBorder: props['hasBorder'] as bool,
+        title: props['title'] as String?,
+        subtitle: props['subtitle'] as String?,
+        elevation: (props['elevation'] as num?)?.toDouble() ?? 1.0,
+        hasBorder: props['hasBorder'] as bool? ?? true,
         body: const Text('This is the main body content of the card. It scales automatically based on its children.'),
       );
     },
@@ -55,8 +54,8 @@ final List<ComponentDefinition> cardComponents = [
     ],
     builder: (context, props) {
       return SectionCard(
-        title: props['title'] as String,
-        subtitle: props['subtitle'] as String,
+        title: props['title'] as String? ?? 'Investigation Progress',
+        subtitle: props['subtitle'] as String?,
         child: const Text('Section content goes here...'),
       );
     },
@@ -85,13 +84,13 @@ final List<ComponentDefinition> cardComponents = [
         padding: const EdgeInsets.all(32),
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [AppColors.primary, AppColors.secondary],
+            colors: [Theme.of(context).colorScheme.primary, Theme.of(context).colorScheme.secondary],
           ),
         ),
         child: GlassCard(
-          blur: (props['blur'] as num).toDouble(),
-          opacity: (props['opacity'] as num).toDouble(),
-          hasBorder: props['hasBorder'] as bool,
+          blur: (props['blur'] as num?)?.toDouble() ?? 10.0,
+          opacity: (props['opacity'] as num?)?.toDouble() ?? 0.2,
+          hasBorder: props['hasBorder'] as bool? ?? true,
           child: const Text('Frosted Glass Content', style: TextStyle(color: Colors.white)),
         ),
       );
@@ -116,7 +115,7 @@ final List<ComponentDefinition> cardComponents = [
       const ComponentProperty(name: 'description', type: PropertyType.string, defaultValue: 'Your profile has been updated successfully.'),
     ],
     builder: (context, props) {
-      final type = props['type'] as InfoCardType;
+      final type = props['type'] as InfoCardType? ?? InfoCardType.info;
       IconData icon = Icons.info_outline;
       if (type == InfoCardType.success) icon = Icons.check_circle_outline;
       if (type == InfoCardType.warning) icon = Icons.warning_amber_rounded;
@@ -125,8 +124,8 @@ final List<ComponentDefinition> cardComponents = [
       return InfoCard(
         type: type,
         icon: icon,
-        title: props['title'] as String,
-        description: props['description'] as String,
+        title: props['title'] as String? ?? 'System Notice',
+        description: props['description'] as String? ?? 'Your profile has been updated successfully.',
       );
     },
   ),

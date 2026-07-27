@@ -1,7 +1,11 @@
 import 'package:equatable/equatable.dart';
 import 'user_model.dart';
 
-/// Authentication response model
+/// Authentication response from the ForenShield PHP REST API.
+///
+/// Returned by POST /auth/login and POST /auth/register.
+/// Contains a short-lived JWT [accessToken] and a long-lived [refreshToken]
+/// used by [AuthInterceptor] to silently renew sessions.
 class AuthResponseModel extends Equatable {
   final String accessToken;
   final String refreshToken;

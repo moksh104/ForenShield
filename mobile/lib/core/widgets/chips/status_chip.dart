@@ -1,27 +1,26 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_colors.dart';
-import '../../theme/app_typography.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_radius.dart';
+import '../../theme/foren_theme.dart';
 
-/// Predefined states for ForenShield investigation cases, tasks, or modules.
 enum StatusChipState { active, pending, completed, failed, locked }
 
-/// A display-only chip specifically designed to clearly communicate status.
-/// 
-/// Automatically handles color-coding and icons based on the [StatusChipState].
 class StatusChip extends StatelessWidget {
-  /// The specific state to display.
   final StatusChipState state;
 
   const StatusChip({super.key, required this.state});
 
   @override
   Widget build(BuildContext context) {
-    final style = _getStyle();
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final style = _getStyle(foren);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: style.bgColor,
         borderRadius: AppRadius.borderMd,
@@ -34,7 +33,7 @@ class StatusChip extends StatelessWidget {
           const SizedBox(width: AppSpacing.xs),
           Text(
             _getLabel(),
-            style: AppTypography.labelSmall.copyWith(
+            style: theme.textTheme.labelSmall?.copyWith(
               color: style.textColor,
               fontWeight: FontWeight.bold,
             ),
@@ -46,49 +45,58 @@ class StatusChip extends StatelessWidget {
 
   String _getLabel() {
     switch (state) {
-      case StatusChipState.active: return 'ACTIVE';
-      case StatusChipState.pending: return 'PENDING';
-      case StatusChipState.completed: return 'COMPLETED';
-      case StatusChipState.failed: return 'FAILED';
-      case StatusChipState.locked: return 'LOCKED';
+      case StatusChipState.active:
+        return 'ACTIVE';
+      case StatusChipState.pending:
+        return 'PENDING';
+      case StatusChipState.completed:
+        return 'COMPLETED';
+      case StatusChipState.failed:
+        return 'FAILED';
+      case StatusChipState.locked:
+        return 'LOCKED';
     }
   }
 
-  _StatusStyle _getStyle() {
+  _StatusStyle _getStyle(ForenColors foren) {
     switch (state) {
       case StatusChipState.active:
+        final c = foren.info.t500;
         return _StatusStyle(
-          bgColor: AppColors.info.withValues(alpha: 0.15),
-          borderColor: AppColors.info.withValues(alpha: 0.3),
-          textColor: AppColors.info,
+          bgColor: c.withValues(alpha: 0.15),
+          borderColor: c.withValues(alpha: 0.3),
+          textColor: c,
           icon: Icons.play_circle_outline,
         );
       case StatusChipState.pending:
+        final c = foren.warning.t500;
         return _StatusStyle(
-          bgColor: AppColors.warning.withValues(alpha: 0.15),
-          borderColor: AppColors.warning.withValues(alpha: 0.3),
-          textColor: AppColors.warning,
+          bgColor: c.withValues(alpha: 0.15),
+          borderColor: c.withValues(alpha: 0.3),
+          textColor: c,
           icon: Icons.hourglass_empty,
         );
       case StatusChipState.completed:
+        final c = foren.success.t500;
         return _StatusStyle(
-          bgColor: AppColors.success.withValues(alpha: 0.15),
-          borderColor: AppColors.success.withValues(alpha: 0.3),
-          textColor: AppColors.success,
+          bgColor: c.withValues(alpha: 0.15),
+          borderColor: c.withValues(alpha: 0.3),
+          textColor: c,
           icon: Icons.check_circle_outline,
         );
       case StatusChipState.failed:
+        final c = foren.critical.t500;
         return _StatusStyle(
-          bgColor: AppColors.error.withValues(alpha: 0.15),
-          borderColor: AppColors.error.withValues(alpha: 0.3),
-          textColor: AppColors.error,
+          bgColor: c.withValues(alpha: 0.15),
+          borderColor: c.withValues(alpha: 0.3),
+          textColor: c,
           icon: Icons.error_outline,
         );
       case StatusChipState.locked:
         return _StatusStyle(
-          bgColor: AppColors.surfaceVariant,
-          borderColor: AppColors.outline,
-          textColor: AppColors.textDisabled,
+          bgColor: foren.surfaceRaised1,
+          borderColor: foren.borderSubtle,
+          textColor: foren.textDisabled,
           icon: Icons.lock_outline,
         );
     }

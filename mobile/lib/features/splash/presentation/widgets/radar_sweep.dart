@@ -48,9 +48,11 @@ class _RadarSweepState extends State<RadarSweep>
     return AnimatedBuilder(
       animation: _rotationAnimation,
       builder: (context, child) {
-        return CustomPaint(
-          painter: _RadarPainter(_rotationAnimation.value),
-          child: const SizedBox.expand(),
+        return RepaintBoundary(
+          child: CustomPaint(
+            painter: _RadarPainter(_rotationAnimation.value),
+            child: const SizedBox.expand(),
+          ),
         );
       },
     );

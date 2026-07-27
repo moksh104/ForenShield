@@ -26,9 +26,9 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
     ],
     builder: (context, props) {
       return RankBadge(
-        rank: props['rank'] as RankTier,
-        size: (props['size'] as num).toDouble(),
-        showLabel: props['showLabel'] as bool,
+        rank: props['rank'] as RankTier? ?? RankTier.bronze,
+        size: (props['size'] as num?)?.toDouble() ?? 48.0,
+        showLabel: props['showLabel'] as bool? ?? true,
       );
     },
   ),
@@ -47,11 +47,12 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
       const ComponentProperty(name: 'progress', type: PropertyType.number, defaultValue: 0.65),
     ],
     builder: (context, props) {
+      final double progress = (props['progress'] as num?)?.toDouble() ?? 0.65;
       return LinearProgressCard(
-        title: props['title'] as String,
+        title: props['title'] as String? ?? 'Module Completion',
         subtitle: 'Based on total points',
-        progressText: '${((props['progress'] as num) * 100).toInt()}%',
-        progress: (props['progress'] as num).toDouble(),
+        progressText: '${(progress * 100).toInt()}%',
+        progress: progress,
       );
     },
   ),
@@ -71,9 +72,9 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
       const ComponentProperty(name: 'progress', type: PropertyType.number, defaultValue: 0.88),
     ],
     builder: (context, props) {
-      final p = (props['progress'] as num).toDouble();
+      final p = (props['progress'] as num?)?.toDouble() ?? 0.88;
       return CircularProgressCard(
-        title: props['title'] as String,
+        title: props['title'] as String? ?? 'Case Accuracy',
         progress: p,
         centerWidget: Text('${(p * 100).toInt()}%'),
       );
@@ -95,8 +96,8 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
     ],
     builder: (context, props) {
       return LessonProgressBar(
-        totalSteps: (props['totalSteps'] as num).toInt(),
-        completedSteps: (props['completedSteps'] as num).toInt(),
+        totalSteps: (props['totalSteps'] as num?)?.toInt() ?? 5,
+        completedSteps: (props['completedSteps'] as num?)?.toInt() ?? 2,
       );
     },
   ),
@@ -116,7 +117,7 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
     ],
     builder: (context, props) {
       return XPProgressBar(
-        currentXP: (props['currentXP'] as num).toInt(),
+        currentXP: (props['currentXP'] as num?)?.toInt() ?? 1500,
         targetXP: 2500,
         currentLevel: 5,
       );

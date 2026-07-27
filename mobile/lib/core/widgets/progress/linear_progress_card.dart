@@ -63,7 +63,9 @@ class LinearProgressCard extends StatelessWidget {
             const SizedBox(height: AppSpacing.xxs),
             Text(
               subtitle!,
-              style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.bodySmall.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
           const SizedBox(height: AppSpacing.md),

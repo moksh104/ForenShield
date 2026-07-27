@@ -1,27 +1,15 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
+import '../theme/foren_theme.dart';
 import 'app_button.dart';
 
 /// A reusable success state widget to display completed processes, solved cases, or successful submissions.
 class AppSuccessState extends StatelessWidget {
-  /// The primary heading explaining the success.
   final String title;
-
-  /// The secondary text providing context on the accomplishment.
   final String description;
-
-  /// The callback executed when the user taps the continue button.
   final VoidCallback onContinue;
-
-  /// The text displayed on the primary action button. Defaults to 'Continue'.
   final String continueText;
-
-  /// The icon representing the success. Defaults to [Icons.check_circle_outline].
   final IconData successIcon;
-
-  /// Whether to play a subtle scale-in animation when the widget first appears.
   final bool animate;
 
   const AppSuccessState({
@@ -36,6 +24,10 @@ class AppSuccessState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final successColor = foren.success.t500;
+
     Widget content = Center(
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.xl),
@@ -50,24 +42,24 @@ class AppSuccessState extends StatelessWidget {
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppColors.success.withValues(alpha: 0.1),
+                  color: successColor.withValues(alpha: 0.1),
                 ),
-                child: Icon(
-                  successIcon,
-                  size: 64,
-                  color: AppColors.success,
-                ),
+                child: Icon(successIcon, size: 64, color: successColor),
               ),
               const SizedBox(height: AppSpacing.lg),
               Text(
                 title,
-                style: AppTypography.headlineSmall.copyWith(color: AppColors.textPrimary),
+                style: theme.textTheme.headlineSmall?.copyWith(
+                  color: theme.colorScheme.onSurface,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
                 description,
-                style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xl),
@@ -92,7 +84,7 @@ class AppSuccessState extends StatelessWidget {
           return Transform.scale(
             scale: scale,
             child: Opacity(
-              opacity: (scale - 0.8) / 0.2, // Maps 0.8->1.0 to 0.0->1.0
+              opacity: (scale - 0.8) / 0.2,
               child: child,
             ),
           );

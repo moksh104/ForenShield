@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_motion.dart';
+import '../theme/foren_theme.dart';
 import 'app_text_field.dart';
 
 /// A specialized text field for entering passwords securely.
-/// 
-/// Automatically manages visibility toggle and optional strength/requirements indicators.
 class PasswordField extends StatefulWidget {
   final String? label;
   final String? hint;
@@ -53,6 +50,9 @@ class _PasswordFieldState extends State<PasswordField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
@@ -73,8 +73,10 @@ class _PasswordFieldState extends State<PasswordField> {
           prefixIcon: const Icon(Icons.lock_outline),
           suffixIcon: IconButton(
             icon: Icon(
-              _obscureText ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-              color: AppColors.textSecondary,
+              _obscureText
+                  ? Icons.visibility_outlined
+                  : Icons.visibility_off_outlined,
+              color: foren.textSecondary,
             ),
             onPressed: widget.enabled ? _toggleVisibility : null,
             splashRadius: 24,
@@ -83,49 +85,57 @@ class _PasswordFieldState extends State<PasswordField> {
         if (widget.showStrengthIndicator || widget.requirements.isNotEmpty)
           Padding(
             padding: const EdgeInsets.only(top: AppSpacing.sm),
-            child: _buildStrengthAndRequirements(),
+            child: _buildStrengthAndRequirements(theme, foren),
           ),
       ],
     );
   }
 
-  Widget _buildStrengthAndRequirements() {
+  Widget _buildStrengthAndRequirements(ThemeData theme, ForenColors foren) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       mainAxisSize: MainAxisSize.min,
       children: [
         if (widget.showStrengthIndicator && widget.strength != null) ...[
-          _buildStrengthBar(widget.strength!),
+          _buildStrengthBar(foren, widget.strength!),
           const SizedBox(height: AppSpacing.sm),
         ],
         if (widget.requirements.isNotEmpty)
-          ...widget.requirements.map((req) => Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
-                child: Row(
-                  children: [
-                    const Icon(Icons.circle, size: 4, color: AppColors.textSecondary),
-                    const SizedBox(width: AppSpacing.sm),
-                    Expanded(
-                      child: Text(
-                        req,
-                        style: AppTypography.labelSmall.copyWith(color: AppColors.textSecondary),
+          ...widget.requirements.map(
+            (req) => Padding(
+              padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
+              child: Row(
+                children: [
+                  Icon(
+                    Icons.circle,
+                    size: 4,
+                    color: foren.textSecondary,
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      req,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: foren.textSecondary,
                       ),
                     ),
-                  ],
-                ),
-              )),
+                  ),
+                ],
+              ),
+            ),
+          ),
       ],
     );
   }
 
-  Widget _buildStrengthBar(double strength) {
+  Widget _buildStrengthBar(ForenColors foren, double strength) {
     Color color;
     if (strength < 0.33) {
-      color = AppColors.error;
+      color = foren.critical.t500;
     } else if (strength < 0.66) {
-      color = AppColors.warning;
+      color = foren.warning.t500;
     } else {
-      color = AppColors.success;
+      color = foren.success.t500;
     }
 
     return LayoutBuilder(
@@ -134,7 +144,7 @@ class _PasswordFieldState extends State<PasswordField> {
           height: 4,
           width: constraints.maxWidth,
           decoration: BoxDecoration(
-            color: AppColors.surfaceVariant,
+            color: foren.surfaceRaised1,
             borderRadius: BorderRadius.circular(2),
           ),
           child: AnimatedContainer(

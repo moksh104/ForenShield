@@ -1,0 +1,210 @@
+/* ForenShield Component Library — Web (Landing Website)
+   Framework-agnostic CSS classes — works with plain HTML, React,
+   Vue, or any templating layer. Requires tokens.css to be loaded
+   first. Usage examples are in components.md.
+
+   SCOPE: this file intentionally covers only the components a
+   marketing/landing surface needs — Nav, Buttons, and a curated set
+   of "showcase" Cards/Badges used to demonstrate the product. It
+   does not reproduce in-app-only components (dialogs, evidence
+   lists, in-product search) — those exist only inside the Flutter
+   app. See the design system doc §"Web scope" note. */
+
+* { box-sizing: border-box; }
+
+body {
+  font-family: var(--foren-font-family);
+  background: var(--foren-bg-base);
+  color: var(--foren-text-primary);
+}
+
+/* ============================================================
+   Navigation — Top App Bar (site header)
+   ============================================================ */
+
+.foren-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--foren-space-md) var(--foren-space-lg);
+  background: var(--foren-bg-base);
+  border-bottom: 1px solid var(--foren-border-subtle);
+}
+
+.foren-nav__title {
+  font-weight: 700;
+  font-size: 20px;
+}
+
+.foren-nav__links {
+  display: flex;
+  gap: var(--foren-space-lg);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.foren-nav__links a {
+  color: var(--foren-text-secondary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+  transition: color var(--foren-duration-micro) var(--foren-ease-micro);
+}
+
+.foren-nav__links a:hover {
+  color: var(--foren-mission-control-500);
+}
+
+/* ============================================================
+   Buttons — Primary / Secondary / Ghost / Danger / Icon Button
+   ============================================================ */
+
+.foren-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--foren-space-sm);
+  padding: var(--foren-space-md) var(--foren-space-lg);
+  border-radius: var(--foren-radius-button);
+  border: none;
+  font-family: var(--foren-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity var(--foren-duration-micro) var(--foren-ease-micro),
+              transform var(--foren-duration-micro) var(--foren-ease-micro);
+}
+
+.foren-btn:active { transform: scale(0.98); }
+.foren-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.foren-btn--small { padding: var(--foren-space-sm) var(--foren-space-md); font-size: 12px; }
+
+/* Primary — filled with the feature accent (default: Mission Control) */
+.foren-btn--primary {
+  background: var(--foren-mission-control-500);
+  color: #FFFFFF;
+}
+.foren-btn--primary.foren-accent-academy { background: var(--foren-academy-500); }
+.foren-btn--primary.foren-accent-investigation { background: var(--foren-investigation-500); }
+.foren-btn--primary.foren-accent-simulation { background: var(--foren-simulation-500); }
+.foren-btn--primary.foren-accent-profile { background: var(--foren-profile-500); }
+
+/* Secondary — outlined */
+.foren-btn--secondary {
+  background: transparent;
+  color: var(--foren-mission-control-700);
+  border: 1px solid var(--foren-mission-control-500);
+}
+[data-theme='dark'] .foren-btn--secondary { color: var(--foren-mission-control-300); }
+
+/* Ghost — text only */
+.foren-btn--ghost {
+  background: transparent;
+  color: var(--foren-mission-control-700);
+  padding-left: var(--foren-space-md);
+  padding-right: var(--foren-space-md);
+}
+[data-theme='dark'] .foren-btn--ghost { color: var(--foren-mission-control-300); }
+
+/* Danger — always Critical, never tinted by feature */
+.foren-btn--danger {
+  background: var(--foren-critical-500);
+  color: #FFFFFF;
+}
+
+/* Icon button */
+.foren-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--foren-text-secondary);
+  cursor: pointer;
+  transition: background var(--foren-duration-micro) var(--foren-ease-micro);
+}
+.foren-icon-btn:hover { background: var(--foren-bg-surface-raised-1); }
+
+/* ============================================================
+   Cards — showcase subset: Mission / Course / Statistics / Achievement
+   ============================================================ */
+
+.foren-card {
+  background: var(--foren-bg-surface);
+  border: 1px solid var(--foren-border-subtle);
+  border-radius: var(--foren-radius-card);
+  padding: var(--foren-space-md);
+  box-shadow: var(--foren-shadow-1);
+}
+[data-theme='dark'] .foren-card { box-shadow: none; background: var(--foren-bg-surface-raised-1); }
+
+.foren-card__eyebrow {
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--foren-mission-control-700);
+}
+[data-theme='dark'] .foren-card__eyebrow { color: var(--foren-mission-control-300); }
+
+.foren-card__title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: var(--foren-space-xs) 0;
+}
+
+.foren-card__body {
+  font-size: 14px;
+  color: var(--foren-text-secondary);
+}
+
+.foren-card--academy .foren-card__eyebrow { color: var(--foren-academy-700); }
+[data-theme='dark'] .foren-card--academy .foren-card__eyebrow { color: var(--foren-academy-300); }
+
+.foren-card--investigation .foren-card__eyebrow { color: var(--foren-investigation-700); }
+[data-theme='dark'] .foren-card--investigation .foren-card__eyebrow { color: var(--foren-investigation-300); }
+
+.foren-card--simulation .foren-card__eyebrow { color: var(--foren-simulation-700); }
+[data-theme='dark'] .foren-card--simulation .foren-card__eyebrow { color: var(--foren-simulation-300); }
+
+/* Statistics card (used on landing page to showcase product metrics) */
+.foren-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.foren-stat__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--foren-text-secondary);
+}
+.foren-stat__value {
+  font-size: 28px;
+  font-weight: 700;
+}
+
+/* ============================================================
+   Badges — Threat / Difficulty / XP Chip
+   (only the badges useful for showcasing product screenshots/UI)
+   ============================================================ */
+
+.foren-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: var(--foren-space-xs) var(--foren-space-sm);
+  border-radius: var(--foren-radius-pill);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.foren-badge--critical { background: rgba(239, 68, 68, 0.16); color: var(--foren-critical-500); }
+.foren-badge--warning  { background: rgba(249, 115, 22, 0.16); color: var(--foren-warning-500); }
+.foren-badge--success  { background: rgba(22, 163, 74, 0.16); color: var(--foren-success-500); }
+.foren-badge--info     { background: rgba(14, 165, 233, 0.16); color: var(--foren-info-500); }
+.foren-badge--xp       { background: rgba(245, 158, 11, 0.16); color: var(--foren-academy-500); }

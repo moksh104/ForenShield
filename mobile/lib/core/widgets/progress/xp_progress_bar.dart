@@ -35,11 +35,15 @@ class XPProgressBar extends StatelessWidget {
           children: [
             Text(
               'Level $currentLevel',
-              style: AppTypography.labelLarge.copyWith(fontWeight: FontWeight.bold),
+              style: AppTypography.labelLarge.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
             ),
             Text(
               '$currentXP / $targetXP XP',
-              style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary),
+              style: AppTypography.labelMedium.copyWith(
+                color: AppColors.textSecondary,
+              ),
             ),
           ],
         ),

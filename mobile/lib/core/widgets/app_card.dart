@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_radius.dart';
-import '../theme/app_shadows.dart';
+import '../theme/foren_theme.dart';
 
 /// A standard, highly reusable card component following the ForenShield design system.
-/// 
-/// It acts as the foundational surface for most grouped content.
+///
+/// Colors sourced from ForenTheme/ForenColors rather than hard-coded legacy values.
 class AppCard extends StatelessWidget {
   /// The main content of the card.
   final Widget body;
@@ -63,27 +61,33 @@ class AppCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
     final effectiveRadius = borderRadius ?? AppRadius.borderMd;
-    
+
     Widget cardContent = Padding(
       padding: padding,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          if (header != null) header!
-          else if (title != null || subtitle != null || leadingIcon != null || trailingAction != null)
-            _buildStandardHeader(),
-          
-          if ((header != null || title != null) && body is! SizedBox) 
+          if (header != null)
+            header!
+          else if (title != null ||
+              subtitle != null ||
+              leadingIcon != null ||
+              trailingAction != null)
+            _buildStandardHeader(context),
+
+          if ((header != null || title != null) && body is! SizedBox)
             const SizedBox(height: AppSpacing.md),
-            
+
           body,
-          
+
           if (footer != null) ...[
             const SizedBox(height: AppSpacing.md),
             footer!,
-          ]
+          ],
         ],
       ),
     );
@@ -98,26 +102,24 @@ class AppCard extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        color: _getSurfaceColor(),
+        color: _getSurfaceColor(foren),
         borderRadius: effectiveRadius,
-        border: hasBorder 
-            ? Border.all(color: AppColors.outline, width: 1)
+        border: hasBorder
+            ? Border.all(color: foren.borderSubtle, width: 1)
             : null,
-        boxShadow: _getShadows(),
       ),
-      child: Material(
-        type: MaterialType.transparency,
-        child: cardContent,
-      ),
+      child: Material(type: MaterialType.transparency, child: cardContent),
     );
   }
 
-  Widget _buildStandardHeader() {
+  Widget _buildStandardHeader(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (leadingIcon != null) ...[
-          Icon(leadingIcon, color: AppColors.primary, size: 24),
+          Icon(leadingIcon, color: theme.colorScheme.primary, size: 24),
           const SizedBox(width: AppSpacing.sm),
         ],
         Expanded(
@@ -125,11 +127,13 @@ class AppCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              if (title != null)
-                Text(title!, style: AppTypography.titleMedium),
+              if (title != null) Text(title!, style: theme.textTheme.titleMedium),
               if (subtitle != null) ...[
                 const SizedBox(height: AppSpacing.xxs),
-                Text(subtitle!, style: AppTypography.bodySmall),
+                Text(
+                  subtitle!,
+                  style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary),
+                ),
               ],
             ],
           ),
@@ -142,17 +146,9 @@ class AppCard extends StatelessWidget {
     );
   }
 
-  Color _getSurfaceColor() {
-    if (elevation == 0) return AppColors.surface;
-    if (elevation == 1) return AppColors.surfaceVariant;
-    return AppColors.surfaceElevated;
-  }
-
-  List<BoxShadow>? _getShadows() {
-    if (elevation == 0) return AppShadows.none;
-    if (elevation == 1) return AppShadows.subtle;
-    if (elevation == 2) return AppShadows.small;
-    if (elevation == 3) return AppShadows.medium;
-    return AppShadows.large;
+  Color _getSurfaceColor(ForenColors foren) {
+    if (elevation == 0) return foren.surfaceRaised1;
+    if (elevation == 1) return foren.surfaceRaised1;
+    return foren.surfaceRaised2;
   }
 }

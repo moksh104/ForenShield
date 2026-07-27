@@ -1,10 +1,37 @@
+import 'dart:async';
 import 'package:dio/dio.dart';
 import '../../storage/storage_service.dart';
-import '../../constants/app_constants.dart';
+import '../../config/api_config.dart';
+import '../../constants/api_endpoints.dart';
+import '../../logger/app_logger.dart';
 
-/// Interceptor for JWT token injection and refresh
+/// JWT auth interceptor for the ForenShield PHP REST API.
+///
+/// - Injects a Bearer token on every non-auth request.
+/// - On 401, exchanges the refresh token for a new access token and retries.
+/// - Queues multiple requests if a refresh is already in progress.
+/// - Prevents infinite retry loops using an `extra` flag.
 class AuthInterceptor extends Interceptor {
-  final StorageService _storage = StorageService();
+  final StorageService _storage;
+
+  AuthInterceptor(this._storage);
+
+  // Dedicated Dio instances for specific tasks to avoid interceptor loops
+  final Dio _refreshDio = Dio(BaseOptions(
+    baseUrl: ApiConfig.baseUrl,
+    connectTimeout: ApiConfig.timeout,
+    receiveTimeout: ApiConfig.timeout,
+    sendTimeout: ApiConfig.timeout,
+  ));
+  final Dio _retryDio = Dio(BaseOptions(
+    baseUrl: ApiConfig.baseUrl,
+    connectTimeout: ApiConfig.timeout,
+    receiveTimeout: ApiConfig.timeout,
+    sendTimeout: ApiConfig.timeout,
+  ));
+
+  bool _isRefreshing = false;
+  Completer<String?>? _refreshCompleter;
 
   @override
   void onRequest(
@@ -16,9 +43,7 @@ class AuthInterceptor extends Interceptor {
       return handler.next(options);
     }
 
-    // Get access token from storage
-    final token = await _storage.read(AppConstants.keyAccessToken);
-    
+    final token = await _storage.getAccessToken();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -27,54 +52,109 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(
-    DioException err,
-    ErrorInterceptorHandler handler,
-  ) async {
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    final requestOptions = err.requestOptions;
+
     // Handle 401 Unauthorized - attempt token refresh
-    if (err.response?.statusCode == 401) {
-      try {
-        final refreshToken = await _storage.read(AppConstants.keyRefreshToken);
-        
-        if (refreshToken == null || refreshToken.isEmpty) {
+    // Prevent infinite loops by checking the 'retried' extra flag
+    if (err.response?.statusCode == 401 &&
+        !_isAuthEndpoint(requestOptions.path) &&
+        requestOptions.extra['retried'] != true) {
+      final refreshToken = await _storage.getRefreshToken();
+      if (refreshToken == null || refreshToken.isEmpty) {
+        return handler.next(err);
+      }
+
+      if (_isRefreshing) {
+        // Wait for the ongoing refresh to complete
+        final newToken = await _refreshCompleter?.future;
+        if (newToken != null) {
+          return _retryRequest(requestOptions, newToken, handler);
+        } else {
           return handler.next(err);
         }
+      }
 
-        // Attempt to refresh token
-        final dio = Dio();
-        final response = await dio.post(
-          '${AppConstants.apiBaseUrl}/auth/refresh',
+      _isRefreshing = true;
+      _refreshCompleter = Completer<String?>();
+
+      try {
+        AppLogger.i('Attempting token refresh...');
+        final response = await _refreshDio.post(
+          ApiEndpoints.refresh,
           data: {'refreshToken': refreshToken},
         );
 
-        if (response.statusCode == 200) {
-          final newAccessToken = response.data['accessToken'] as String?;
-          final newRefreshToken = response.data['refreshToken'] as String?;
+        if (response.statusCode == 200 &&
+            response.data is Map<String, dynamic>) {
+          final data = response.data as Map<String, dynamic>;
+          final newAccessToken = data['accessToken'] as String?;
+          final newRefreshToken = data['refreshToken'] as String?;
 
-          if (newAccessToken != null) {
-            await _storage.write(AppConstants.keyAccessToken, newAccessToken);
-            if (newRefreshToken != null) {
-              await _storage.write(AppConstants.keyRefreshToken, newRefreshToken);
+          if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            await _storage.saveAccessToken(newAccessToken);
+            if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+              await _storage.saveRefreshToken(newRefreshToken);
             }
 
-            // Retry original request
-            final options = err.requestOptions;
-            options.headers['Authorization'] = 'Bearer $newAccessToken';
-            final retryResponse = await dio.fetch(options);
-            return handler.resolve(retryResponse);
+            _refreshCompleter?.complete(newAccessToken);
+            return _retryRequest(requestOptions, newAccessToken, handler);
           }
         }
-      } catch (e) {
-        await _storage.deleteAll();
-      }
-    }
 
-    handler.next(err);
+        // Refresh failed (invalid response format or missing token)
+        _refreshCompleter?.complete(null);
+        await _storage.clearSession();
+      } on DioException catch (e) {
+        AppLogger.e('Token refresh failed (API Error)', e);
+        _refreshCompleter?.complete(null);
+        await _storage.clearSession();
+      } catch (e, stackTrace) {
+        AppLogger.e('Token refresh failed (Unexpected Error)', e, stackTrace);
+        _refreshCompleter?.complete(null);
+        await _storage.clearSession();
+      } finally {
+        _isRefreshing = false;
+        _refreshCompleter = null;
+      }
+    } else {
+      handler.next(err);
+    }
+  }
+
+  Future<void> _retryRequest(
+    RequestOptions requestOptions,
+    String token,
+    ErrorInterceptorHandler handler,
+  ) async {
+    // Mark this request as retried to prevent infinite loops
+    requestOptions.extra['retried'] = true;
+    requestOptions.headers['Authorization'] = 'Bearer $token';
+
+    final options = Options(
+      method: requestOptions.method,
+      headers: requestOptions.headers,
+      extra: requestOptions.extra,
+    );
+
+    try {
+      final response = await _retryDio.request<dynamic>(
+        requestOptions.path,
+        data: requestOptions.data,
+        queryParameters: requestOptions.queryParameters,
+        options: options,
+      );
+      handler.resolve(response);
+    } on DioException catch (e) {
+      handler.next(e);
+    } catch (e) {
+      handler.reject(DioException(requestOptions: requestOptions, error: e));
+    }
   }
 
   bool _isAuthEndpoint(String path) {
-    return path.contains('/auth/login') ||
-        path.contains('/auth/register') ||
-        path.contains('/auth/refresh');
+    return path.contains(ApiEndpoints.login) ||
+        path.contains(ApiEndpoints.register) ||
+        path.contains(ApiEndpoints.refresh);
   }
 }

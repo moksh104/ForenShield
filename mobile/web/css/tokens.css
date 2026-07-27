@@ -1,0 +1,107 @@
+/* ForenShield Design System v1.0 — Web Tokens
+   Mirrors lib/theme/app_tokens.dart exactly. Any value changed here
+   must be changed there too, and vice versa — this is the contract
+   that keeps the Landing Website and the Flutter app visually one
+   product. */
+
+:root {
+  /* ---- Neutral scale (Light — default) ---- */
+  --foren-bg-base: #F5F7FA;
+  --foren-bg-surface: #FFFFFF;
+  --foren-bg-surface-raised-1: #F0F3F7;
+  --foren-bg-surface-raised-2: #E7ECF1;
+  --foren-bg-surface-raised-3: #FFFFFF;
+  --foren-border-subtle: #E1E6EC;
+  --foren-border-default: #C7D0DA;
+  --foren-text-primary: #111820;
+  --foren-text-secondary: #48545F;
+  --foren-text-disabled: #9AA4AE;
+
+  /* ---- Feature accents (base tone, works on both themes) ---- */
+  --foren-mission-control-300: #67E8F9;
+  --foren-mission-control-500: #06B6D4;
+  --foren-mission-control-700: #0E7490;
+
+  --foren-academy-300: #FCD34D;
+  --foren-academy-500: #F59E0B;
+  --foren-academy-700: #B45309;
+
+  --foren-investigation-300: #C4B5FD;
+  --foren-investigation-500: #8B5CF6;
+  --foren-investigation-700: #6D28D9;
+
+  --foren-simulation-300: #86EFAC;
+  --foren-simulation-500: #22C55E;
+  --foren-simulation-700: #15803D;
+
+  --foren-profile-300: #93C5FD;
+  --foren-profile-500: #3B82F6;
+  --foren-profile-700: #1D4ED8;
+
+  /* ---- Semantic / status ---- */
+  --foren-success-300: #4ADE80;
+  --foren-success-500: #16A34A;
+  --foren-success-700: #166534;
+
+  --foren-warning-300: #FDBA74;
+  --foren-warning-500: #F97316;
+  --foren-warning-700: #C2410C;
+
+  --foren-critical-300: #FCA5A5;
+  --foren-critical-500: #EF4444;
+  --foren-critical-700: #B91C1C;
+
+  --foren-info-300: #7DD3FC;
+  --foren-info-500: #0EA5E9;
+  --foren-info-700: #0369A1;
+
+  /* ---- Spacing (8pt grid, 4 as half-step) ---- */
+  --foren-space-xs: 4px;
+  --foren-space-sm: 8px;
+  --foren-space-md: 16px;
+  --foren-space-lg: 24px;
+  --foren-space-xl: 32px;
+  --foren-space-xxl: 48px;
+  --foren-space-xxxl: 64px;
+
+  /* ---- Radius ---- */
+  --foren-radius-button: 16px;
+  --foren-radius-input: 16px;
+  --foren-radius-card: 20px;
+  --foren-radius-dialog: 24px;
+  --foren-radius-image: 18px;
+  --foren-radius-pill: 999px;
+
+  /* ---- Elevation (light theme = real shadow) ---- */
+  --foren-shadow-1: 0 1px 3px rgba(16, 24, 32, 0.08);
+  --foren-shadow-2: 0 4px 8px rgba(16, 24, 32, 0.10);
+  --foren-shadow-3: 0 8px 24px rgba(16, 24, 32, 0.14);
+
+  /* ---- Motion ---- */
+  --foren-duration-micro: 120ms;
+  --foren-duration-standard: 250ms;
+  --foren-duration-emphasis: 600ms;
+  --foren-ease-micro: cubic-bezier(0, 0, 0.2, 1);       /* easeOut     */
+  --foren-ease-standard: cubic-bezier(0.4, 0, 0.2, 1);  /* easeInOutCubic */
+
+  /* ---- Typography ---- */
+  --foren-font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ---- Dark theme override (primary experience) ---- */
+[data-theme='dark'] {
+  --foren-bg-base: #0A0E14;
+  --foren-bg-surface: #0F1620;
+  --foren-bg-surface-raised-1: #141C28;
+  --foren-bg-surface-raised-2: #1B2531;
+  --foren-bg-surface-raised-3: #24303D;
+  --foren-border-subtle: #232E3B;
+  --foren-border-default: #374557;
+  --foren-text-primary: #E8EDF2;
+  --foren-text-secondary: #A9B4C0;
+  --foren-text-disabled: #5C6773;
+
+  /* Dark theme communicates elevation via surface tint, not shadow —
+     shadows are disabled at the component level when this attribute
+     is present; see components.css. */
+}

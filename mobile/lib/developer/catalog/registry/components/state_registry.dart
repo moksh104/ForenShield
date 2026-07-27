@@ -25,10 +25,10 @@ final List<ComponentDefinition> stateComponents = [
     ],
     builder: (context, props) {
       return AppLoadingState(
-        title: props['title'] as String,
-        description: props['description'] as String,
-        size: props['size'] as AppLoadingSize,
-        progress: (props['isDeterminate'] as bool) ? 0.65 : null,
+        title: props['title'] as String?,
+        description: props['description'] as String?,
+        size: props['size'] as AppLoadingSize? ?? AppLoadingSize.medium,
+        progress: (props['isDeterminate'] as bool? ?? false) ? 0.65 : null,
       );
     },
   ),
@@ -48,8 +48,8 @@ final List<ComponentDefinition> stateComponents = [
     ],
     builder: (context, props) {
       return AppEmptyState(
-        title: props['title'] as String,
-        description: props['description'] as String,
+        title: props['title'] as String? ?? 'No Evidence Found',
+        description: props['description'] as String? ?? 'Adjust your search parameters and try again.',
       );
     },
   ),
@@ -69,8 +69,8 @@ final List<ComponentDefinition> stateComponents = [
     ],
     builder: (context, props) {
       return AppErrorState(
-        title: props['title'] as String,
-        description: props['description'] as String,
+        title: props['title'] as String? ?? 'Connection Failed',
+        description: props['description'] as String? ?? 'Could not reach the secure server.',
         onRetry: () {},
       );
     },
@@ -93,9 +93,9 @@ final List<ComponentDefinition> stateComponents = [
     ],
     builder: (context, props) {
       return AppSuccessState(
-        title: props['title'] as String,
-        description: props['description'] as String,
-        animate: props['animate'] as bool,
+        title: props['title'] as String? ?? 'Investigation Complete',
+        description: props['description'] as String? ?? 'You have successfully closed this case.',
+        animate: props['animate'] as bool? ?? true,
         onContinue: () {},
       );
     },

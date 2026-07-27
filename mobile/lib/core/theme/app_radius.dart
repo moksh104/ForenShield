@@ -1,30 +1,54 @@
 import 'package:flutter/material.dart';
 
-class AppRadius {
-  AppRadius._();
+/// Defines the border radius scale for the ForenShield application.
+/// Consistent rounding for cards, dialogs, buttons, and other components.
+abstract class AppRadius {
+  /// 4.0 pixels
+  static const double xs = 4.0;
 
-  // Base Radii
-  static const Radius none = Radius.zero;
-  static const Radius sm = Radius.circular(4.0);
-  static const Radius md = Radius.circular(8.0);
-  static const Radius lg = Radius.circular(12.0);
-  static const Radius xl = Radius.circular(16.0);
-  static const Radius pill = Radius.circular(999.0);
+  /// 8.0 pixels
+  static const double sm = 8.0;
 
-  // BorderRadius helpers
-  static const BorderRadius borderNone = BorderRadius.zero;
-  static const BorderRadius borderSm = BorderRadius.all(sm);
-  static const BorderRadius borderMd = BorderRadius.all(md);
-  static const BorderRadius borderLg = BorderRadius.all(lg);
-  static const BorderRadius borderXl = BorderRadius.all(xl);
-  static const BorderRadius borderPill = BorderRadius.all(pill);
+  /// 12.0 pixels
+  static const double md = 12.0;
 
-  // ShapeBorder helpers
-  static const ShapeBorder shapeNone = RoundedRectangleBorder();
-  static const ShapeBorder shapeSm = RoundedRectangleBorder(borderRadius: borderSm);
-  static const ShapeBorder shapeMd = RoundedRectangleBorder(borderRadius: borderMd);
-  static const ShapeBorder shapeLg = RoundedRectangleBorder(borderRadius: borderLg);
-  static const ShapeBorder shapeXl = RoundedRectangleBorder(borderRadius: borderXl);
-  static const ShapeBorder shapePill = RoundedRectangleBorder(borderRadius: borderPill);
-  static const ShapeBorder circular = CircleBorder();
+  /// 16.0 pixels
+  static const double lg = 16.0;
+
+  /// 24.0 pixels
+  static const double xl = 24.0;
+
+  /// 32.0 pixels
+  static const double xxl = 32.0;
+
+  /// Circular radius for fully rounded elements like pills or avatars
+  static const double circular = 999.0;
+
+  // Pre-defined BorderRadius objects for convenience
+  static const BorderRadius borderRadiusXs = BorderRadius.all(
+    Radius.circular(xs),
+  );
+  static const BorderRadius borderRadiusSm = BorderRadius.all(
+    Radius.circular(sm),
+  );
+  static const BorderRadius borderRadiusMd = BorderRadius.all(
+    Radius.circular(md),
+  );
+  static const BorderRadius borderRadiusLg = BorderRadius.all(
+    Radius.circular(lg),
+  );
+  static const BorderRadius borderRadiusXl = BorderRadius.all(
+    Radius.circular(xl),
+  );
+  static const BorderRadius borderRadiusXxl = BorderRadius.all(
+    Radius.circular(xxl),
+  );
+  static const BorderRadius borderRadiusCircular = BorderRadius.all(
+    Radius.circular(circular),
+  );
+
+  // Backwards compatibility aliases
+  static const BorderRadius borderMd = borderRadiusMd;
+  static const BorderRadius borderPill = borderRadiusCircular;
+  static const BorderRadius borderLg = borderRadiusLg;
 }

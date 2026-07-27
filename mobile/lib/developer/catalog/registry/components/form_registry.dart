@@ -29,13 +29,13 @@ final List<ComponentDefinition> formComponents = [
     ],
     builder: (context, props) {
       return AppTextField(
-        label: props['label'] as String,
-        hint: props['hint'] as String,
-        helperText: props['helperText'] as String,
-        enabled: props['enabled'] as bool,
-        isSuccess: props['isSuccess'] as bool,
-        isLoading: props['isLoading'] as bool,
-        showClearButton: props['showClearButton'] as bool,
+        label: props['label'] as String?,
+        hint: props['hint'] as String?,
+        helperText: props['helperText'] as String?,
+        enabled: props['enabled'] as bool? ?? true,
+        isSuccess: props['isSuccess'] as bool? ?? false,
+        isLoading: props['isLoading'] as bool? ?? false,
+        showClearButton: props['showClearButton'] as bool? ?? true,
       );
     },
   ),
@@ -57,10 +57,10 @@ final List<ComponentDefinition> formComponents = [
     ],
     builder: (context, props) {
       return PasswordField(
-        label: props['label'] as String,
-        showStrengthIndicator: props['showStrengthIndicator'] as bool,
-        strength: (props['strength'] as num).toDouble(),
-        enabled: props['enabled'] as bool,
+        label: props['label'] as String?,
+        showStrengthIndicator: props['showStrengthIndicator'] as bool? ?? true,
+        strength: (props['strength'] as num?)?.toDouble() ?? 0.4,
+        enabled: props['enabled'] as bool? ?? true,
         requirements: const ['Minimum 8 chars', '1 Uppercase', '1 Number'],
       );
     },
@@ -83,9 +83,9 @@ final List<ComponentDefinition> formComponents = [
     ],
     builder: (context, props) {
       return SearchField(
-        hint: props['hint'] as String,
-        isLoading: props['isLoading'] as bool,
-        enabled: props['enabled'] as bool,
+        hint: props['hint'] as String?,
+        isLoading: props['isLoading'] as bool? ?? false,
+        enabled: props['enabled'] as bool? ?? true,
       );
     },
   ),
@@ -108,9 +108,9 @@ final List<ComponentDefinition> formComponents = [
     ],
     builder: (context, props) {
       return MultilineField(
-        label: props['label'] as String,
-        minLines: (props['minLines'] as num).toInt(),
-        maxLength: (props['maxLength'] as num).toInt(),
+        label: props['label'] as String?,
+        minLines: (props['minLines'] as num?)?.toInt() ?? 3,
+        maxLength: (props['maxLength'] as num?)?.toInt() ?? 250,
       );
     },
   ),

@@ -26,11 +26,11 @@ final List<ComponentDefinition> buttonComponents = [
     ],
     builder: (context, props) {
       return AppButton(
-        text: props['text'] as String,
-        type: props['type'] as AppButtonType,
-        isLoading: props['isLoading'] as bool,
-        fullWidth: props['fullWidth'] as bool,
-        onPressed: (props['isDisabled'] as bool) ? null : () {},
+        text: props['text'] as String? ?? 'Button Text',
+        type: props['type'] as AppButtonType? ?? AppButtonType.primary,
+        isLoading: props['isLoading'] as bool? ?? false,
+        fullWidth: props['fullWidth'] as bool? ?? false,
+        onPressed: (props['isDisabled'] as bool? ?? false) ? null : () {},
       );
     },
   ),

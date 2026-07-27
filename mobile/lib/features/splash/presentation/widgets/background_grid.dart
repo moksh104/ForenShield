@@ -32,9 +32,11 @@ class _BackgroundGridState extends State<BackgroundGrid>
     return AnimatedBuilder(
       animation: _controller,
       builder: (context, child) {
-        return CustomPaint(
-          painter: _GridPainter(_controller.value),
-          size: Size.infinite,
+        return RepaintBoundary(
+          child: CustomPaint(
+            painter: _GridPainter(_controller.value),
+            size: Size.infinite,
+          ),
         );
       },
     );

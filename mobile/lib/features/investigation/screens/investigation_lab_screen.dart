@@ -1,17 +1,5 @@
-import 'package:flutter/material.dart';
+import '../presentation/pages/case_list_screen.dart';
 
-class InvestigationLabScreen extends StatelessWidget {
-  const InvestigationLabScreen({super.key});
+export '../presentation/pages/case_list_screen.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Investigation Lab'),
-      ),
-      body: const Center(
-        child: Text('InvestigationLabScreen'),
-      ),
-    );
-  }
-}
+typedef InvestigationLabScreen = CaseListScreen;

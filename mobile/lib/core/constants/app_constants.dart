@@ -7,19 +7,9 @@ class AppConstants {
   static const String appTagline = 'Learn. Investigate. Defend.';
   static const String appVersion = '1.0.0';
 
-  // API Configuration
-  static const String apiBaseUrl = String.fromEnvironment(
-    'API_BASE_URL',
-    defaultValue: 'http://localhost:3000/api/v1',
-  );
-  static const Duration apiTimeout = Duration(seconds: 30);
+  // API Configuration moved to ApiConfig
 
-  // Storage Keys
-  static const String keyAccessToken = 'access_token';
-  static const String keyRefreshToken = 'refresh_token';
-  static const String keyUserId = 'user_id';
-  static const String keyUserEmail = 'user_email';
-  static const String keyIsFirstLaunch = 'is_first_launch';
+  // Storage Keys moved to core/constants/storage_keys.dart
 
   // Gamification - XP Awards
   static const int xpLessonComplete = 50;
@@ -59,8 +49,10 @@ class AppConstants {
 
   // Error Messages
   static const String errorGeneric = 'Something went wrong. Please try again.';
-  static const String errorNetwork = 'Network error. Please check your connection.';
-  static const String errorUnauthorized = 'Session expired. Please log in again.';
+  static const String errorNetwork =
+      'Network error. Please check your connection.';
+  static const String errorUnauthorized =
+      'Session expired. Please log in again.';
 
   // Assets
   static const String assetsLottie = 'assets/lottie/';

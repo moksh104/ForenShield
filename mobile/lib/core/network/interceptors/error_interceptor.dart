@@ -1,61 +1,58 @@
 import 'package:dio/dio.dart';
-import '../../utils/logger.dart';
-import '../api_exception.dart';
+import '../../logger/app_logger.dart';
+import '../../exceptions/app_exceptions.dart';
 
 /// Interceptor for centralized error handling
 class ErrorInterceptor extends Interceptor {
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) {
-    final apiException = _handleError(err);
-    AppLogger.error('API Error', error: apiException);
+    final appException = _handleError(err);
+    AppLogger.e('API Error', appException);
 
     final modifiedError = DioException(
       requestOptions: err.requestOptions,
       response: err.response,
       type: err.type,
-      error: apiException,
+      error: appException,
     );
 
     handler.next(modifiedError);
   }
 
-  ApiException _handleError(DioException error) {
+  AppException _handleError(DioException error) {
     switch (error.type) {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return const ApiException(
-          message: 'Connection timeout',
-          statusCode: 0,
-          type: ApiExceptionType.timeout,
-        );
+        return const TimeoutException();
 
       case DioExceptionType.connectionError:
-        return const ApiException(
-          message: 'No internet connection',
-          statusCode: 0,
-          type: ApiExceptionType.noInternet,
-        );
+        return const NetworkException('No internet connection');
 
       case DioExceptionType.badResponse:
         return _handleResponseError(error.response);
 
+      case DioExceptionType.badCertificate:
+        return const NetworkException('Invalid certificate');
+
+      case DioExceptionType.unknown:
+        // Commonly thrown for SocketExceptions (No internet) or parsing errors
+        if (error.error != null && error.error.toString().contains('SocketException')) {
+          return const NetworkException();
+        }
+        if (error.error != null && error.error is FormatException) {
+          return const SerializationException();
+        }
+        return const ApiException('An unexpected error occurred');
+
       default:
-        return const ApiException(
-          message: 'An unexpected error occurred',
-          statusCode: 0,
-          type: ApiExceptionType.unknown,
-        );
+        return const ApiException('An unexpected error occurred');
     }
   }
 
-  ApiException _handleResponseError(Response? response) {
+  AppException _handleResponseError(Response? response) {
     if (response == null) {
-      return const ApiException(
-        message: 'No response from server',
-        statusCode: 0,
-        type: ApiExceptionType.unknown,
-      );
+      return const ApiException('No response from server');
     }
 
     final statusCode = response.statusCode ?? 0;
@@ -66,34 +63,33 @@ class ErrorInterceptor extends Interceptor {
       message = data['message'] as String? ?? message;
     }
 
-    ApiExceptionType type;
     switch (statusCode) {
       case 400:
-        type = ApiExceptionType.badRequest;
-        break;
+        return ValidationException(
+          message,
+          data is Map<String, dynamic> ? data : null,
+          400,
+        );
       case 401:
-        type = ApiExceptionType.unauthorized;
-        break;
+        return const UnauthorizedException();
       case 403:
-        type = ApiExceptionType.forbidden;
-        break;
+        return const ForbiddenException();
       case 404:
-        type = ApiExceptionType.notFound;
-        break;
+        return const NotFoundException();
+      case 409:
+        return ConflictException(message);
+      case 422:
+        return ValidationException(
+          message,
+          data is Map<String, dynamic> ? data : null,
+          422,
+        );
       case 500:
       case 502:
       case 503:
-        type = ApiExceptionType.serverError;
-        break;
+        return const ServerException();
       default:
-        type = ApiExceptionType.unknown;
+        return ApiException(message, statusCode);
     }
-
-    return ApiException(
-      message: message,
-      statusCode: statusCode,
-      type: type,
-      data: data is Map<String, dynamic> ? data : null,
-    );
   }
 }

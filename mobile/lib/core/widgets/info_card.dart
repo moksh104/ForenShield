@@ -1,29 +1,15 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_radius.dart';
+import '../theme/foren_theme.dart';
 
-/// Visual style variants for the [InfoCard].
 enum InfoCardType { success, warning, error, info }
 
-/// A card designed to display a specific message, status, or alert.
-/// 
-/// Automatically handles color-coding and layout based on the [InfoCardType].
 class InfoCard extends StatelessWidget {
-  /// The visual style of the card. Defaults to [InfoCardType.info].
   final InfoCardType type;
-
-  /// The primary icon displayed next to the text.
   final IconData icon;
-
-  /// The main heading text.
   final String title;
-
-  /// Detailed description text.
   final String description;
-
-  /// Optional call-to-action button placed below the description.
   final Widget? ctaButton;
 
   const InfoCard({
@@ -37,7 +23,9 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorContext = _getColorContext();
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final colorContext = _getColorContext(foren, theme);
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -58,12 +46,16 @@ class InfoCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: AppTypography.titleMedium.copyWith(color: colorContext.titleColor),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorContext.titleColor,
+                  ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   description,
-                  style: AppTypography.bodyMedium.copyWith(color: colorContext.textColor),
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colorContext.textColor,
+                  ),
                 ),
                 if (ctaButton != null) ...[
                   const SizedBox(height: AppSpacing.md),
@@ -77,39 +69,43 @@ class InfoCard extends StatelessWidget {
     );
   }
 
-  _InfoCardColors _getColorContext() {
+  _InfoCardColors _getColorContext(ForenColors foren, ThemeData theme) {
     switch (type) {
       case InfoCardType.success:
+        final c = foren.success.t500;
         return _InfoCardColors(
-          backgroundColor: AppColors.success.withValues(alpha: 0.1),
-          borderColor: AppColors.success.withValues(alpha: 0.3),
-          iconColor: AppColors.success,
-          titleColor: AppColors.success,
-          textColor: AppColors.textPrimary,
+          backgroundColor: c.withValues(alpha: 0.1),
+          borderColor: c.withValues(alpha: 0.3),
+          iconColor: c,
+          titleColor: c,
+          textColor: theme.colorScheme.onSurface,
         );
       case InfoCardType.warning:
+        final c = foren.warning.t500;
         return _InfoCardColors(
-          backgroundColor: AppColors.warning.withValues(alpha: 0.1),
-          borderColor: AppColors.warning.withValues(alpha: 0.3),
-          iconColor: AppColors.warning,
-          titleColor: AppColors.warning,
-          textColor: AppColors.textPrimary,
+          backgroundColor: c.withValues(alpha: 0.1),
+          borderColor: c.withValues(alpha: 0.3),
+          iconColor: c,
+          titleColor: c,
+          textColor: theme.colorScheme.onSurface,
         );
       case InfoCardType.error:
+        final c = foren.critical.t500;
         return _InfoCardColors(
-          backgroundColor: AppColors.error.withValues(alpha: 0.1),
-          borderColor: AppColors.error.withValues(alpha: 0.3),
-          iconColor: AppColors.error,
-          titleColor: AppColors.error,
-          textColor: AppColors.textPrimary,
+          backgroundColor: c.withValues(alpha: 0.1),
+          borderColor: c.withValues(alpha: 0.3),
+          iconColor: c,
+          titleColor: c,
+          textColor: theme.colorScheme.onSurface,
         );
       case InfoCardType.info:
+        final c = foren.info.t500;
         return _InfoCardColors(
-          backgroundColor: AppColors.info.withValues(alpha: 0.1),
-          borderColor: AppColors.info.withValues(alpha: 0.3),
-          iconColor: AppColors.info,
-          titleColor: AppColors.info,
-          textColor: AppColors.textPrimary,
+          backgroundColor: c.withValues(alpha: 0.1),
+          borderColor: c.withValues(alpha: 0.3),
+          iconColor: c,
+          titleColor: c,
+          textColor: theme.colorScheme.onSurface,
         );
     }
   }

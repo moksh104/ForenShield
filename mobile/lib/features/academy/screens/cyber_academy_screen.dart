@@ -1,17 +1,5 @@
-import 'package:flutter/material.dart';
+import '../presentation/pages/course_list_screen.dart';
 
-class CyberAcademyScreen extends StatelessWidget {
-  const CyberAcademyScreen({super.key});
+export '../presentation/pages/course_list_screen.dart';
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cyber Academy'),
-      ),
-      body: const Center(
-        child: Text('CyberAcademyScreen'),
-      ),
-    );
-  }
-}
+typedef CyberAcademyScreen = CourseListScreen;

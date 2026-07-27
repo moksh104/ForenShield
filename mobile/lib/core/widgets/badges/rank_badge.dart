@@ -1,21 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_typography.dart';
 import '../../theme/app_spacing.dart';
 
-/// Predefined ranks for the ForenShield gamification system.
 enum RankTier { bronze, silver, gold, platinum, diamond }
 
-/// A highly visual badge representing a user's achieved rank.
-/// 
-/// Can be configured to show just the icon, or the icon with the rank title.
 class RankBadge extends StatelessWidget {
-  /// The rank tier to display.
   final RankTier rank;
-
-  /// Whether to display the text label of the rank. Defaults to true.
   final bool showLabel;
-
-  /// The size of the badge icon. Defaults to 32.0.
   final double size;
 
   const RankBadge({
@@ -27,6 +17,7 @@ class RankBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     final colors = _getColors();
 
     return Column(
@@ -41,11 +32,7 @@ class RankBadge extends StatelessWidget {
             gradient: LinearGradient(
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
-              colors: [
-                colors.light,
-                colors.base,
-                colors.dark,
-              ],
+              colors: [colors.light, colors.base, colors.dark],
             ),
             boxShadow: [
               BoxShadow(
@@ -67,7 +54,7 @@ class RankBadge extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           Text(
             _getLabel(),
-            style: AppTypography.labelMedium.copyWith(
+            style: theme.textTheme.labelMedium?.copyWith(
               color: colors.base,
               fontWeight: FontWeight.bold,
               letterSpacing: 0.5,
@@ -80,21 +67,31 @@ class RankBadge extends StatelessWidget {
 
   String _getLabel() {
     switch (rank) {
-      case RankTier.bronze: return 'Bronze';
-      case RankTier.silver: return 'Silver';
-      case RankTier.gold: return 'Gold';
-      case RankTier.platinum: return 'Platinum';
-      case RankTier.diamond: return 'Diamond';
+      case RankTier.bronze:
+        return 'Bronze';
+      case RankTier.silver:
+        return 'Silver';
+      case RankTier.gold:
+        return 'Gold';
+      case RankTier.platinum:
+        return 'Platinum';
+      case RankTier.diamond:
+        return 'Diamond';
     }
   }
 
   IconData _getIcon() {
     switch (rank) {
-      case RankTier.bronze: return Icons.shield_outlined;
-      case RankTier.silver: return Icons.security;
-      case RankTier.gold: return Icons.admin_panel_settings;
-      case RankTier.platinum: return Icons.local_police;
-      case RankTier.diamond: return Icons.diamond;
+      case RankTier.bronze:
+        return Icons.shield_outlined;
+      case RankTier.silver:
+        return Icons.security;
+      case RankTier.gold:
+        return Icons.admin_panel_settings;
+      case RankTier.platinum:
+        return Icons.local_police;
+      case RankTier.diamond:
+        return Icons.diamond;
     }
   }
 

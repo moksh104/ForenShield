@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/component_definition.dart';
 import '../../providers/playground_state_provider.dart';
-import '../../../../../core/theme/app_colors.dart';
+import '../../../../../core/theme/foren_theme.dart';
 import '../../../../../core/theme/app_spacing.dart';
 import '../../../../../core/theme/app_radius.dart';
 
@@ -23,12 +23,17 @@ class _LivePreviewCardState extends ConsumerState<LivePreviewCard> {
   @override
   Widget build(BuildContext context) {
     final activeState = ref.watch(playgroundStateProvider(widget.component.name));
+    final Map<String, dynamic> safeState = activeState.isEmpty
+        ? { for (var p in widget.component.properties) p.name: p.defaultValue }
+        : activeState;
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
 
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: theme.colorScheme.surface,
         borderRadius: AppRadius.borderLg,
-        border: Border.all(color: AppColors.outline),
+        border: Border.all(color: foren.borderSubtle),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -36,18 +41,18 @@ class _LivePreviewCardState extends ConsumerState<LivePreviewCard> {
           // Toolbar
           Container(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-            decoration: const BoxDecoration(
-              border: Border(bottom: BorderSide(color: AppColors.outline)),
+            decoration: BoxDecoration(
+              border: Border(bottom: BorderSide(color: foren.borderSubtle)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text('Live Preview', style: TextStyle(fontWeight: FontWeight.bold, color: AppColors.textSecondary)),
+                Text('Live Preview', style: TextStyle(fontWeight: FontWeight.bold, color: foren.textSecondary)),
                 IconButton(
                   icon: Icon(_isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
                   tooltip: 'Toggle Preview Theme',
                   onPressed: () => setState(() => _isDark = !_isDark),
-                  color: AppColors.textSecondary,
+                  color: foren.textSecondary,
                 ),
               ],
             ),
@@ -64,7 +69,7 @@ class _LivePreviewCardState extends ConsumerState<LivePreviewCard> {
             // Override the theme locally for this specific preview box
             child: Theme(
               data: _isDark ? ThemeData.dark() : ThemeData.light(),
-              child: widget.component.builder(context, activeState),
+              child: widget.component.builder(context, safeState),
             ),
           ),
         ],

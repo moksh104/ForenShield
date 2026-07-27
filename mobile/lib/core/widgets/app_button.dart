@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../theme/app_colors.dart';
-import '../theme/app_typography.dart';
 import '../theme/app_spacing.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_motion.dart';
+import '../theme/foren_theme.dart';
 
 /// Defines the visual styling variant of the [AppButton].
 enum AppButtonType { primary, secondary, tertiary, destructive }
 
 /// A highly customizable, reusable button component following the ForenShield UX Blueprint.
+/// Colors are sourced from the live ForenTheme/ForenColors rather than hard-coded values.
 class AppButton extends StatelessWidget {
   final String text;
   final VoidCallback? onPressed;
@@ -58,7 +58,7 @@ class AppButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget button = _buildButtonVariant();
+    Widget button = _buildButtonVariant(context);
 
     if (tooltip != null) {
       button = Tooltip(message: tooltip!, child: button);
@@ -89,8 +89,10 @@ class AppButton extends StatelessWidget {
     return button;
   }
 
-  Widget _buildButtonVariant() {
-    final style = _getBaseStyle();
+  Widget _buildButtonVariant(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final style = _getBaseStyle(context);
 
     switch (type) {
       case AppButtonType.primary:
@@ -99,13 +101,19 @@ class AppButton extends StatelessWidget {
           autofocus: autofocus,
           focusNode: focusNode,
           style: style.copyWith(
-            backgroundColor: WidgetStateProperty.resolveWith((states) =>
-                states.contains(WidgetState.disabled) ? AppColors.surfaceVariant : AppColors.primary),
-            foregroundColor: WidgetStateProperty.resolveWith((states) =>
-                states.contains(WidgetState.disabled) ? AppColors.textDisabled : AppColors.background),
+            backgroundColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.disabled)
+                  ? foren.surfaceRaised1
+                  : theme.colorScheme.primary,
+            ),
+            foregroundColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.disabled)
+                  ? foren.textDisabled
+                  : theme.scaffoldBackgroundColor,
+            ),
             elevation: WidgetStateProperty.all(1),
           ),
-          child: _buildChild(),
+          child: _buildChild(context),
         );
       case AppButtonType.secondary:
         return OutlinedButton(
@@ -113,22 +121,24 @@ class AppButton extends StatelessWidget {
           autofocus: autofocus,
           focusNode: focusNode,
           style: style.copyWith(
-            side: WidgetStateProperty.resolveWith((states) => BorderSide(
-                  color: states.contains(WidgetState.disabled) ? AppColors.outline : AppColors.primary,
-                  width: 1.5,
-                )),
+            side: WidgetStateProperty.resolveWith(
+              (states) => BorderSide(
+                color: states.contains(WidgetState.disabled)
+                    ? foren.borderSubtle
+                    : theme.colorScheme.primary,
+                width: 1.5,
+              ),
+            ),
           ),
-          child: _buildChild(),
+          child: _buildChild(context),
         );
       case AppButtonType.tertiary:
         return TextButton(
           onPressed: _isDisabled ? null : _handlePress,
           autofocus: autofocus,
           focusNode: focusNode,
-          style: style.copyWith(
-            elevation: WidgetStateProperty.all(0),
-          ),
-          child: _buildChild(),
+          style: style.copyWith(elevation: WidgetStateProperty.all(0)),
+          child: _buildChild(context),
         );
       case AppButtonType.destructive:
         return ElevatedButton(
@@ -136,18 +146,26 @@ class AppButton extends StatelessWidget {
           autofocus: autofocus,
           focusNode: focusNode,
           style: style.copyWith(
-            backgroundColor: WidgetStateProperty.resolveWith((states) =>
-                states.contains(WidgetState.disabled) ? AppColors.surfaceVariant : AppColors.error),
-            foregroundColor: WidgetStateProperty.resolveWith((states) =>
-                states.contains(WidgetState.disabled) ? AppColors.textDisabled : AppColors.textPrimary),
+            backgroundColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.disabled)
+                  ? foren.surfaceRaised1
+                  : theme.colorScheme.error,
+            ),
+            foregroundColor: WidgetStateProperty.resolveWith(
+              (states) => states.contains(WidgetState.disabled)
+                  ? foren.textDisabled
+                  : theme.colorScheme.onError,
+            ),
             elevation: WidgetStateProperty.all(1),
           ),
-          child: _buildChild(),
+          child: _buildChild(context),
         );
     }
   }
 
-  ButtonStyle _getBaseStyle() {
+  ButtonStyle _getBaseStyle(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
     return ButtonStyle(
       animationDuration: AppMotion.fast,
       padding: WidgetStateProperty.all(
@@ -159,14 +177,19 @@ class AppButton extends StatelessWidget {
           borderRadius: borderRadius ?? AppRadius.borderMd,
         ),
       ),
-      foregroundColor: WidgetStateProperty.resolveWith((states) =>
-          states.contains(WidgetState.disabled) ? AppColors.textDisabled : AppColors.primary),
+      foregroundColor: WidgetStateProperty.resolveWith(
+        (states) => states.contains(WidgetState.disabled)
+            ? foren.textDisabled
+            : theme.colorScheme.primary,
+      ),
     );
   }
 
-  Widget _buildChild() {
-    final textColor = _isDisabled ? AppColors.textDisabled : _getTextColor();
-    final textStyle = AppTypography.labelLarge.copyWith(color: textColor);
+  Widget _buildChild(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+    final textColor = _isDisabled ? foren.textDisabled : _getTextColor(context);
+    final textStyle = theme.textTheme.labelLarge?.copyWith(color: textColor);
 
     if (isLoading) {
       return Row(
@@ -181,8 +204,12 @@ class AppButton extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation<Color>(textColor),
             ),
           ),
-          if (loadingText != null || text.isNotEmpty) const SizedBox(width: AppSpacing.sm),
-          if (loadingText != null) Text(loadingText!, style: textStyle) else Text(text, style: textStyle),
+          if (loadingText != null || text.isNotEmpty)
+            const SizedBox(width: AppSpacing.sm),
+          if (loadingText != null)
+            Text(loadingText!, style: textStyle)
+          else
+            Text(text, style: textStyle),
         ],
       );
     }
@@ -204,15 +231,17 @@ class AppButton extends StatelessWidget {
     );
   }
 
-  Color _getTextColor() {
+  Color _getTextColor(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
     switch (type) {
       case AppButtonType.primary:
-        return AppColors.background;
+        return theme.scaffoldBackgroundColor;
       case AppButtonType.secondary:
       case AppButtonType.tertiary:
-        return AppColors.primary;
+        return theme.colorScheme.primary;
       case AppButtonType.destructive:
-        return AppColors.textPrimary;
+        return foren.critical.t500;
     }
   }
 }

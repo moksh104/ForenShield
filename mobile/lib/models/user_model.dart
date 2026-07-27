@@ -1,6 +1,10 @@
 import 'package:equatable/equatable.dart';
 
-/// User model
+/// User data model for the ForenShield PHP REST API.
+///
+/// The API returns JSON with camelCase or snake_case keys depending on the
+/// Laravel serialisation convention configured on the backend.
+/// Field names in [fromJson] must match the backend response exactly.
 class UserModel extends Equatable {
   final String id;
   final String email;

@@ -1,5 +1,5 @@
-name: mobile
-description: "A new Flutter project."
+name: forenshield
+description: "ForenShield — Learn. Investigate. Defend. A cybersecurity training platform built with Flutter."
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -45,10 +45,12 @@ dependencies:
   dio: ^5.10.0
   pretty_dio_logger: ^1.4.0
   
+  # Fonts
+  google_fonts: ^6.2.1
+
   # Graphics & Animation
   flutter_svg: ^2.0.10
   lottie: ^3.4.0
-  rive: ^0.14.9
   flutter_animate: ^4.5.2
   
   # Data & Models
@@ -61,6 +63,7 @@ dependencies:
   
   # Storage
   shared_preferences: ^2.3.5
+  image_picker: ^1.1.2
   
   # Environment
   flutter_dotenv: ^5.2.1
@@ -88,6 +91,7 @@ flutter:
   uses-material-design: true
 
   assets:
+    - .env
     - assets/images/
     - assets/icons/
     - assets/logos/

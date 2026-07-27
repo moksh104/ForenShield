@@ -38,10 +38,14 @@ class PlaygroundControls extends ConsumerWidget {
                   width: 140,
                   child: Text(
                     prop.name,
-                    style: AppTypography.labelMedium.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.labelMedium.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ),
-                Expanded(child: _buildControl(ref, prop, currentValue, component.name)),
+                Expanded(
+                  child: _buildControl(ref, prop, currentValue, component.name),
+                ),
               ],
             ),
           );
@@ -50,37 +54,56 @@ class PlaygroundControls extends ConsumerWidget {
     );
   }
 
-  Widget _buildControl(WidgetRef ref, ComponentProperty prop, dynamic currentValue, String componentName) {
+  Widget _buildControl(
+    WidgetRef ref,
+    ComponentProperty prop,
+    dynamic currentValue,
+    String componentName,
+  ) {
     switch (prop.type) {
       case PropertyType.boolean:
         return Switch(
           value: currentValue as bool,
           onChanged: (val) {
-            ref.read(playgroundStateProvider(componentName).notifier).updateProperty(prop.name, val);
+            ref
+                .read(playgroundStateProvider(componentName).notifier)
+                .updateProperty(prop.name, val);
           },
-          activeColor: AppColors.primary,
+          activeThumbColor: AppColors.primary,
         );
       case PropertyType.string:
         return TextField(
-          controller: TextEditingController(text: currentValue as String)
-            ..selection = TextSelection.collapsed(offset: (currentValue as String).length),
+          controller: TextEditingController(
+            text: currentValue as String,
+          )..selection = TextSelection.collapsed(offset: (currentValue).length),
           onChanged: (val) {
-            ref.read(playgroundStateProvider(componentName).notifier).updateProperty(prop.name, val);
+            ref
+                .read(playgroundStateProvider(componentName).notifier)
+                .updateProperty(prop.name, val);
           },
           decoration: const InputDecoration(
             isDense: true,
             border: OutlineInputBorder(),
-            contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+            contentPadding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.sm,
+            ),
           ),
           style: AppTypography.bodyMedium,
         );
       case PropertyType.number:
         return Slider(
-          value: currentValue is double ? currentValue : (currentValue as num).toDouble(),
+          value: currentValue is double
+              ? currentValue
+              : (currentValue as num).toDouble(),
           min: 0,
-          max: (currentValue is double && currentValue > 100) ? 5000 : 100, // naive scaling for demo
+          max: (currentValue is double && currentValue > 100)
+              ? 5000
+              : 100, // naive scaling for demo
           onChanged: (val) {
-            ref.read(playgroundStateProvider(componentName).notifier).updateProperty(prop.name, val);
+            ref
+                .read(playgroundStateProvider(componentName).notifier)
+                .updateProperty(prop.name, val);
           },
           activeColor: AppColors.primary,
         );
@@ -96,11 +119,12 @@ class PlaygroundControls extends ConsumerWidget {
           }).toList(),
           onChanged: (val) {
             if (val != null) {
-              ref.read(playgroundStateProvider(componentName).notifier).updateProperty(prop.name, val);
+              ref
+                  .read(playgroundStateProvider(componentName).notifier)
+                  .updateProperty(prop.name, val);
             }
           },
         );
     }
-    return const SizedBox();
   }
 }

@@ -5,7 +5,6 @@ import '../../../../core/widgets/chips/status_chip.dart';
 import '../../../../core/widgets/chips/difficulty_chip.dart';
 import '../../../../core/widgets/chips/category_chip.dart';
 import '../../../../core/widgets/chips/xp_chip.dart';
-import '../../../../core/theme/app_colors.dart';
 
 final List<ComponentDefinition> chipComponents = [
   ComponentDefinition(
@@ -29,13 +28,13 @@ final List<ComponentDefinition> chipComponents = [
     ],
     builder: (context, props) {
       return AppChip(
-        label: props['label'] as String,
-        type: props['type'] as AppChipType,
-        isSelected: props['isSelected'] as bool,
-        isRemovable: props['isRemovable'] as bool,
-        isEnabled: props['isEnabled'] as bool,
+        label: props['label'] as String? ?? 'ForenShield',
+        type: props['type'] as AppChipType? ?? AppChipType.filled,
+        isSelected: props['isSelected'] as bool? ?? false,
+        isRemovable: props['isRemovable'] as bool? ?? false,
+        isEnabled: props['isEnabled'] as bool? ?? true,
         onTap: () {},
-        onRemoved: (props['isRemovable'] as bool) ? () {} : null,
+        onRemoved: (props['isRemovable'] as bool? ?? false) ? () {} : null,
       );
     },
   ),
@@ -50,7 +49,7 @@ final List<ComponentDefinition> chipComponents = [
       const ComponentProperty(name: 'state', type: PropertyType.selection, defaultValue: StatusChipState.active, options: StatusChipState.values),
     ],
     builder: (context, props) {
-      return StatusChip(state: props['state'] as StatusChipState);
+      return StatusChip(state: props['state'] as StatusChipState? ?? StatusChipState.active);
     },
   ),
   ComponentDefinition(
@@ -64,7 +63,7 @@ final List<ComponentDefinition> chipComponents = [
       const ComponentProperty(name: 'level', type: PropertyType.selection, defaultValue: DifficultyLevel.beginner, options: DifficultyLevel.values),
     ],
     builder: (context, props) {
-      return DifficultyChip(level: props['level'] as DifficultyLevel);
+      return DifficultyChip(level: props['level'] as DifficultyLevel? ?? DifficultyLevel.beginner);
     },
   ),
   ComponentDefinition(
@@ -79,8 +78,8 @@ final List<ComponentDefinition> chipComponents = [
     ],
     builder: (context, props) {
       return CategoryChip(
-        label: props['label'] as String,
-        color: AppColors.primary,
+        label: props['label'] as String? ?? 'Cryptography',
+        color: Theme.of(context).colorScheme.primary,
         icon: Icons.code,
       );
     },
@@ -98,8 +97,8 @@ final List<ComponentDefinition> chipComponents = [
     ],
     builder: (context, props) {
       return XPChip(
-        xp: (props['xp'] as num).toInt(),
-        animate: props['animate'] as bool,
+        xp: (props['xp'] as num?)?.toInt() ?? 1250,
+        animate: props['animate'] as bool? ?? true,
       );
     },
   ),

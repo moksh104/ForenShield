@@ -1,19 +1,10 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_typography.dart';
 import '../../theme/app_spacing.dart';
 import '../../theme/app_radius.dart';
 
-/// A generic categorization chip that accepts custom colors and icons.
-/// 
-/// Ideal for tagging content with dynamic categories provided by a backend.
 class CategoryChip extends StatelessWidget {
-  /// The name of the category.
   final String label;
-
-  /// The primary color for the category tag.
   final Color color;
-
-  /// An optional icon to display alongside the category name.
   final IconData? icon;
 
   const CategoryChip({
@@ -25,8 +16,12 @@ class CategoryChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.15),
         borderRadius: AppRadius.borderMd,
@@ -41,7 +36,7 @@ class CategoryChip extends StatelessWidget {
           ],
           Text(
             label,
-            style: AppTypography.labelSmall.copyWith(
+            style: theme.textTheme.labelSmall?.copyWith(
               color: color,
               fontWeight: FontWeight.w600,
             ),

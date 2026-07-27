@@ -1,11 +1,8 @@
 import 'package:flutter/material.dart';
-import '../theme/app_colors.dart';
+import '../theme/foren_theme.dart';
 import 'app_text_field.dart';
 
 /// A specialized text field optimized for search operations.
-/// 
-/// Automatically includes a search icon prefix and an instant clear suffix button.
-/// Provides a clean API ready for debounced search operations.
 class SearchField extends StatelessWidget {
   final String? hint;
   final bool enabled;
@@ -30,6 +27,9 @@ class SearchField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>()!;
+
     return AppTextField(
       hint: hint,
       enabled: enabled,
@@ -39,7 +39,7 @@ class SearchField extends StatelessWidget {
       onChanged: onChanged,
       onSubmitted: onSubmitted,
       autofocus: autofocus,
-      prefixIcon: const Icon(Icons.search, color: AppColors.textSecondary),
+      prefixIcon: Icon(Icons.search, color: foren.textSecondary),
       showClearButton: true,
       keyboardType: TextInputType.text,
       textInputAction: TextInputAction.search,

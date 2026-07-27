@@ -66,15 +66,14 @@ class CircularProgressCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  title,
-                  style: AppTypography.titleMedium,
-                ),
+                Text(title, style: AppTypography.titleMedium),
                 if (subtitle != null) ...[
                   const SizedBox(height: AppSpacing.xxs),
                   Text(
                     subtitle!,
-                    style: AppTypography.bodySmall.copyWith(color: AppColors.textSecondary),
+                    style: AppTypography.bodySmall.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
                   ),
                 ],
               ],
