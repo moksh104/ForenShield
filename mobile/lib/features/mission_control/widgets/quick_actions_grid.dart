@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_motion.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 /// A responsive quick-actions grid.
 class QuickActionsGrid extends StatelessWidget {
@@ -10,32 +14,32 @@ class QuickActionsGrid extends StatelessWidget {
         QuickAction(
           icon: Icons.search_outlined,
           label: 'New Scan',
-          color: Color(0xFF34D399),
+          color: AppColors.success,
         ),
         QuickAction(
           icon: Icons.folder_open_outlined,
           label: 'Evidence',
-          color: Color(0xFF60A5FA),
+          color: AppColors.logoBlue,
         ),
         QuickAction(
           icon: Icons.bar_chart_outlined,
           label: 'Reports',
-          color: Color(0xFFFBBF24),
+          color: AppColors.warning,
         ),
         QuickAction(
           icon: Icons.fingerprint_outlined,
           label: 'Forensics',
-          color: Color(0xFFA78BFA),
+          color: AppColors.info,
         ),
         QuickAction(
           icon: Icons.shield_outlined,
           label: 'Threats',
-          color: Color(0xFFF87171),
+          color: AppColors.error,
         ),
         QuickAction(
           icon: Icons.settings_outlined,
           label: 'Settings',
-          color: Color(0xFF94A3B8),
+          color: AppColors.textSecondary,
         ),
       ];
 
@@ -56,7 +60,7 @@ class QuickActionsGrid extends StatelessWidget {
               color: theme.colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -100,12 +104,12 @@ class _QuickActionTileState extends State<_QuickActionTile> {
         onTapCancel: () => setState(() => _pressed = false),
         onTap: widget.action.onTap,
         child: AnimatedContainer(
-          duration: const Duration(milliseconds: 120),
+          duration: AppMotion.fast,
           decoration: BoxDecoration(
             color: _pressed
                 ? widget.action.color.withValues(alpha: 0.15)
                 : theme.colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(AppRadius.medium),
             border: Border.all(
               color: _pressed
                   ? widget.action.color.withValues(alpha: 0.4)
@@ -120,7 +124,7 @@ class _QuickActionTileState extends State<_QuickActionTile> {
                 height: 40,
                 decoration: BoxDecoration(
                   color: widget.action.color.withValues(alpha: 0.12),
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(AppRadius.small),
                 ),
                 child: Icon(
                   widget.action.icon,
@@ -128,7 +132,7 @@ class _QuickActionTileState extends State<_QuickActionTile> {
                   size: 20,
                 ),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 widget.action.label,
                 style: theme.textTheme.labelSmall?.copyWith(

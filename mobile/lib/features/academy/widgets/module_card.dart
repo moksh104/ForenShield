@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../models/course_model.dart';
 import '../utils/academy_utils.dart';
 
@@ -21,11 +23,11 @@ class ModuleCard extends StatelessWidget {
       button: true,
       child: InkWell(
         onTap: onTap,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: AppRadius.cardRadius,
         child: Container(
           decoration: BoxDecoration(
             color: theme.colorScheme.surfaceContainerHigh,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: AppRadius.cardRadius,
             border: Border.all(
               color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
             ),
@@ -131,11 +133,11 @@ class ModuleCard extends StatelessWidget {
   Color _difficultyColor(CourseDifficulty difficulty) {
     switch (difficulty) {
       case CourseDifficulty.beginner:
-        return const Color(0xFF34D399);
+        return AppColors.success;
       case CourseDifficulty.intermediate:
-        return const Color(0xFFFBBF24);
+        return AppColors.warning;
       case CourseDifficulty.advanced:
-        return const Color(0xFFF87171);
+        return AppColors.error;
     }
   }
 }

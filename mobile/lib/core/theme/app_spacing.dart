@@ -1,9 +1,8 @@
+import 'package:flutter/material.dart';
+
 /// Defines the spacing scale for the ForenShield application.
 /// Ensures consistent margins and paddings across the app without magic numbers.
 abstract class AppSpacing {
-  /// 2.0 pixels
-  static const double xxxs = 2.0;
-
   /// 4.0 pixels
   static const double xxs = 4.0;
 
@@ -22,9 +21,21 @@ abstract class AppSpacing {
   /// 32.0 pixels
   static const double xl = 32.0;
 
+  /// 40.0 pixels
+  static const double xxl = 40.0;
+
   /// 48.0 pixels
-  static const double xxl = 48.0;
+  static const double xxxl = 48.0;
 
   /// 64.0 pixels
-  static const double xxxl = 64.0;
+  static const double huge = 64.0;
+
+  // Semantic padding constants
+  static const EdgeInsets pagePadding = EdgeInsets.all(lg);
+  static const EdgeInsets cardPadding = EdgeInsets.all(md);
+  static const EdgeInsets buttonPadding = EdgeInsets.symmetric(
+    horizontal: lg,
+    vertical: md,
+  );
+  static const EdgeInsets dialogPadding = EdgeInsets.all(xl);
 }

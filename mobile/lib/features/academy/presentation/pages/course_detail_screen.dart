@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
@@ -92,7 +93,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                       background: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [const Color(0xFF0F172A), theme.colorScheme.surface],
+                            colors: [AppColors.bgBase, theme.colorScheme.surface],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                           ),

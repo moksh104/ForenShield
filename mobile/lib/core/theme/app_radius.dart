@@ -24,6 +24,27 @@ abstract class AppRadius {
   /// Circular radius for fully rounded elements like pills or avatars
   static const double circular = 999.0;
 
+  // Named semantic double constants
+  static const double small = 12.0;
+  static const double medium = 16.0;
+  static const double large = 20.0;
+  static const double extraLarge = 24.0;
+  static const double pill = 999.0;
+
+  // Semantic component BorderRadius objects
+  static const BorderRadius cardRadius = BorderRadius.all(
+    Radius.circular(large),
+  );
+  static const BorderRadius buttonRadius = BorderRadius.all(
+    Radius.circular(medium),
+  );
+  static const BorderRadius sheetRadius = BorderRadius.all(
+    Radius.circular(extraLarge),
+  );
+  static const BorderRadius dialogRadius = BorderRadius.all(
+    Radius.circular(extraLarge),
+  );
+
   // Pre-defined BorderRadius objects for convenience
   static const BorderRadius borderRadiusXs = BorderRadius.all(
     Radius.circular(xs),

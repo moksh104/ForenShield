@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 /// A card showcasing the daily forensic challenge or case of the day.
 class DailyChallengeCard extends StatelessWidget {
@@ -22,21 +25,21 @@ class DailyChallengeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const accentColor = Color(0xFFA78BFA); // violet
+    final accentColor = AppColors.info;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.cardRadius,
           border: Border.all(
             color: accentColor.withValues(alpha: 0.3),
           ),
         ),
         child: InkWell(
           onTap: isCompleted ? null : onStartTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.cardRadius,
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Row(
@@ -138,7 +141,7 @@ class DailyChallengeCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.sm),
                 if (isCompleted)
                   Icon(Icons.check_circle_outline,
                       color: Colors.greenAccent.shade400, size: 22)

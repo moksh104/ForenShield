@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 /// A vertical timeline section showing recent user activity.
 class RecentActivitySection extends StatelessWidget {
@@ -12,28 +15,28 @@ class RecentActivitySection extends StatelessWidget {
           title: 'Completed: Chain of Custody Lab',
           subtitle: 'Academy · Module 2',
           time: '2h ago',
-          color: Color(0xFF34D399),
+          color: AppColors.success,
         ),
         ActivityItem(
           icon: Icons.search_outlined,
           title: 'Ran hash verification scan',
           subtitle: 'Evidence · evidence_disk_01.img',
           time: '5h ago',
-          color: Color(0xFF60A5FA),
+          color: AppColors.logoBlue,
         ),
         ActivityItem(
           icon: Icons.flag_outlined,
           title: 'Opened new case: #FSC-0091',
           subtitle: 'Investigation · Ransomware',
           time: '7h ago',
-          color: Color(0xFFFBBF24),
+          color: AppColors.warning,
         ),
         ActivityItem(
           icon: Icons.login_outlined,
           title: 'Session started',
           subtitle: 'Login · Mumbai, IN',
           time: '8h ago',
-          color: Color(0xFF94A3B8),
+          color: AppColors.textSecondary,
         ),
       ];
 
@@ -54,11 +57,11 @@ class RecentActivitySection extends StatelessWidget {
               color: theme.colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.cardRadius,
               border: Border.all(
                 color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
               ),

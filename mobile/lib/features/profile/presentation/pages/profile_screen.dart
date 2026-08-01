@@ -1,18 +1,31 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/effects/glass_effect.dart';
+import '../../../../core/effects/glow_effect.dart';
+import '../../../../core/effects/particle_background.dart';
+import '../../../../core/effects/scanner_effect.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
+import '../../../splash/presentation/widgets/background_grid.dart';
 import '../providers/profile_provider.dart';
+import '../widgets/activity_timeline.dart';
+import '../widgets/analyst_banner.dart';
+import '../widgets/analyst_stats_grid.dart';
+import '../widgets/skill_badges_section.dart';
 
-/// User Profile Screen displaying identity avatar, rank, member status, and navigation grid.
+/// Premium Cybersecurity Analyst Operations Dashboard Profile Screen.
 class ProfileScreen extends ConsumerWidget {
   const ProfileScreen({super.key});
+
+  /// Performance & Emergency Switch Compliance
+  static const bool enableAdvancedEffects = true;
+  static const int particleCount = 40;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -20,18 +33,34 @@ class ProfileScreen extends ConsumerWidget {
     final state = ref.watch(profileProvider);
     final notifier = ref.read(profileProvider.notifier);
 
-    return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+    final Widget contentBody = Scaffold(
+      backgroundColor: AppColors.bgBase,
       appBar: AppBar(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
         elevation: 0,
-        title: Text(
-          'Agent Profile',
-          style: TextStyle(
-            color: theme.colorScheme.onSurface,
-            fontWeight: FontWeight.w800,
-            fontSize: 20,
-          ),
+        title: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.primary.withValues(alpha: 0.15),
+                borderRadius: AppRadius.borderRadiusSm,
+                border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
+              ),
+              child: const Icon(Icons.admin_panel_settings_outlined, color: AppColors.primary, size: 18),
+            ),
+            const SizedBox(width: 10),
+            Text(
+              'Analyst Dashboard',
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w800,
+                fontSize: 18,
+                letterSpacing: 0.5,
+                fontFamily: 'Geist',
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
@@ -41,13 +70,32 @@ class ProfileScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: SafeArea(
-        child: _buildBody(context, ref, state, notifier),
+      body: Stack(
+        children: [
+          const Positioned.fill(child: BackgroundGrid()),
+          SafeArea(
+            child: AnimatedSwitcher(
+              duration: const Duration(milliseconds: 400),
+              child: _buildStateBody(context, ref, state, notifier),
+            ),
+          ),
+        ],
       ),
     );
+
+    if (enableAdvancedEffects) {
+      return ParticleBackground(
+        numberOfParticles: particleCount,
+        particleColor: AppColors.logoGold,
+        duration: const Duration(seconds: 18),
+        child: contentBody,
+      );
+    }
+
+    return contentBody;
   }
 
-  Widget _buildBody(
+  Widget _buildStateBody(
     BuildContext context,
     WidgetRef ref,
     ProfileState state,
@@ -61,44 +109,149 @@ class ProfileScreen extends ConsumerWidget {
       case ProfileStatus.initial:
       case ProfileStatus.loading:
         return Center(
-          child: CircularProgressIndicator(color: primaryColor),
-        );
-
-      case ProfileStatus.error:
-        return Center(
+          key: const ValueKey('loading'),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.error_outline, color: foren.critical.t500, size: 48),
-              const SizedBox(height: AppSpacing.sm),
+              SizedBox(
+                width: 160,
+                height: 160,
+                child: ScannerEffect(
+                  color: primaryColor,
+                  child: const Center(
+                    child: Icon(Icons.shield_outlined, size: 54, color: AppColors.logoGold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
               Text(
-                state.errorMessage ?? 'Failed to load profile.',
-                style: TextStyle(color: foren.textSecondary),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ElevatedButton(
-                onPressed: () => notifier.loadProfile(),
-                child: const Text('Retry'),
-              ),
+                'AUTHENTICATING ANALYST CREDENTIALS...',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace',
+                  letterSpacing: 1.0,
+                ),
+              )
+                  .animate()
+                  .fadeIn(duration: 400.ms)
+                  .slideY(begin: 0.2, end: 0),
             ],
           ),
         );
 
+      case ProfileStatus.error:
+        return Center(
+          key: const ValueKey('error'),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: GlassEffect(
+              blurX: 16.0,
+              blurY: 16.0,
+              opacity: 0.12,
+              border: Border.all(color: foren.critical.t500, width: 1.0),
+              borderRadius: AppRadius.borderRadiusXl,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    GlowEffect(
+                      glowColor: foren.critical.t500,
+                      blurRadius: 24,
+                      animate: true,
+                      borderRadius: BorderRadius.circular(40),
+                      child: Container(
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: foren.critical.t500.withValues(alpha: 0.15),
+                        ),
+                        child: Icon(Icons.error_outline, color: foren.critical.t500, size: 48),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      'UPLINK CONNECTION ERROR',
+                      style: TextStyle(
+                        color: foren.critical.t500,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        fontFamily: 'monospace',
+                        letterSpacing: 1.0,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xs),
+                    Text(
+                      state.errorMessage ?? 'Failed to synchronize analyst profile with control center.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: foren.textSecondary, fontSize: 12),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: Colors.black,
+                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: AppRadius.borderRadiusMd,
+                        ),
+                      ),
+                      onPressed: () => notifier.loadProfile(),
+                      icon: const Icon(Icons.refresh, size: 18),
+                      label: const Text('REESTABLISH LINK', style: TextStyle(fontWeight: FontWeight.bold, fontFamily: 'monospace')),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
       case ProfileStatus.empty:
+        return Center(
+          key: const ValueKey('empty'),
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: GlassEffect(
+              blurX: 16.0,
+              blurY: 16.0,
+              opacity: 0.12,
+              border: Border.all(color: AppColors.logoGold, width: 1.0),
+              borderRadius: AppRadius.borderRadiusXl,
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.xl),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.person_off_outlined, color: AppColors.logoGold, size: 48),
+                    const SizedBox(height: AppSpacing.md),
+                    const Text(
+                      'NO ANALYST PROFILE DATA',
+                      style: TextStyle(
+                        color: AppColors.logoGold,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w800,
+                        fontFamily: 'monospace',
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    OutlinedButton(
+                      onPressed: () => notifier.refreshProfile(),
+                      child: const Text('FETCH PROFILE'),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
+        );
+
       case ProfileStatus.refreshing:
       case ProfileStatus.success:
         final profile = state.profile;
         if (profile == null) return const SizedBox.shrink();
-
-        final initials = profile.fullName.isNotEmpty
-            ? profile.fullName
-                .trim()
-                .split(' ')
-                .map((e) => e[0])
-                .take(2)
-                .join()
-                .toUpperCase()
-            : 'A';
 
         return RefreshIndicator(
           onRefresh: () => notifier.refreshProfile(),
@@ -109,145 +262,115 @@ class ProfileScreen extends ConsumerWidget {
             ),
             padding: const EdgeInsets.all(AppSpacing.lg),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Header Avatar & Identity
-                Center(
-                  child: Column(
-                    children: [
-                      GestureDetector(
-                        onTap: () => _showAvatarOptionsBottomSheet(context, ref, profile.avatarUrl),
-                        child: Stack(
-                          children: [
-                            Container(
-                              width: 88,
-                              height: 88,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: primaryColor, width: 2),
-                              ),
-                              child: ClipOval(
-                                child: _buildAvatarWidget(
-                                  profile.avatarUrl,
-                                  initials,
-                                  primaryColor,
-                                  theme,
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: primaryColor,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.camera_alt_outlined,
-                                  size: 16,
-                                  color: theme.scaffoldBackgroundColor,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      Text(
-                        profile.fullName,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                        ),
-                      ),
-                      const SizedBox(height: 2),
-                      Text(
-                        profile.email,
-                        style: TextStyle(
-                          color: foren.textSecondary,
-                          fontSize: 13,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: primaryColor.withValues(alpha: 0.12),
-                          borderRadius: AppRadius.borderRadiusSm,
-                          border: Border.all(
-                            color: primaryColor.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Text(
-                          '${profile.rankTitle} · Level ${profile.level}',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w700,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                // 1. Animated Profile Banner & Identity Header
+                AnalystBanner(
+                  profile: profile,
+                  onAvatarTap: () => _showAvatarOptionsBottomSheet(context, ref, profile.avatarUrl),
+                )
+                    .animate()
+                    .fadeIn(duration: 500.ms)
+                    .slideY(begin: -0.1, end: 0, curve: Curves.easeOut),
+
                 const SizedBox(height: AppSpacing.xl),
 
-                // Info Cards Grid
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    borderRadius: AppRadius.borderRadiusLg,
-                    border: Border.all(
-                      color: foren.borderSubtle.withValues(alpha: 0.4),
-                    ),
+                // 2. Statistics Dashboard Grid (Count-up cards)
+                Text(
+                  'ANALYST TELEMETRY & METRICS',
+                  style: TextStyle(
+                    color: foren.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'monospace',
+                    letterSpacing: 1.0,
                   ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      _ProfileStatItem(label: 'Total XP', value: '${profile.xpPoints} XP'),
-                      _ProfileStatItem(label: 'Member Since', value: profile.memberSince),
-                      const _ProfileStatItem(label: 'Account Status', value: 'Verified'),
-                    ],
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.lg),
+                )
+                    .animate(delay: 150.ms)
+                    .fadeIn(duration: 400.ms),
+                const SizedBox(height: AppSpacing.xs),
 
-                // Nav Links List
-                _NavListTile(
+                AnalystStatsGrid(profile: profile)
+                    .animate(delay: 200.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideY(begin: 0.1, end: 0),
+
+                const SizedBox(height: AppSpacing.xl),
+
+                // 3. Cybersecurity Skill Badges & Domain Matrix
+                const SkillBadgesSection()
+                    .animate(delay: 350.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideY(begin: 0.1, end: 0),
+
+                const SizedBox(height: AppSpacing.xl),
+
+                // 4. Activity Timeline Log
+                ActivityTimeline(xpHistory: profile.xpHistory)
+                    .animate(delay: 450.ms)
+                    .fadeIn(duration: 500.ms)
+                    .slideY(begin: 0.1, end: 0),
+
+                const SizedBox(height: AppSpacing.xl),
+
+                // 5. Navigation Control Tiles
+                Text(
+                  'CONTROL CENTER NAVIGATION',
+                  style: TextStyle(
+                    color: foren.textSecondary,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'monospace',
+                    letterSpacing: 1.0,
+                  ),
+                )
+                    .animate(delay: 550.ms)
+                    .fadeIn(duration: 400.ms),
+                const SizedBox(height: AppSpacing.xs),
+
+                _ProfileNavTile(
                   icon: Icons.emoji_events_outlined,
                   color: foren.warning.t500,
-                  title: 'Achievements & Badges',
-                  subtitle: 'Earned rewards, certificates, and XP log',
+                  title: 'Achievements & Badge Vault',
+                  subtitle: '${profile.badges.where((b) => b.isUnlocked).length} Badges Earned · View Certificate Wall',
                   onTap: () => context.push(RouteConstants.achievementsWall),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                _NavListTile(
+                )
+                    .animate(delay: 600.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideX(begin: -0.1, end: 0),
+
+                _ProfileNavTile(
                   icon: Icons.insights_outlined,
                   color: foren.success.t500,
-                  title: 'Learning & Forensic Statistics',
-                  subtitle: 'Streak, solved cases, and total hours',
+                  title: 'Forensic Statistics Overview',
+                  subtitle: 'Detailed breakdown of cases, streaks & learning hours',
                   onTap: () => context.push(RouteConstants.profileStats),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                _NavListTile(
+                )
+                    .animate(delay: 650.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideX(begin: -0.1, end: 0),
+
+                _ProfileNavTile(
                   icon: Icons.manage_accounts_outlined,
-                  color: foren.info.t500,
-                  title: 'Account Settings & Security',
-                  subtitle: 'Edit profile, change password, and sessions',
+                  color: primaryColor,
+                  title: 'Analyst Account & Security',
+                  subtitle: 'Edit credentials, bio, and multi-factor auth',
                   onTap: () => context.push(RouteConstants.profileAccount),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                _NavListTile(
+                )
+                    .animate(delay: 700.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideX(begin: -0.1, end: 0),
+
+                _ProfileNavTile(
                   icon: Icons.settings_outlined,
                   color: foren.textSecondary,
-                  title: 'App Settings & Support',
-                  subtitle: 'Notifications, theme, and feedback',
+                  title: 'Control Center Settings & Support',
+                  subtitle: 'App preferences, notifications & threat support',
                   onTap: () => context.push(RouteConstants.settings),
-                ),
+                )
+                    .animate(delay: 750.ms)
+                    .fadeIn(duration: 400.ms)
+                    .slideX(begin: -0.1, end: 0),
               ],
             ),
           ),
@@ -256,48 +379,14 @@ class ProfileScreen extends ConsumerWidget {
   }
 }
 
-class _ProfileStatItem extends StatelessWidget {
-  final String label;
-  final String value;
-
-  const _ProfileStatItem({required this.label, required this.value});
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-
-    return Column(
-      children: [
-        Text(
-          value,
-          style: TextStyle(
-            color: theme.colorScheme.onSurface,
-            fontSize: 13,
-            fontWeight: FontWeight.w800,
-          ),
-        ),
-        const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            color: foren.textDisabled,
-            fontSize: 10,
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _NavListTile extends StatelessWidget {
+class _ProfileNavTile extends StatefulWidget {
   final IconData icon;
   final Color color;
   final String title;
   final String subtitle;
   final VoidCallback onTap;
 
-  const _NavListTile({
+  const _ProfileNavTile({
     required this.icon,
     required this.color,
     required this.title,
@@ -306,46 +395,63 @@ class _NavListTile extends StatelessWidget {
   });
 
   @override
+  State<_ProfileNavTile> createState() => _ProfileNavTileState();
+}
+
+class _ProfileNavTileState extends State<_ProfileNavTile> {
+  bool _isHovered = false;
+
+  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
 
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-      child: Material(
-        color: theme.colorScheme.surface,
-        shape: RoundedRectangleBorder(
-          borderRadius: AppRadius.borderRadiusMd,
-          side: BorderSide(color: foren.borderSubtle.withValues(alpha: 0.3)),
-        ),
-        clipBehavior: Clip.antiAlias,
-      child: ListTile(
-        leading: Container(
-          padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(
-            color: color.withValues(alpha: 0.12),
-            shape: BoxShape.circle,
+      child: MouseRegion(
+        onEnter: (_) => setState(() => _isHovered = true),
+        onExit: (_) => setState(() => _isHovered = false),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 180),
+          transform: Matrix4.translationValues(_isHovered ? 4 : 0, 0, 0),
+          child: GlassEffect(
+            blurX: 10.0,
+            blurY: 10.0,
+            opacity: 0.10,
+            border: Border.all(
+              color: _isHovered ? widget.color : foren.borderSubtle,
+              width: 1.0,
+            ),
+            borderRadius: AppRadius.borderRadiusMd,
+            child: ListTile(
+              leading: Container(
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: widget.color.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(widget.icon, color: widget.color, size: 20),
+              ),
+              title: Text(
+                widget.title,
+                style: TextStyle(
+                  color: theme.colorScheme.onSurface,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              subtitle: Text(
+                widget.subtitle,
+                style: TextStyle(
+                  color: foren.textSecondary,
+                  fontSize: 11,
+                ),
+              ),
+              trailing: Icon(Icons.chevron_right, color: widget.color, size: 18),
+              onTap: widget.onTap,
+            ),
           ),
-          child: Icon(icon, color: color, size: 20),
         ),
-        title: Text(
-          title,
-          style: TextStyle(
-            color: theme.colorScheme.onSurface,
-            fontSize: 13,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-        subtitle: Text(
-          subtitle,
-          style: TextStyle(
-            color: foren.textDisabled,
-            fontSize: 11,
-          ),
-        ),
-        trailing: Icon(Icons.chevron_right, color: foren.textDisabled, size: 18),
-        onTap: onTap,
-      ),
       ),
     );
   }
@@ -360,7 +466,7 @@ void _showAvatarOptionsBottomSheet(BuildContext context, WidgetRef ref, String c
 
   showModalBottomSheet(
     context: context,
-    backgroundColor: theme.colorScheme.surface,
+    backgroundColor: AppColors.surface,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
     ),
@@ -454,42 +560,4 @@ Future<void> _pickImageSource(BuildContext context, WidgetRef ref, ImageSource s
       ),
     );
   } catch (_) {}
-}
-
-Widget _buildAvatarWidget(String avatarUrl, String initials, Color primaryColor, ThemeData theme) {
-  if (avatarUrl.isNotEmpty) {
-    if (kIsWeb || avatarUrl.startsWith('http')) {
-      return Image.network(
-        avatarUrl,
-        fit: BoxFit.cover,
-        errorBuilder: (ctx, err, stack) => _buildInitials(initials, primaryColor, theme),
-      );
-    } else {
-      final file = File(avatarUrl);
-      if (file.existsSync()) {
-        return Image.file(
-          file,
-          fit: BoxFit.cover,
-          errorBuilder: (ctx, err, stack) => _buildInitials(initials, primaryColor, theme),
-        );
-      }
-    }
-  }
-  return _buildInitials(initials, primaryColor, theme);
-}
-
-Widget _buildInitials(String initials, Color primaryColor, ThemeData theme) {
-  return Container(
-    color: primaryColor,
-    child: Center(
-      child: Text(
-        initials,
-        style: TextStyle(
-          color: theme.scaffoldBackgroundColor,
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-  );
 }

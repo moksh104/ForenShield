@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
+/// Futuristic cybersecurity radar sweep widget.
 class RadarSweep extends StatefulWidget {
   const RadarSweep({super.key});
 
@@ -11,30 +13,14 @@ class RadarSweep extends StatefulWidget {
 class _RadarSweepState extends State<RadarSweep>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _rotationAnimation;
 
   @override
   void initState() {
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2500),
-    );
-
-    _rotationAnimation = Tween<double>(
-      begin: 0,
-      end: math.pi * 2,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOutCubic,
-    ));
-
-    // Start after a delay and run once
-    Future.delayed(const Duration(milliseconds: 800), () {
-      if (mounted) {
-        _controller.forward();
-      }
-    });
+      duration: const Duration(milliseconds: 3000),
+    )..repeat();
   }
 
   @override
@@ -46,11 +32,11 @@ class _RadarSweepState extends State<RadarSweep>
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _rotationAnimation,
+      animation: _controller,
       builder: (context, child) {
         return RepaintBoundary(
           child: CustomPaint(
-            painter: _RadarPainter(_rotationAnimation.value),
+            painter: _RadarPainter(_controller.value * 2 * math.pi),
             child: const SizedBox.expand(),
           ),
         );
@@ -67,57 +53,84 @@ class _RadarPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
-    final radius = size.width / 2;
+    final radius = math.min(size.width, size.height) / 2;
 
-    // Radar circles
+    // Outer and Inner Concentric Radar Grid Circles
     final circlePaint = Paint()
-      ..color = const Color(0xFF0F766E).withValues(alpha: 0.08)
+      ..color = AppColors.logoGold.withValues(alpha: 0.10)
       ..style = PaintingStyle.stroke
-      ..strokeWidth = 1;
+      ..strokeWidth = 1.0;
 
-    for (int i = 1; i <= 3; i++) {
+    for (int i = 1; i <= 4; i++) {
       canvas.drawCircle(
         center,
-        radius * (i / 3),
+        radius * (i / 4),
         circlePaint,
       );
     }
 
-    // Radar sweep gradient
-    final gradient = SweepGradient(
+    // Crosshair Axis Lines
+    final axisPaint = Paint()
+      ..color = AppColors.logoTeal.withValues(alpha: 0.08)
+      ..strokeWidth = 1.0;
+
+    canvas.drawLine(
+      Offset(center.dx - radius, center.dy),
+      Offset(center.dx + radius, center.dy),
+      axisPaint,
+    );
+    canvas.drawLine(
+      Offset(center.dx, center.dy - radius),
+      Offset(center.dx, center.dy + radius),
+      axisPaint,
+    );
+
+    // Radar 360° Sweep Gradient Arc
+    final sweepGradient = SweepGradient(
+      center: Alignment.center,
+      startAngle: rotation - math.pi / 2,
+      endAngle: rotation,
       colors: [
-        const Color(0xFFC98A2E).withValues(alpha: 0),
-        const Color(0xFFC98A2E).withValues(alpha: 0.15),
-        const Color(0xFFC98A2E).withValues(alpha: 0),
+        AppColors.logoGold.withValues(alpha: 0.0),
+        AppColors.logoGold.withValues(alpha: 0.22),
       ],
-      stops: const [0.0, 0.5, 1.0],
-      transform: GradientRotation(rotation),
     );
 
     final sweepPaint = Paint()
-      ..shader = gradient.createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = sweepGradient.createShader(
+        Rect.fromCircle(center: center, radius: radius),
+      )
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(center, radius, sweepPaint);
 
-    // Radar line
+    // Rotating Radar Laser Sweep Line
     final linePaint = Paint()
-      ..color = const Color(0xFFC98A2E).withValues(alpha: 0.3)
-      ..strokeWidth = 1.5;
+      ..color = AppColors.logoGold.withValues(alpha: 0.5)
+      ..strokeWidth = 1.5
+      ..style = PaintingStyle.stroke;
 
     final lineEnd = Offset(
-      center.dx + radius * math.cos(rotation - math.pi / 2),
-      center.dy + radius * math.sin(rotation - math.pi / 2),
+      center.dx + radius * math.cos(rotation),
+      center.dy + radius * math.sin(rotation),
     );
 
     canvas.drawLine(center, lineEnd, linePaint);
 
-    // Center dot
+    // Pulsating Center Beacon Dot
     final dotPaint = Paint()
-      ..color = const Color(0xFFC98A2E).withValues(alpha: 0.6)
+      ..color = AppColors.logoGold
       ..style = PaintingStyle.fill;
 
-    canvas.drawCircle(center, 3, dotPaint);
+    canvas.drawCircle(center, 3.5, dotPaint);
+
+    // Outer Ring Glow Accent
+    final ringGlowPaint = Paint()
+      ..color = AppColors.logoBlue.withValues(alpha: 0.15)
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.0;
+
+    canvas.drawCircle(center, radius, ringGlowPaint);
   }
 
   @override

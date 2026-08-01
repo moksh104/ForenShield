@@ -1,10 +1,11 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
+import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 
-/// Weekly Statistics Card rendering performance metrics and an fl_chart bar chart.
+/// Weekly Statistics Card rendering performance metrics, count-up animations, and fl_chart bar chart.
 class StatisticCard extends StatelessWidget {
   final int coursesCompleted;
   final int casesSolved;
@@ -30,25 +31,26 @@ class StatisticCard extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
-          borderRadius: AppRadius.borderRadiusLg,
-          border: Border.all(
-            color: foren.borderSubtle.withValues(alpha: 0.4),
-          ),
+      child: GlassEffect(
+        blurX: 16.0,
+        blurY: 16.0,
+        opacity: 0.12,
+        borderRadius: AppRadius.borderRadiusLg,
+        border: Border.all(
+          color: foren.borderSubtle.withValues(alpha: 0.4),
         ),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Stat Chips Grid
+            // Stat Chips Grid with Hover & Count-Up Animations
             Row(
               children: [
                 Expanded(
                   child: _StatTile(
                     label: 'Courses',
-                    value: '$coursesCompleted',
+                    numericValue: coursesCompleted.toDouble(),
+                    valueFormatter: (val) => '${val.toInt()}',
                     color: foren.academy.t500,
                     icon: Icons.school_outlined,
                   ),
@@ -57,7 +59,8 @@ class StatisticCard extends StatelessWidget {
                 Expanded(
                   child: _StatTile(
                     label: 'Cases Solved',
-                    value: '$casesSolved',
+                    numericValue: casesSolved.toDouble(),
+                    valueFormatter: (val) => '${val.toInt()}',
                     color: foren.investigation.t500,
                     icon: Icons.search_outlined,
                   ),
@@ -66,7 +69,8 @@ class StatisticCard extends StatelessWidget {
                 Expanded(
                   child: _StatTile(
                     label: 'Hours',
-                    value: '${hoursPracticed.toStringAsFixed(1)}h',
+                    numericValue: hoursPracticed,
+                    valueFormatter: (val) => '${val.toStringAsFixed(1)}h',
                     color: foren.simulation.t500,
                     icon: Icons.timer_outlined,
                   ),
@@ -75,7 +79,8 @@ class StatisticCard extends StatelessWidget {
                 Expanded(
                   child: _StatTile(
                     label: 'XP Earned',
-                    value: '+$xpEarned',
+                    numericValue: xpEarned.toDouble(),
+                    valueFormatter: (val) => '+${val.toInt()}',
                     color: primaryColor,
                     icon: Icons.bolt_outlined,
                   ),
@@ -83,13 +88,23 @@ class StatisticCard extends StatelessWidget {
               ],
             ),
             const SizedBox(height: AppSpacing.lg),
-            Text(
-              'Weekly Activity & XP Output',
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 13,
-                fontWeight: FontWeight.w700,
-              ),
+            Row(
+              children: [
+                Icon(
+                  Icons.analytics_outlined,
+                  size: 16,
+                  color: primaryColor,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  'Weekly Activity & XP Output',
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ],
             ),
             const SizedBox(height: AppSpacing.md),
             // FL Chart Bar Chart
@@ -163,9 +178,16 @@ class StatisticCard extends StatelessWidget {
                       barRods: [
                         BarChartRodData(
                           toY: dailyXpData[i],
-                          color: i == dailyXpData.length - 1
-                              ? primaryColor
-                              : primaryColor.withValues(alpha: 0.45),
+                          gradient: LinearGradient(
+                            colors: i == dailyXpData.length - 1
+                                ? [primaryColor, foren.investigation.t500]
+                                : [
+                                    primaryColor.withValues(alpha: 0.6),
+                                    primaryColor.withValues(alpha: 0.2),
+                                  ],
+                            begin: Alignment.topCenter,
+                            end: Alignment.bottomCenter,
+                          ),
                           width: 14,
                           borderRadius: BorderRadius.circular(4),
                         ),
@@ -182,54 +204,92 @@ class StatisticCard extends StatelessWidget {
   }
 }
 
-class _StatTile extends StatelessWidget {
+class _StatTile extends StatefulWidget {
   final String label;
-  final String value;
+  final double numericValue;
+  final String Function(double) valueFormatter;
   final Color color;
   final IconData icon;
 
   const _StatTile({
     required this.label,
-    required this.value,
+    required this.numericValue,
+    required this.valueFormatter,
     required this.color,
     required this.icon,
   });
+
+  @override
+  State<_StatTile> createState() => _StatTileState();
+}
+
+class _StatTileState extends State<_StatTile> {
+  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
-      decoration: BoxDecoration(
-        color: foren.surfaceRaised1,
-        borderRadius: AppRadius.borderRadiusSm,
-      ),
-      child: Column(
-        children: [
-          Icon(icon, size: 16, color: color),
-          const SizedBox(height: 4),
-          Text(
-            value,
-            style: TextStyle(
-              color: color,
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-            ),
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 180),
+        transform: Matrix4.translationValues(0, _isHovered ? -2 : 0, 0),
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+        decoration: BoxDecoration(
+          color: _isHovered
+              ? widget.color.withValues(alpha: 0.15)
+              : foren.surfaceRaised1.withValues(alpha: 0.6),
+          borderRadius: AppRadius.borderRadiusSm,
+          border: Border.all(
+            color: _isHovered
+                ? widget.color.withValues(alpha: 0.5)
+                : foren.borderSubtle.withValues(alpha: 0.2),
           ),
-          const SizedBox(height: 2),
-          Text(
-            label,
-            style: TextStyle(
-              color: foren.textDisabled,
-              fontSize: 9,
-              fontWeight: FontWeight.w500,
+          boxShadow: _isHovered
+              ? [
+                  BoxShadow(
+                    color: widget.color.withValues(alpha: 0.2),
+                    blurRadius: 10,
+                    spreadRadius: 1,
+                  ),
+                ]
+              : null,
+        ),
+        child: Column(
+          children: [
+            Icon(widget.icon, size: 16, color: widget.color),
+            const SizedBox(height: 4),
+            TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: widget.numericValue),
+              duration: const Duration(milliseconds: 1200),
+              curve: Curves.easeOutCubic,
+              builder: (context, val, child) {
+                return Text(
+                  widget.valueFormatter(val),
+                  style: TextStyle(
+                    color: widget.color,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w800,
+                  ),
+                );
+              },
             ),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+            const SizedBox(height: 2),
+            Text(
+              widget.label,
+              style: TextStyle(
+                color: foren.textDisabled,
+                fontSize: 9,
+                fontWeight: FontWeight.w500,
+              ),
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+            ),
+          ],
+        ),
       ),
     );
   }

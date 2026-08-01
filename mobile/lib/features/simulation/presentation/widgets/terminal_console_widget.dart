@@ -1,16 +1,25 @@
 import 'package:flutter/material.dart';
+import '../../../../core/effects/glass_effect.dart';
+import '../../../../core/effects/glow_effect.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/terminal_line.dart';
 
+/// Interactive terminal shell component for Simulation Lab scenarios with glassmorphism.
 class TerminalConsoleWidget extends StatefulWidget {
-  final List<TerminalLine> lines;
-  final ValueChanged<String> onCommandSubmitted;
+  final List<TerminalLine>? history;
+  final List<TerminalLine>? lines;
+  final ValueChanged<String>? onCommandSubmitted;
 
   const TerminalConsoleWidget({
     super.key,
-    required this.lines,
-    required this.onCommandSubmitted,
+    this.history,
+    this.lines,
+    this.onCommandSubmitted,
   });
+
+  List<TerminalLine> get effectiveHistory => history ?? lines ?? const [];
 
   @override
   State<TerminalConsoleWidget> createState() => _TerminalConsoleWidgetState();
@@ -21,9 +30,9 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
   final ScrollController _scrollController = ScrollController();
 
   @override
-  void didUpdateWidget(covariant TerminalConsoleWidget oldWidget) {
+  void didUpdateWidget(TerminalConsoleWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.lines.length != oldWidget.lines.length) {
+    if (widget.effectiveHistory.length != oldWidget.effectiveHistory.length) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (_scrollController.hasClients) {
           _scrollController.animateTo(
@@ -44,9 +53,9 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
   }
 
   void _handleSubmit() {
-    final text = _inputController.text;
-    if (text.trim().isNotEmpty) {
-      widget.onCommandSubmitted(text);
+    final text = _inputController.text.trim();
+    if (text.isNotEmpty) {
+      widget.onCommandSubmitted?.call(text);
       _inputController.clear();
     }
   }
@@ -55,22 +64,25 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
+    final historyList = widget.effectiveHistory;
+    final primaryColor = theme.colorScheme.primary;
 
-    return Container(
-      decoration: BoxDecoration(
-        color: const Color(0xFF0A0D12),
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: foren.borderSubtle.withValues(alpha: 0.5),
-        ),
+    return GlassEffect(
+      blurX: 14.0,
+      blurY: 14.0,
+      opacity: 0.12,
+      border: Border.all(
+        color: primaryColor.withValues(alpha: 0.35),
+        width: 1.0,
       ),
+      borderRadius: AppRadius.buttonRadius,
       child: Column(
         children: [
           // Terminal Header
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
-              color: const Color(0xFF121721),
+              color: AppColors.surfaceHighlight.withValues(alpha: 0.8),
               borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
               border: Border(
                 bottom: BorderSide(
@@ -80,50 +92,58 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
             ),
             child: Row(
               children: [
-                const Icon(Icons.terminal, size: 18, color: Color(0xFF00E5FF)),
+                const Icon(Icons.terminal, size: 18, color: AppColors.primary),
                 const SizedBox(width: 8),
                 const Text(
                   'FS-HOST-09 [Interactive Shell]',
                   style: TextStyle(
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.primary,
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight: FontWeight.w800,
                     fontFamily: 'monospace',
                   ),
                 ),
                 const Spacer(),
-                Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(
-                    color: Color(0xFF00E676),
-                    shape: BoxShape.circle,
+                GlowEffect(
+                  glowColor: AppColors.success,
+                  blurRadius: 8,
+                  animate: true,
+                  borderRadius: BorderRadius.circular(10),
+                  child: Container(
+                    width: 8,
+                    height: 8,
+                    decoration: const BoxDecoration(
+                      color: AppColors.success,
+                      shape: BoxShape.circle,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 6),
                 const Text(
-                  'ONLINE',
+                  'VM ONLINE',
                   style: TextStyle(
-                    color: Color(0xFF00E676),
+                    color: AppColors.success,
                     fontSize: 10,
                     fontWeight: FontWeight.w800,
+                    fontFamily: 'monospace',
+                    letterSpacing: 0.5,
                   ),
                 ),
               ],
             ),
           ),
 
-          // Terminal Output Scrollable Area
+          // Terminal Output Area
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(16),
-              itemCount: widget.lines.length,
+              padding: const EdgeInsets.all(12),
+              itemCount: historyList.length,
               itemBuilder: (context, index) {
-                final line = widget.lines[index];
+                final line = historyList[index];
                 return Padding(
-                  padding: const EdgeInsets.only(bottom: 6),
-                  child: Text(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: SelectableText(
                     line.text,
                     style: TextStyle(
                       fontFamily: 'monospace',
@@ -141,7 +161,7 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
-              color: const Color(0xFF0E131C),
+              color: AppColors.surface.withValues(alpha: 0.8),
               borderRadius:
                   const BorderRadius.vertical(bottom: Radius.circular(11)),
               border: Border(
@@ -155,7 +175,7 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
                 const Text(
                   'root@vm:~# ',
                   style: TextStyle(
-                    color: Color(0xFF00E5FF),
+                    color: AppColors.primary,
                     fontSize: 13,
                     fontWeight: FontWeight.w800,
                     fontFamily: 'monospace',
@@ -173,7 +193,7 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
                     decoration: const InputDecoration(
                       hintText: 'type command (e.g. netstat, pkill, iptables, help)...',
                       hintStyle: TextStyle(
-                        color: Color(0xFF5A667A),
+                        color: AppColors.textSecondary,
                         fontSize: 12,
                       ),
                       border: InputBorder.none,
@@ -198,16 +218,16 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
   Color _getLineColor(TerminalLineType type, ForenColors foren) {
     switch (type) {
       case TerminalLineType.input:
-        return const Color(0xFF00E5FF);
+        return AppColors.primary;
       case TerminalLineType.success:
-        return const Color(0xFF00E676);
+        return AppColors.success;
       case TerminalLineType.error:
         return foren.critical.t500;
       case TerminalLineType.system:
-        return const Color(0xFFFFB74D);
+        return AppColors.warning;
       case TerminalLineType.prompt:
       case TerminalLineType.output:
-        return const Color(0xFFD0D7DE);
+        return AppColors.textPrimary;
     }
   }
 }

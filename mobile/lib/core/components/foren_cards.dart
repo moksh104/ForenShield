@@ -1,66 +1,320 @@
-/// ForenShield Component Library — Cards
-/// Mission / Investigation / Course / Simulation / Alert / Evidence /
-/// Statistics / Achievement
+/// ForenShield Component Library — Primary Card System
+/// Unified card implementation supporting Elevated, Bordered, Glass (GlassEffect), and Glow (GlowEffect) modes.
 library;
 
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
-import 'foren_status.dart';
-import 'foren_progress.dart';
+import '../effects/glass_effect.dart';
+import '../effects/glow_effect.dart';
+import '../theme/app_colors.dart';
+import '../theme/app_radius.dart';
+import '../theme/app_shadows.dart';
+import '../theme/app_spacing.dart';
+import '../theme/app_tokens.dart';
+import '../theme/foren_theme.dart';
 import 'foren_buttons.dart';
+import 'foren_progress.dart';
+import 'foren_status.dart';
 
-/// Base card shell every card variant below is built on. Keeps radius,
-/// elevation, padding, and border identical everywhere so a card
-/// always reads as "a card" regardless of which feature it belongs to.
+/// Card rendering modes supported across ForenShield.
+enum ForenCardMode { elevated, bordered, glass, glow }
+
+/// Primary unified card shell for ForenShield.
+/// Supports elevated, bordered, glassmorphic (GlassEffect), and glowing (GlowEffect) modes.
 class ForenCard extends StatelessWidget {
-  final Widget child;
+  final Widget? child;
+  final Widget? body;
+  final Widget? header;
+  final Widget? footer;
+  final String? title;
+  final String? subtitle;
+  final IconData? leadingIcon;
+  final Widget? trailingAction;
   final VoidCallback? onTap;
   final EdgeInsetsGeometry padding;
-  final Color? leftAccentBar; // used by Alert Card for severity stripe
+  final Color? leftAccentBar;
+  final ForenCardMode mode;
+  final double elevation;
+  final bool hasBorder;
+  final BorderRadius? borderRadius;
+  final Border? border;
+  final Color? color;
+  final Color? glowColor;
 
   const ForenCard({
     super.key,
-    required this.child,
+    this.child,
+    this.body,
+    this.header,
+    this.footer,
+    this.title,
+    this.subtitle,
+    this.leadingIcon,
+    this.trailingAction,
     this.onTap,
-    this.padding = const EdgeInsets.all(ForenSpace.md),
+    this.padding = const EdgeInsets.all(AppSpacing.md),
     this.leftAccentBar,
+    this.mode = ForenCardMode.bordered,
+    this.elevation = 1,
+    this.hasBorder = true,
+    this.borderRadius,
+    this.border,
+    this.color,
+    this.glowColor,
   });
+
+  const ForenCard.elevated({
+    super.key,
+    this.child,
+    this.body,
+    this.header,
+    this.footer,
+    this.title,
+    this.subtitle,
+    this.leadingIcon,
+    this.trailingAction,
+    this.onTap,
+    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.leftAccentBar,
+    this.elevation = 1,
+    this.hasBorder = false,
+    this.borderRadius,
+    this.border,
+    this.color,
+  })  : mode = ForenCardMode.elevated,
+        glowColor = null;
+
+  const ForenCard.bordered({
+    super.key,
+    this.child,
+    this.body,
+    this.header,
+    this.footer,
+    this.title,
+    this.subtitle,
+    this.leadingIcon,
+    this.trailingAction,
+    this.onTap,
+    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.leftAccentBar,
+    this.borderRadius,
+    this.border,
+    this.color,
+  })  : mode = ForenCardMode.bordered,
+        elevation = 0,
+        hasBorder = true,
+        glowColor = null;
+
+  const ForenCard.glass({
+    super.key,
+    this.child,
+    this.body,
+    this.header,
+    this.footer,
+    this.title,
+    this.subtitle,
+    this.leadingIcon,
+    this.trailingAction,
+    this.onTap,
+    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.leftAccentBar,
+    this.borderRadius,
+    this.border,
+    this.color,
+  })  : mode = ForenCardMode.glass,
+        elevation = 0,
+        hasBorder = true,
+        glowColor = null;
+
+  const ForenCard.glow({
+    super.key,
+    this.child,
+    this.body,
+    this.header,
+    this.footer,
+    this.title,
+    this.subtitle,
+    this.leadingIcon,
+    this.trailingAction,
+    this.onTap,
+    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.leftAccentBar,
+    this.glowColor,
+    this.borderRadius,
+    this.border,
+    this.color,
+  })  : mode = ForenCardMode.glow,
+        elevation = 1,
+        hasBorder = true;
+
+  Widget _buildCardContent(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final effectiveChild = child ?? body ?? const SizedBox.shrink();
+
+    return Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          if (header != null)
+            header!
+          else if (title != null ||
+              subtitle != null ||
+              leadingIcon != null ||
+              trailingAction != null)
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (leadingIcon != null) ...[
+                  Icon(leadingIcon, color: theme.colorScheme.primary, size: 24),
+                  const SizedBox(width: AppSpacing.sm),
+                ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      if (title != null)
+                        Text(title!, style: theme.textTheme.titleMedium),
+                      if (subtitle != null) ...[
+                        const SizedBox(height: AppSpacing.xxs),
+                        Text(
+                          subtitle!,
+                          style: theme.textTheme.bodySmall
+                              ?.copyWith(color: foren?.textSecondary ?? AppColors.textSecondary),
+                        ),
+                      ],
+                    ],
+                  ),
+                ),
+                if (trailingAction != null) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  trailingAction!,
+                ],
+              ],
+            ),
+
+          if ((header != null || title != null) && child == null && body != null)
+            const SizedBox(height: AppSpacing.md),
+
+          effectiveChild,
+
+          if (footer != null) ...[
+            const SizedBox(height: AppSpacing.md),
+            footer!,
+          ],
+        ],
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
     final isDark = theme.brightness == Brightness.dark;
-    final foren = theme.extension<ForenColors>()!;
+    final effectiveRadius = borderRadius ?? AppRadius.cardRadius;
+    final surfaceColor = color ??
+        (isDark
+            ? (foren?.surfaceRaised1 ?? AppColors.surface)
+            : AppColors.lightSurface);
 
-    final content = Container(
-      decoration: BoxDecoration(
-        color: theme.colorScheme.surface,
-        borderRadius: ForenRadius.cardBr,
-        border: Border.all(color: foren.borderSubtle, width: ForenBorderWidth.hairline),
-        boxShadow: isDark ? null : ForenElevation.lightShadow(ForenElevation.level1),
-      ),
-      child: ClipRRect(
-        borderRadius: ForenRadius.cardBr,
+    Border? effectiveBorder;
+    if (hasBorder || border != null) {
+      effectiveBorder = border ??
+          Border.all(
+            color: foren?.borderSubtle ?? AppColors.borderSubtle,
+            width: 1.0,
+          );
+    }
+
+    Widget content = _buildCardContent(context);
+
+    if (leftAccentBar != null) {
+      content = IntrinsicHeight(
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            if (leftAccentBar != null) Container(width: 4, color: leftAccentBar),
-            Expanded(child: Padding(padding: padding, child: child)),
+            Container(width: 4, color: leftAccentBar),
+            Expanded(child: content),
           ],
         ),
-      ),
-    );
+      );
+    }
 
-    if (onTap == null) return content;
-    return Material(
-      color: Colors.transparent,
-      borderRadius: ForenRadius.cardBr,
-      child: InkWell(borderRadius: ForenRadius.cardBr, onTap: onTap, child: content),
-    );
+    if (onTap != null) {
+      content = Material(
+        color: Colors.transparent,
+        borderRadius: effectiveRadius,
+        child: InkWell(
+          borderRadius: effectiveRadius,
+          onTap: onTap,
+          child: content,
+        ),
+      );
+    }
+
+    switch (mode) {
+      case ForenCardMode.glass:
+        return GlassEffect(
+          borderRadius: effectiveRadius,
+          border: effectiveBorder,
+          color: surfaceColor,
+          opacity: isDark ? 0.15 : 0.85,
+          child: content,
+        );
+      case ForenCardMode.glow:
+        final glowWidget = Container(
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: effectiveRadius,
+            border: effectiveBorder,
+          ),
+          child: ClipRRect(
+            borderRadius: effectiveRadius,
+            child: content,
+          ),
+        );
+        return GlowEffect(
+          glowColor: glowColor ?? theme.colorScheme.primary,
+          borderRadius: effectiveRadius,
+          child: glowWidget,
+        );
+      case ForenCardMode.elevated:
+        final shadows = AppShadows.forBrightness(
+          brightness: theme.brightness,
+          level: elevation >= 2 ? ElevationLevel.medium : ElevationLevel.low,
+        );
+        return Container(
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: effectiveRadius,
+            border: effectiveBorder,
+            boxShadow: shadows,
+          ),
+          child: ClipRRect(
+            borderRadius: effectiveRadius,
+            child: content,
+          ),
+        );
+      case ForenCardMode.bordered:
+        return Container(
+          decoration: BoxDecoration(
+            color: surfaceColor,
+            borderRadius: effectiveRadius,
+            border: effectiveBorder,
+          ),
+          child: ClipRRect(
+            borderRadius: effectiveRadius,
+            child: content,
+          ),
+        );
+    }
   }
 }
 
-/// Entry point into a Mission Briefing (see Signature Feature 1).
+/// Entry point into a Mission Briefing.
 class ForenMissionCard extends StatelessWidget {
   final String title;
   final ForenThreatLevel priority;
@@ -92,7 +346,7 @@ class ForenMissionCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(Icons.shield_outlined, size: ForenIconSize.defaultSize, color: accent),
+              Icon(Icons.shield_outlined, size: 24, color: accent),
               ForenThreatBadge(level: priority),
             ],
           ),
@@ -222,7 +476,7 @@ class ForenCourseCard extends StatelessWidget {
   }
 }
 
-/// A scenario in Simulation Lab (e.g. Phishing, Password Safety).
+/// A scenario in Simulation Lab.
 class ForenSimulationCard extends StatelessWidget {
   final String title;
   final String scenarioType;
@@ -274,8 +528,7 @@ class ForenSimulationCard extends StatelessWidget {
   }
 }
 
-/// A live/incoming alert. Uses a severity-colored left accent bar
-/// rather than the feature accent — alerts are semantic, not feature.
+/// A live/incoming alert.
 class ForenAlertCard extends StatelessWidget {
   final String message;
   final ForenThreatLevel severity;
@@ -326,12 +579,11 @@ class ForenAlertCard extends StatelessWidget {
 
 enum ForenEvidenceType { email, pdf, pcap, memoryDump, screenshot, other }
 
-/// A single evidence file — used inside the Evidence Workspace
-/// (Signature Feature 2).
+/// A single evidence file — used inside Evidence Workspace.
 class ForenEvidenceCard extends StatelessWidget {
   final String filename;
   final ForenEvidenceType type;
-  final String meta; // e.g. "2.4 MB"
+  final String meta;
   final VoidCallback? onTap;
 
   const ForenEvidenceCard({
@@ -363,7 +615,7 @@ class ForenEvidenceCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: ForenSpace.md, vertical: ForenSpace.sm),
       child: Row(
         children: [
-          Icon(_icon, size: ForenIconSize.defaultSize, color: accent),
+          Icon(_icon, size: 24, color: accent),
           const SizedBox(width: ForenSpace.sm),
           Expanded(
             child: Text(filename, style: theme.textTheme.titleSmall, overflow: TextOverflow.ellipsis),
@@ -375,13 +627,12 @@ class ForenEvidenceCard extends StatelessWidget {
   }
 }
 
-/// A single headline metric — used on the Threat Dashboard
-/// (Signature Feature 4).
+/// A single headline metric.
 class ForenStatisticsCard extends StatelessWidget {
   final String label;
   final String value;
   final IconData? icon;
-  final String? trend; // e.g. "+4% this week"
+  final String? trend;
   final bool trendPositive;
 
   const ForenStatisticsCard({
@@ -422,7 +673,7 @@ class ForenStatisticsCard extends StatelessWidget {
   }
 }
 
-/// An unlockable achievement/badge.
+/// An unlockable achievement/badge card.
 class ForenAchievementCard extends StatelessWidget {
   final String title;
   final IconData icon;

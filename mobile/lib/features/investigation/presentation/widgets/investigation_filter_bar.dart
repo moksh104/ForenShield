@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../../../core/effects/glass_effect.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 
-/// Search, Status/Priority filters for Investigation Cases.
+/// Glassmorphic Filter & Search Bar for Investigation Cases.
 class InvestigationFilterBar extends StatelessWidget {
   final List<String> statusFilters;
   final String selectedStatus;
@@ -23,82 +25,88 @@ class InvestigationFilterBar extends StatelessWidget {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
     final invColor = foren.investigation.t500;
+    final primaryColor = theme.colorScheme.primary;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Search Input
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: TextField(
-            onChanged: onSearchSubmitted,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: 14,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Column(
+        children: [
+          // Glassmorphic Search Input Field
+          GlassEffect(
+            blurX: 12.0,
+            blurY: 12.0,
+            opacity: 0.10,
+            border: Border.all(
+              color: primaryColor.withValues(alpha: 0.3),
+              width: 1.0,
             ),
-            decoration: InputDecoration(
-              hintText: 'Search cases by ID or title...',
-              hintStyle: TextStyle(
-                color: foren.textDisabled,
+            borderRadius: AppRadius.borderRadiusMd,
+            child: TextField(
+              onChanged: onSearchSubmitted,
+              style: TextStyle(
+                color: theme.colorScheme.onSurface,
                 fontSize: 13,
               ),
-              prefixIcon: Icon(
-                Icons.search,
-                color: foren.textDisabled,
-                size: 20,
-              ),
-              filled: true,
-              fillColor: foren.surfaceRaised1,
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: 10,
-              ),
-              border: const OutlineInputBorder(
-                borderRadius: AppRadius.borderRadiusMd,
-                borderSide: BorderSide.none,
+              decoration: InputDecoration(
+                hintText: 'Search cases by title, code, or artifact...',
+                hintStyle: TextStyle(
+                  color: foren.textSecondary,
+                  fontSize: 12,
+                ),
+                prefixIcon: Icon(
+                  Icons.search,
+                  color: primaryColor,
+                  size: 20,
+                ),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: 12,
+                ),
               ),
             ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        // Filter Chips Horizontal Scroll List
-        SizedBox(
-          height: 38,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            scrollDirection: Axis.horizontal,
-            itemCount: statusFilters.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              final status = statusFilters[index];
-              final isSelected = status == selectedStatus;
-              return ChoiceChip(
-                label: Text(status),
-                selected: isSelected,
-                onSelected: (_) => onStatusSelected(status),
-                selectedColor: invColor,
-                backgroundColor: foren.surfaceRaised1,
-                labelStyle: TextStyle(
-                  color: isSelected
-                      ? theme.scaffoldBackgroundColor
-                      : foren.textSecondary,
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.borderRadiusSm,
-                  side: BorderSide(
-                    color: isSelected
-                        ? invColor
-                        : foren.borderSubtle.withValues(alpha: 0.3),
+          const SizedBox(height: AppSpacing.sm),
+
+          // Status Filter Chips Row
+          SizedBox(
+            height: 34,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: statusFilters.length,
+              separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.xs),
+              itemBuilder: (context, index) {
+                final status = statusFilters[index];
+                final isSelected = selectedStatus == status;
+
+                return ChoiceChip(
+                  label: Text(status),
+                  selected: isSelected,
+                  onSelected: (_) => onStatusSelected(status),
+                  selectedColor: invColor,
+                  backgroundColor: AppColors.surface,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: AppRadius.borderRadiusSm,
+                    side: BorderSide(
+                      color: isSelected ? invColor : foren.borderSubtle,
+                      width: 1.0,
+                    ),
                   ),
-                ),
-                showCheckmark: false,
-              );
-            },
+                  labelStyle: TextStyle(
+                    color: isSelected
+                        ? theme.scaffoldBackgroundColor
+                        : foren.textSecondary,
+                    fontSize: 11,
+                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
+                    fontFamily: 'monospace',
+                  ),
+                  showCheckmark: false,
+                );
+              },
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

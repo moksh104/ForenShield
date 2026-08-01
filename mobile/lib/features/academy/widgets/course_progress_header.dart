@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
 import '../models/course_model.dart';
 import '../utils/academy_utils.dart';
 
@@ -21,7 +23,7 @@ class CourseProgressHeader extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(24)),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(AppRadius.extraLarge)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -55,13 +57,13 @@ class CourseProgressHeader extends StatelessWidget {
               _StatChip(
                 icon: Icons.timer_outlined,
                 label: AcademyUtils.formatDuration(course.estimatedMinutes),
-                color: const Color(0xFFFBBF24),
+                color: AppColors.warning,
               ),
               const SizedBox(width: 10),
               _StatChip(
                 icon: Icons.bolt_outlined,
                 label: '${course.totalXp} XP',
-                color: const Color(0xFFA78BFA),
+                color: AppColors.info,
               ),
             ],
           ),

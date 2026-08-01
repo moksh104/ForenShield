@@ -15,8 +15,8 @@ class AppMotion {
   /// 150ms - Micro-interactions, hover states, ripples
   static const Duration fast = Duration(milliseconds: 150);
 
-  /// 300ms - Standard transitions, expansions
-  static const Duration normal = Duration(milliseconds: 300);
+  /// 250ms - Standard transitions, expansions
+  static const Duration normal = Duration(milliseconds: 250);
 
   /// 500ms - Emphasized celebrations, complex state changes
   static const Duration slow = Duration(milliseconds: 500);
@@ -27,6 +27,18 @@ class AppMotion {
   // ------------------------------------
   // Animation Curves
   // ------------------------------------
+
+  /// Fade curve - smooth opacity transition
+  static const Curve fade = Curves.easeOut;
+
+  /// Scale curve - spring/overshoot scale transition
+  static const Curve scale = Curves.easeOutBack;
+
+  /// Slide curve - natural position slide transition
+  static const Curve slide = Curves.easeInOutCubic;
+
+  /// Bounce curve - energetic bounce effect
+  static const Curve bounce = Curves.bounceOut;
 
   /// Standard easing for generic movement
   static const Curve standard = Curves.easeInOut;
@@ -39,9 +51,6 @@ class AppMotion {
 
   /// Dramatic easing for major transitions
   static const Curve emphasized = Curves.easeInOutCubic;
-
-  /// Playful bounce easing
-  static const Curve bounce = Curves.bounceOut;
 
   /// Elastic spring easing
   static const Curve elastic = Curves.elasticOut;

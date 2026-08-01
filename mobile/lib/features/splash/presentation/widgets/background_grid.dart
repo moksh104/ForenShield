@@ -1,6 +1,8 @@
-import 'package:flutter/material.dart';
 import 'dart:math' as math;
+import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
+/// Animated cybersecurity background grid painter with parallax & node dot accents.
 class BackgroundGrid extends StatefulWidget {
   const BackgroundGrid({super.key});
 
@@ -17,7 +19,7 @@ class _BackgroundGridState extends State<BackgroundGrid>
     super.initState();
     _controller = AnimationController(
       vsync: this,
-      duration: const Duration(seconds: 20),
+      duration: const Duration(seconds: 22),
     )..repeat();
   }
 
@@ -48,20 +50,20 @@ class _GridPainter extends CustomPainter {
 
   _GridPainter(this.animationValue);
 
-  static const _gridSpacing = 40.0;
+  static const _gridSpacing = 44.0;
   static const _dotRadius = 1.5;
-  static const _numMapLines = 8;
+  static const _numMapLines = 10;
   static const _randomSeed = 42;
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF0F766E).withValues(alpha: 0.03)
+      ..color = AppColors.logoTeal.withValues(alpha: 0.04)
       ..strokeWidth = 0.5
       ..style = PaintingStyle.stroke;
 
     final dotPaint = Paint()
-      ..color = const Color(0xFFC98A2E).withValues(alpha: 0.05)
+      ..color = AppColors.logoGold.withValues(alpha: 0.08)
       ..style = PaintingStyle.fill;
 
     final offsetY = animationValue * _gridSpacing;
@@ -75,7 +77,7 @@ class _GridPainter extends CustomPainter {
       );
     }
 
-    // Horizontal lines with parallax
+    // Horizontal lines with parallax shift
     for (double y = -_gridSpacing; y < size.height + _gridSpacing; y += _gridSpacing) {
       final adjustedY = (y + offsetY) % (size.height + _gridSpacing);
       canvas.drawLine(
@@ -85,7 +87,7 @@ class _GridPainter extends CustomPainter {
       );
     }
 
-    // Subtle dots at intersections
+    // Subtle dots at grid intersections
     for (double x = 0; x < size.width; x += _gridSpacing * 2) {
       for (double y = 0; y < size.height; y += _gridSpacing * 2) {
         final adjustedY = (y + offsetY) % (size.height + _gridSpacing);
@@ -93,9 +95,9 @@ class _GridPainter extends CustomPainter {
       }
     }
 
-    // Investigation map lines (subtle diagonal connections)
+    // Cyber network vector lines (subtle diagonal node connections)
     final mapPaint = Paint()
-      ..color = const Color(0xFF0F766E).withValues(alpha: 0.02)
+      ..color = AppColors.logoTeal.withValues(alpha: 0.03)
       ..strokeWidth = 0.5;
 
     final random = math.Random(_randomSeed);

@@ -1,35 +1,82 @@
 import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
+/// Elevation level enum aligned with Material 3 principles.
+enum ElevationLevel { low, medium, high }
+
 /// Defines the elevation and shadow/glow system for the ForenShield application.
-/// Includes both standard shadows and cyber-themed glows.
+/// Grounded in Material 3 principles (Light mode uses drop shadows;
+/// Dark mode uses minimal shadows / ambient depth overlays).
 abstract class AppShadows {
-  /// Very subtle shadow for small cards or buttons
+  /// Material 3 Low Elevation (Level 1: Cards / Raised surfaces) - Light Mode
   static const List<BoxShadow> low = [
     BoxShadow(
-      color: Color(0x33000000), // 20% opacity black
-      blurRadius: 4.0,
-      offset: Offset(0, 2),
+      color: Color(0x1A101820), // rgba(16, 24, 32, 0.10)
+      blurRadius: 3.0,
+      offset: Offset(0, 1),
     ),
   ];
 
-  /// Medium shadow for dialogs, modals, and raised surfaces
+  /// Material 3 Medium Elevation (Level 2: Hovered cards / Dropdowns / Popovers) - Light Mode
   static const List<BoxShadow> medium = [
     BoxShadow(
-      color: Color(0x40000000), // 25% opacity black
+      color: Color(0x1F101820), // rgba(16, 24, 32, 0.12)
       blurRadius: 8.0,
       offset: Offset(0, 4),
     ),
   ];
 
-  /// High shadow for floating action buttons or extreme elevation
+  /// Material 3 High Elevation (Level 3: Dialogs / Bottom Sheets / Modals) - Light Mode
   static const List<BoxShadow> high = [
     BoxShadow(
-      color: Color(0x66000000), // 40% opacity black
-      blurRadius: 16.0,
+      color: Color(0x24101820), // rgba(16, 24, 32, 0.14)
+      blurRadius: 24.0,
       offset: Offset(0, 8),
     ),
   ];
+
+  /// Dark Mode Low Shadow (Subtle ambient depth for dark theme)
+  static const List<BoxShadow> darkLow = [
+    BoxShadow(
+      color: Color(0x40000000), // 25% opacity black
+      blurRadius: 4.0,
+      offset: Offset(0, 2),
+    ),
+  ];
+
+  /// Dark Mode Medium Shadow
+  static const List<BoxShadow> darkMedium = [
+    BoxShadow(
+      color: Color(0x66000000), // 40% opacity black
+      blurRadius: 10.0,
+      offset: Offset(0, 4),
+    ),
+  ];
+
+  /// Dark Mode High Shadow
+  static const List<BoxShadow> darkHigh = [
+    BoxShadow(
+      color: Color(0x80000000), // 50% opacity black
+      blurRadius: 20.0,
+      offset: Offset(0, 8),
+    ),
+  ];
+
+  /// Dynamic shadow lookup respecting light/dark theme and M3 elevation level
+  static List<BoxShadow> forBrightness({
+    required Brightness brightness,
+    required ElevationLevel level,
+  }) {
+    final isDark = brightness == Brightness.dark;
+    switch (level) {
+      case ElevationLevel.low:
+        return isDark ? darkLow : low;
+      case ElevationLevel.medium:
+        return isDark ? darkMedium : medium;
+      case ElevationLevel.high:
+        return isDark ? darkHigh : high;
+    }
+  }
 
   // Backwards compatibility aliases
   static const List<BoxShadow> none = [];

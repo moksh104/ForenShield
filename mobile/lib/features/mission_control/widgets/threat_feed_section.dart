@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 /// A threat intelligence feed showing recent alerts.
 class ThreatFeedSection extends StatelessWidget {
@@ -51,7 +54,7 @@ class ThreatFeedSection extends StatelessWidget {
                 width: 8,
                 height: 8,
                 decoration: const BoxDecoration(
-                  color: Color(0xFFF87171),
+                  color: AppColors.error,
                   shape: BoxShape.circle,
                 ),
               ),
@@ -59,7 +62,7 @@ class ThreatFeedSection extends StatelessWidget {
               Text(
                 'LIVE',
                 style: theme.textTheme.labelSmall?.copyWith(
-                  color: const Color(0xFFF87171),
+                  color: AppColors.error,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 0.8,
                   fontSize: 9,
@@ -67,11 +70,11 @@ class ThreatFeedSection extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppSpacing.sm),
           Container(
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerHigh,
-              borderRadius: BorderRadius.circular(20),
+              borderRadius: AppRadius.cardRadius,
               border: Border.all(
                 color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
               ),
@@ -212,13 +215,13 @@ enum ThreatSeverity {
   Color get color {
     switch (this) {
       case ThreatSeverity.critical:
-        return const Color(0xFFF87171);
+        return AppColors.error;
       case ThreatSeverity.high:
-        return const Color(0xFFFBBF24);
+        return AppColors.warning;
       case ThreatSeverity.medium:
-        return const Color(0xFF60A5FA);
+        return AppColors.logoBlue;
       case ThreatSeverity.low:
-        return const Color(0xFF94A3B8);
+        return AppColors.textSecondary;
     }
   }
 

@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 /// Displays the currently active forensic investigation case.
 class ActiveInvestigationCard extends StatelessWidget {
@@ -18,7 +21,7 @@ class ActiveInvestigationCard extends StatelessWidget {
     this.caseTitle = 'Ransomware Intrusion: NovaCorp',
     this.caseType = 'Ransomware Analysis',
     this.statusLabel = 'In Progress',
-    this.statusColor = const Color(0xFFF59E0B),
+    this.statusColor = AppColors.warning,
     this.timeActive = '2h 14m',
     this.objectivesCompleted = 3,
     this.totalObjectives = 7,
@@ -37,14 +40,14 @@ class ActiveInvestigationCard extends StatelessWidget {
       child: Container(
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHigh,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.cardRadius,
           border: Border.all(
             color: statusColor.withValues(alpha: 0.35),
           ),
         ),
         child: InkWell(
           onTap: onContinueTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.cardRadius,
           child: Padding(
             padding: const EdgeInsets.all(18),
             child: Column(
@@ -57,7 +60,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                           horizontal: 8, vertical: 3),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.15),
-                        borderRadius: BorderRadius.circular(6),
+                        borderRadius: BorderRadius.circular(AppRadius.xs),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -98,7 +101,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   caseTitle,
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -139,7 +142,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppSpacing.md),
                 Row(
                   children: [
                     Expanded(
@@ -193,7 +196,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                          borderRadius: BorderRadius.circular(AppRadius.small),
                         ),
                       ),
                       child: Text(

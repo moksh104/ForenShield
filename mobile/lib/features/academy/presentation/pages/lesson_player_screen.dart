@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
@@ -281,7 +282,7 @@ class _CodeSnippetCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A),
+        color: AppColors.bgBase,
         borderRadius: AppRadius.borderRadiusMd,
         border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.5)),
       ),

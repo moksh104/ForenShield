@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_spacing.dart';
 
 /// A quick-access banner card for launching the Simulation Lab.
 class SimulationCard extends StatelessWidget {
@@ -12,7 +15,7 @@ class SimulationCard extends StatelessWidget {
     super.key,
     this.scenarioTitle = 'Incident Response Drill',
     this.difficultyLabel = 'Medium',
-    this.difficultyColor = const Color(0xFF60A5FA),
+    this.difficultyColor = AppColors.logoBlue,
     this.description =
         'Contain and eradicate an active C2 beacon on a compromised endpoint.',
     this.onLaunchTap,
@@ -26,19 +29,19 @@ class SimulationCard extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.cardRadius,
           gradient: const LinearGradient(
             colors: [Color(0xFF1E3A5F), Color(0xFF0F172A)],
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
           border: Border.all(
-            color: const Color(0xFF60A5FA).withValues(alpha: 0.2),
+            color: AppColors.logoBlue.withValues(alpha: 0.2),
           ),
         ),
         child: InkWell(
           onTap: onLaunchTap,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: AppRadius.cardRadius,
           child: Padding(
             padding: const EdgeInsets.all(20),
             child: Row(
@@ -47,19 +50,19 @@ class SimulationCard extends StatelessWidget {
                   width: 52,
                   height: 52,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF60A5FA).withValues(alpha: 0.15),
+                    color: AppColors.logoBlue.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(14),
                     border: Border.all(
-                      color: const Color(0xFF60A5FA).withValues(alpha: 0.3),
+                      color: AppColors.logoBlue.withValues(alpha: 0.3),
                     ),
                   ),
                   child: const Icon(
                     Icons.terminal_outlined,
-                    color: Color(0xFF60A5FA),
+                    color: AppColors.logoBlue,
                     size: 24,
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppSpacing.md),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +72,7 @@ class SimulationCard extends StatelessWidget {
                           Text(
                             'SIM LAB',
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: const Color(0xFF60A5FA).withValues(alpha: 0.7),
+                              color: AppColors.logoBlue.withValues(alpha: 0.7),
                               fontWeight: FontWeight.w700,
                               letterSpacing: 1.0,
                               fontSize: 9,
@@ -114,17 +117,17 @@ class SimulationCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppSpacing.sm),
                 Container(
                   width: 36,
                   height: 36,
                   decoration: BoxDecoration(
-                    color: const Color(0xFF60A5FA).withValues(alpha: 0.15),
+                    color: AppColors.logoBlue.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(
                     Icons.play_arrow_rounded,
-                    color: Color(0xFF60A5FA),
+                    color: AppColors.logoBlue,
                     size: 20,
                   ),
                 ),

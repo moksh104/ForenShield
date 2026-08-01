@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 
 /// The top header for the Cyber Academy screen.
 ///
@@ -124,13 +125,13 @@ class AcademyHeader extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: const Color(0xFFA78BFA).withValues(alpha: 0.2),
+                        color: AppColors.info.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: const Text(
                         'Analyst II',
                         style: TextStyle(
-                          color: Color(0xFFA78BFA),
+                          color: AppColors.info,
                           fontWeight: FontWeight.w700,
                           fontSize: 11,
                         ),

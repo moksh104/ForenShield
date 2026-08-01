@@ -1,11 +1,7 @@
 import 'package:flutter/material.dart';
-import '../theme/app_spacing.dart';
-import '../theme/app_radius.dart';
-import '../theme/foren_theme.dart';
+import '../components/foren_cards.dart';
 
-/// A standard, highly reusable card component following the ForenShield design system.
-///
-/// Colors sourced from ForenTheme/ForenColors rather than hard-coded legacy values.
+/// A standard, backward-compatible card component wrapper delegating directly to [ForenCard].
 class AppCard extends StatelessWidget {
   /// The main content of the card.
   final Widget body;
@@ -54,101 +50,31 @@ class AppCard extends StatelessWidget {
     this.subtitle,
     this.elevation = 1,
     this.hasBorder = true,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.all(16.0),
     this.onTap,
     this.borderRadius,
   });
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    final effectiveRadius = borderRadius ?? AppRadius.borderMd;
+    final mode = elevation > 0
+        ? ForenCardMode.elevated
+        : (hasBorder ? ForenCardMode.bordered : ForenCardMode.bordered);
 
-    Widget cardContent = Padding(
+    return ForenCard(
+      body: body,
+      header: header,
+      footer: footer,
+      leadingIcon: leadingIcon,
+      trailingAction: trailingAction,
+      title: title,
+      subtitle: subtitle,
+      elevation: elevation,
+      hasBorder: hasBorder,
       padding: padding,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          if (header != null)
-            header!
-          else if (title != null ||
-              subtitle != null ||
-              leadingIcon != null ||
-              trailingAction != null)
-            _buildStandardHeader(context),
-
-          if ((header != null || title != null) && body is! SizedBox)
-            const SizedBox(height: AppSpacing.md),
-
-          body,
-
-          if (footer != null) ...[
-            const SizedBox(height: AppSpacing.md),
-            footer!,
-          ],
-        ],
-      ),
+      onTap: onTap,
+      borderRadius: borderRadius,
+      mode: mode,
     );
-
-    if (onTap != null) {
-      cardContent = InkWell(
-        onTap: onTap,
-        borderRadius: effectiveRadius,
-        child: cardContent,
-      );
-    }
-
-    return Container(
-      decoration: BoxDecoration(
-        color: _getSurfaceColor(foren),
-        borderRadius: effectiveRadius,
-        border: hasBorder
-            ? Border.all(color: foren.borderSubtle, width: 1)
-            : null,
-      ),
-      child: Material(type: MaterialType.transparency, child: cardContent),
-    );
-  }
-
-  Widget _buildStandardHeader(BuildContext context) {
-    final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        if (leadingIcon != null) ...[
-          Icon(leadingIcon, color: theme.colorScheme.primary, size: 24),
-          const SizedBox(width: AppSpacing.sm),
-        ],
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              if (title != null) Text(title!, style: theme.textTheme.titleMedium),
-              if (subtitle != null) ...[
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  subtitle!,
-                  style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary),
-                ),
-              ],
-            ],
-          ),
-        ),
-        if (trailingAction != null) ...[
-          const SizedBox(width: AppSpacing.sm),
-          trailingAction!,
-        ],
-      ],
-    );
-  }
-
-  Color _getSurfaceColor(ForenColors foren) {
-    if (elevation == 0) return foren.surfaceRaised1;
-    if (elevation == 1) return foren.surfaceRaised1;
-    return foren.surfaceRaised2;
   }
 }

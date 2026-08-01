@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/effects/glass_effect.dart';
+import '../../../../core/effects/particle_background.dart';
+import '../../../../core/effects/scanner_effect.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../domain/entities/evidence_entity.dart';
 import '../providers/investigation_provider.dart';
 
@@ -77,9 +83,34 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
+        backgroundColor: AppColors.bgBase,
         body: Center(
-          child: CircularProgressIndicator(color: invColor),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                width: 140,
+                height: 140,
+                child: ScannerEffect(
+                  color: primaryColor,
+                  child: const Center(
+                    child: Icon(Icons.document_scanner, size: 48, color: AppColors.logoGold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'PARSING EVIDENCE ARTIFACT...',
+                style: TextStyle(
+                  color: primaryColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                  fontFamily: 'monospace',
+                  letterSpacing: 1.0,
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
@@ -87,222 +118,311 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
     final ev = _evidence;
     if (ev == null) {
       return Scaffold(
-        backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(backgroundColor: theme.scaffoldBackgroundColor),
+        backgroundColor: AppColors.bgBase,
+        appBar: AppBar(backgroundColor: AppColors.bgBase),
         body: Center(
           child: Text(
             'Evidence artifact not found.',
-            style: TextStyle(color: foren.textDisabled),
+            style: TextStyle(color: foren.textSecondary),
           ),
         ),
       );
     }
 
     return Scaffold(
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: AppColors.bgBase,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface,
+        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => context.pop(),
         ),
         title: Text(
           ev.title,
-          style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+          style: TextStyle(
+            color: theme.colorScheme.onSurface,
+            fontSize: 15,
+            fontWeight: FontWeight.w800,
+            fontFamily: 'Geist',
+          ),
         ),
       ),
-      body: SafeArea(
-        child: Column(
+      body: ParticleBackground(
+        numberOfParticles: 40,
+        particleColor: AppColors.logoGold,
+        duration: const Duration(seconds: 18),
+        child: Stack(
           children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Type & Timestamp Header
-                    Row(
-                      children: [
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 3),
-                          decoration: BoxDecoration(
-                            color: invColor.withValues(alpha: 0.15),
-                            borderRadius: AppRadius.borderRadiusXs,
-                          ),
-                          child: Text(
-                            ev.type.toUpperCase(),
-                            style: TextStyle(
-                              color: invColor,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
+            const Positioned.fill(child: BackgroundGrid()),
+            SafeArea(
+              child: Column(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          // Type & Timestamp Header Badge Row
+                          GlassEffect(
+                            blurX: 12.0,
+                            blurY: 12.0,
+                            opacity: 0.12,
+                            border: Border.all(
+                              color: primaryColor.withValues(alpha: 0.35),
+                              width: 1.0,
                             ),
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          ev.timestamp,
-                          style: TextStyle(
-                            color: foren.textDisabled,
-                            fontSize: 11,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    // Interactive Content Viewer
-                    if (ev.type == 'image') ...[
-                      Text(
-                        'Interactive Image Viewer (Pinch to Zoom)',
-                        style: TextStyle(
-                          color: foren.textDisabled,
-                          fontSize: 11,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Container(
-                        height: 220,
-                        decoration: const BoxDecoration(
-                          color: Color(0xFF0F172A),
-                          borderRadius: AppRadius.borderRadiusMd,
-                        ),
-                        child: ClipRRect(
-                          borderRadius: AppRadius.borderRadiusMd,
-                          child: InteractiveViewer(
-                            panEnabled: true,
-                            minScale: 0.5,
-                            maxScale: 4.0,
-                            child: Center(
-                              child: Icon(
-                                Icons.image_search,
-                                size: 80,
-                                color: invColor.withValues(alpha: 0.5),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                    ],
-
-                    // Raw Payload / Content Box
-                    Text(
-                      'Evidence Content Payload',
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface,
-                        fontSize: 13,
-                        fontWeight: FontWeight.w700,
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF0F172A),
-                        borderRadius: AppRadius.borderRadiusMd,
-                        border: Border.all(
-                          color: foren.borderSubtle.withValues(alpha: 0.4),
-                        ),
-                      ),
-                      child: Text(
-                        ev.contentText,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontSize: 12,
-                          fontFamily: 'monospace',
-                          height: 1.4,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: AppSpacing.lg),
-
-                    // Metadata Table
-                    if (ev.metadataMap.isNotEmpty) ...[
-                      Text(
-                        'Extracted Artifact Metadata',
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontSize: 13,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.xs),
-                      Container(
-                        decoration: BoxDecoration(
-                          color: theme.colorScheme.surface,
-                          borderRadius: AppRadius.borderRadiusMd,
-                          border: Border.all(
-                            color: foren.borderSubtle.withValues(alpha: 0.3),
-                          ),
-                        ),
-                        child: Column(
-                          children: ev.metadataMap.entries.map((entry) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: AppSpacing.md,
-                                vertical: 10,
-                              ),
+                            borderRadius: AppRadius.borderRadiusLg,
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
                               child: Row(
                                 children: [
-                                  Text(
-                                    entry.key,
-                                    style: TextStyle(
-                                      color: foren.textDisabled,
-                                      fontSize: 12,
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                    decoration: BoxDecoration(
+                                      color: primaryColor.withValues(alpha: 0.15),
+                                      borderRadius: AppRadius.borderRadiusXs,
+                                      border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
+                                    ),
+                                    child: Text(
+                                      'TYPE: ${ev.type.toUpperCase()}',
+                                      style: TextStyle(
+                                        color: primaryColor,
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.w800,
+                                        fontFamily: 'monospace',
+                                      ),
                                     ),
                                   ),
                                   const Spacer(),
                                   Text(
-                                    entry.value,
+                                    ev.timestamp,
                                     style: TextStyle(
-                                      color: primaryColor,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w600,
+                                      color: foren.textSecondary,
+                                      fontSize: 11,
                                       fontFamily: 'monospace',
                                     ),
                                   ),
                                 ],
                               ),
-                            );
-                          }).toList(),
+                            ),
+                          )
+                              .animate()
+                              .fadeIn(duration: 400.ms)
+                              .slideY(begin: -0.1, end: 0),
+
+                          const SizedBox(height: AppSpacing.md),
+
+                          // Interactive Image Viewer Container
+                          if (ev.type == 'image') ...[
+                            Text(
+                              'INTERACTIVE IMAGE INSPECTOR (PINCH TO ZOOM)',
+                              style: TextStyle(
+                                color: foren.textSecondary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'monospace',
+                                letterSpacing: 0.8,
+                              ),
+                            )
+                                .animate(delay: 100.ms)
+                                .fadeIn(duration: 400.ms),
+
+                            const SizedBox(height: AppSpacing.xs),
+
+                            GlassEffect(
+                              blurX: 14.0,
+                              blurY: 14.0,
+                              opacity: 0.12,
+                              border: Border.all(
+                                color: primaryColor.withValues(alpha: 0.4),
+                                width: 1.0,
+                              ),
+                              borderRadius: AppRadius.borderRadiusMd,
+                              child: SizedBox(
+                                height: 220,
+                                child: ClipRRect(
+                                  borderRadius: AppRadius.borderRadiusMd,
+                                  child: InteractiveViewer(
+                                    panEnabled: true,
+                                    minScale: 0.5,
+                                    maxScale: 4.0,
+                                    child: Center(
+                                      child: Column(
+                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        children: [
+                                          Icon(
+                                            Icons.image_search,
+                                            size: 72,
+                                            color: primaryColor.withValues(alpha: 0.6),
+                                          ),
+                                          const SizedBox(height: 8),
+                                          Text(
+                                            'PINCH TO ZOOM EVIDENCE ARTIFACT',
+                                            style: TextStyle(
+                                              color: primaryColor,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w700,
+                                              fontFamily: 'monospace',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            )
+                                .animate(delay: 150.ms)
+                                .fadeIn(duration: 400.ms),
+
+                            const SizedBox(height: AppSpacing.md),
+                          ],
+
+                          // Raw Payload / Content Box
+                          Text(
+                            'EVIDENCE CONTENT PAYLOAD',
+                            style: TextStyle(
+                              color: foren.textSecondary,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'monospace',
+                              letterSpacing: 0.8,
+                            ),
+                          )
+                              .animate(delay: 200.ms)
+                              .fadeIn(duration: 400.ms),
+
+                          const SizedBox(height: AppSpacing.xs),
+
+                          GlassEffect(
+                            blurX: 14.0,
+                            blurY: 14.0,
+                            opacity: 0.12,
+                            border: Border.all(
+                              color: foren.borderSubtle.withValues(alpha: 0.4),
+                              width: 1.0,
+                            ),
+                            borderRadius: AppRadius.borderRadiusMd,
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Text(
+                                ev.contentText,
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface,
+                                  fontSize: 12,
+                                  fontFamily: 'monospace',
+                                  height: 1.4,
+                                ),
+                              ),
+                            ),
+                          )
+                              .animate(delay: 250.ms)
+                              .fadeIn(duration: 400.ms),
+
+                          const SizedBox(height: AppSpacing.lg),
+
+                          // Metadata Table
+                          if (ev.metadataMap.isNotEmpty) ...[
+                            Text(
+                              'EXTRACTED ARTIFACT METADATA',
+                              style: TextStyle(
+                                color: foren.textSecondary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'monospace',
+                                letterSpacing: 0.8,
+                              ),
+                            )
+                                .animate(delay: 350.ms)
+                                .fadeIn(duration: 400.ms),
+
+                            const SizedBox(height: AppSpacing.xs),
+
+                            GlassEffect(
+                              blurX: 14.0,
+                              blurY: 14.0,
+                              opacity: 0.12,
+                              border: Border.all(
+                                color: foren.borderSubtle.withValues(alpha: 0.4),
+                                width: 1.0,
+                              ),
+                              borderRadius: AppRadius.borderRadiusMd,
+                              child: Column(
+                                children: ev.metadataMap.entries.map((entry) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: AppSpacing.md,
+                                      vertical: 10,
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          entry.key.toUpperCase(),
+                                          style: TextStyle(
+                                            color: foren.textSecondary,
+                                            fontSize: 11,
+                                            fontFamily: 'monospace',
+                                          ),
+                                        ),
+                                        const Spacer(),
+                                        Text(
+                                          entry.value,
+                                          style: TextStyle(
+                                            color: primaryColor,
+                                            fontSize: 11,
+                                            fontWeight: FontWeight.w700,
+                                            fontFamily: 'monospace',
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            )
+                                .animate(delay: 400.ms)
+                                .fadeIn(duration: 400.ms),
+                          ],
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // Bottom Action Footer
+                  GlassEffect(
+                    blurX: 14.0,
+                    blurY: 14.0,
+                    opacity: 0.15,
+                    border: Border(top: BorderSide(color: foren.borderSubtle)),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      child: SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          onPressed: ev.isReviewed ? null : _markReviewed,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: invColor,
+                            foregroundColor: theme.scaffoldBackgroundColor,
+                            shape: const RoundedRectangleBorder(
+                              borderRadius: AppRadius.borderRadiusMd,
+                            ),
+                          ),
+                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                          label: Text(
+                            ev.isReviewed ? 'ARTIFACT REVIEWED ✓' : 'MARK ARTIFACT AS REVIEWED',
+                            style: const TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
                         ),
                       ),
-                    ],
-                  ],
-                ),
-              ),
-            ),
-
-            // Bottom Action Footer
-            Container(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              decoration: BoxDecoration(
-                color: theme.colorScheme.surface,
-                border: Border(top: BorderSide(color: foren.borderSubtle)),
-              ),
-              child: SizedBox(
-                width: double.infinity,
-                height: 46,
-                child: ElevatedButton.icon(
-                  onPressed: ev.isReviewed ? null : _markReviewed,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: invColor,
-                    foregroundColor: theme.scaffoldBackgroundColor,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: AppRadius.borderRadiusMd,
                     ),
                   ),
-                  icon: const Icon(Icons.check_circle_outline, size: 18),
-                  label: Text(
-                    ev.isReviewed ? 'Reviewed ✓' : 'Mark as Reviewed',
-                    style: const TextStyle(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                ),
+                ],
               ),
             ),
           ],
