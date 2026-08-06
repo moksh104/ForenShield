@@ -146,7 +146,13 @@ class _AvatarButton extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final initials = userName.isNotEmpty
-        ? userName.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        ? userName
+              .trim()
+              .split(' ')
+              .map((e) => e[0])
+              .take(2)
+              .join()
+              .toUpperCase()
         : 'A';
 
     return Semantics(
@@ -160,10 +166,7 @@ class _AvatarButton extends StatelessWidget {
           height: 42,
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [
-                theme.colorScheme.primary,
-                theme.colorScheme.tertiary,
-              ],
+              colors: [theme.colorScheme.primary, theme.colorScheme.tertiary],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),

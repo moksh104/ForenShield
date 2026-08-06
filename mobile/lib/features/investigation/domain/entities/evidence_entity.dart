@@ -4,7 +4,8 @@ import 'package:equatable/equatable.dart';
 class EvidenceEntity extends Equatable {
   final String id;
   final String title;
-  final String type; // 'image' | 'pdf' | 'text' | 'log' | 'metadata' | 'history' | 'email'
+  final String
+  type; // 'image' | 'pdf' | 'text' | 'log' | 'metadata' | 'history' | 'email'
   final String? fileUrl;
   final String contentText;
   final Map<String, String> metadataMap;
@@ -37,13 +38,13 @@ class EvidenceEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        type,
-        fileUrl,
-        contentText,
-        metadataMap,
-        isReviewed,
-        timestamp,
-      ];
+    id,
+    title,
+    type,
+    fileUrl,
+    contentText,
+    metadataMap,
+    isReviewed,
+    timestamp,
+  ];
 }

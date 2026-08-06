@@ -4,10 +4,7 @@ class TokenPairModel extends Equatable {
   final String accessToken;
   final String refreshToken;
 
-  const TokenPairModel({
-    required this.accessToken,
-    required this.refreshToken,
-  });
+  const TokenPairModel({required this.accessToken, required this.refreshToken});
 
   @override
   List<Object?> get props => [accessToken, refreshToken];
@@ -20,9 +17,6 @@ class TokenPairModel extends Equatable {
   }
 
   Map<String, dynamic> toJson() {
-    return {
-      'accessToken': accessToken,
-      'refreshToken': refreshToken,
-    };
+    return {'accessToken': accessToken, 'refreshToken': refreshToken};
   }
 }

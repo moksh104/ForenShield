@@ -1,117 +1,231 @@
-import 'dart:math' as math;
 import 'package:flutter/material.dart';
-import '../../../../core/theme/app_colors.dart';
 
-/// Animated cybersecurity background grid painter with parallax & node dot accents.
-class BackgroundGrid extends StatefulWidget {
-  const BackgroundGrid({super.key});
+/// Dot-matrix World Map background representation for the ForenShield splash screen.
+class WorldMapWidget extends StatelessWidget {
+  final Color color;
 
-  @override
-  State<BackgroundGrid> createState() => _BackgroundGridState();
-}
-
-class _BackgroundGridState extends State<BackgroundGrid>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 22),
-    )..repeat();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
+  const WorldMapWidget({super.key, required this.color});
 
   @override
   Widget build(BuildContext context) {
-    return AnimatedBuilder(
-      animation: _controller,
-      builder: (context, child) {
-        return RepaintBoundary(
-          child: CustomPaint(
-            painter: _GridPainter(_controller.value),
-            size: Size.infinite,
-          ),
-        );
-      },
+    return CustomPaint(
+      size: const Size(double.infinity, 120),
+      painter: _WorldMapPainter(color: color),
     );
   }
 }
 
-class _GridPainter extends CustomPainter {
-  final double animationValue;
+class _WorldMapPainter extends CustomPainter {
+  final Color color;
 
-  _GridPainter(this.animationValue);
-
-  static const _gridSpacing = 44.0;
-  static const _dotRadius = 1.5;
-  static const _numMapLines = 10;
-  static const _randomSeed = 42;
+  _WorldMapPainter({required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = AppColors.logoTeal.withValues(alpha: 0.04)
-      ..strokeWidth = 0.5
-      ..style = PaintingStyle.stroke;
-
-    final dotPaint = Paint()
-      ..color = AppColors.logoGold.withValues(alpha: 0.08)
+      ..color = color
       ..style = PaintingStyle.fill;
 
-    final offsetY = animationValue * _gridSpacing;
+    final width = size.width;
+    final height = size.height;
 
-    // Vertical lines
-    for (double x = 0; x < size.width; x += _gridSpacing) {
-      canvas.drawLine(
-        Offset(x, 0),
-        Offset(x, size.height),
-        paint,
-      );
-    }
+    const points = [
+      // North America
+      Offset(0.18, 0.25),
+      Offset(0.22, 0.20),
+      Offset(0.25, 0.22),
+      Offset(0.20, 0.30),
+      Offset(0.15, 0.35),
+      Offset(0.24, 0.32),
+      Offset(0.28, 0.35),
+      Offset(0.22, 0.40),
+      Offset(0.26, 0.42),
+      Offset(0.30, 0.38),
+      Offset(0.18, 0.45),
+      Offset(0.25, 0.50),
 
-    // Horizontal lines with parallax shift
-    for (double y = -_gridSpacing; y < size.height + _gridSpacing; y += _gridSpacing) {
-      final adjustedY = (y + offsetY) % (size.height + _gridSpacing);
-      canvas.drawLine(
-        Offset(0, adjustedY),
-        Offset(size.width, adjustedY),
-        paint,
-      );
-    }
+      // South America
+      Offset(0.30, 0.60),
+      Offset(0.32, 0.65),
+      Offset(0.35, 0.70),
+      Offset(0.33, 0.75),
+      Offset(0.31, 0.80), Offset(0.29, 0.85), Offset(0.34, 0.78),
 
-    // Subtle dots at grid intersections
-    for (double x = 0; x < size.width; x += _gridSpacing * 2) {
-      for (double y = 0; y < size.height; y += _gridSpacing * 2) {
-        final adjustedY = (y + offsetY) % (size.height + _gridSpacing);
-        canvas.drawCircle(Offset(x, adjustedY), _dotRadius, dotPaint);
-      }
-    }
+      // Europe
+      Offset(0.48, 0.22),
+      Offset(0.52, 0.20),
+      Offset(0.55, 0.25),
+      Offset(0.50, 0.28),
+      Offset(0.53, 0.30), Offset(0.56, 0.32), Offset(0.49, 0.35),
 
-    // Cyber network vector lines (subtle diagonal node connections)
-    final mapPaint = Paint()
-      ..color = AppColors.logoTeal.withValues(alpha: 0.03)
-      ..strokeWidth = 0.5;
+      // Africa
+      Offset(0.50, 0.45),
+      Offset(0.53, 0.48),
+      Offset(0.56, 0.52),
+      Offset(0.52, 0.58),
+      Offset(0.55, 0.62),
+      Offset(0.58, 0.68),
+      Offset(0.54, 0.72),
+      Offset(0.51, 0.65),
 
-    final random = math.Random(_randomSeed);
-    for (int i = 0; i < _numMapLines; i++) {
-      final x1 = random.nextDouble() * size.width;
-      final y1 = random.nextDouble() * size.height;
-      final x2 = random.nextDouble() * size.width;
-      final y2 = random.nextDouble() * size.height;
+      // Asia
+      Offset(0.62, 0.22),
+      Offset(0.66, 0.20),
+      Offset(0.70, 0.18),
+      Offset(0.74, 0.22),
+      Offset(0.65, 0.28),
+      Offset(0.69, 0.30),
+      Offset(0.73, 0.28),
+      Offset(0.78, 0.25),
+      Offset(0.63, 0.35),
+      Offset(0.68, 0.38),
+      Offset(0.72, 0.35),
+      Offset(0.76, 0.38),
+      Offset(0.80, 0.32),
+      Offset(0.84, 0.30),
+      Offset(0.75, 0.45),
+      Offset(0.78, 0.48),
+      Offset(0.82, 0.42),
+      Offset(0.85, 0.46),
+      Offset(0.71, 0.50),
+      Offset(0.74, 0.54),
 
-      canvas.drawLine(Offset(x1, y1), Offset(x2, y2), mapPaint);
+      // Australia / Oceania
+      Offset(0.82, 0.72),
+      Offset(0.85, 0.70),
+      Offset(0.88, 0.74),
+      Offset(0.84, 0.78),
+      Offset(0.87, 0.80),
+    ];
+
+    for (final p in points) {
+      final dx = p.dx * width;
+      final dy = p.dy * height;
+      canvas.drawCircle(Offset(dx, dy), 1.8, paint);
     }
   }
 
   @override
-  bool shouldRepaint(_GridPainter oldDelegate) =>
-      animationValue != oldDelegate.animationValue;
+  bool shouldRepaint(covariant _WorldMapPainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
+}
+
+/// Vector City Skyline & Suspension Bridge outline artwork matching splash spec.
+class CitySkylineWidget extends StatelessWidget {
+  final Color color;
+
+  const CitySkylineWidget({super.key, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return CustomPaint(
+      size: const Size(double.infinity, 140),
+      painter: _CitySkylinePainter(color: color),
+    );
+  }
+}
+
+class _CitySkylinePainter extends CustomPainter {
+  final Color color;
+
+  _CitySkylinePainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.0;
+
+    final width = size.width;
+    final height = size.height;
+
+    final path = Path();
+
+    // Baseline across the bottom
+    path.moveTo(0, height);
+
+    // Suspension Bridge (left side 0.0 .. 0.3)
+    path.lineTo(0, height - 15);
+    path.lineTo(width * 0.04, height - 15);
+    path.lineTo(width * 0.08, height - 55); // Tower 1
+    path.lineTo(width * 0.08, height - 15);
+    path.moveTo(width * 0.08, height - 55);
+    path.lineTo(width * 0.18, height - 55); // Tower 2
+    path.lineTo(width * 0.18, height - 15);
+    path.lineTo(width * 0.28, height - 15);
+
+    // Bridge Cable arcs
+    final cablePath = Path();
+    cablePath.moveTo(0, height - 35);
+    cablePath.quadraticBezierTo(
+      width * 0.04,
+      height - 15,
+      width * 0.08,
+      height - 55,
+    );
+    cablePath.quadraticBezierTo(
+      width * 0.13,
+      height - 25,
+      width * 0.18,
+      height - 55,
+    );
+    cablePath.quadraticBezierTo(
+      width * 0.23,
+      height - 15,
+      width * 0.28,
+      height - 35,
+    );
+    canvas.drawPath(cablePath, paint);
+
+    // City Skyline Buildings (center and right 0.3 .. 1.0)
+    final bPath = Path();
+    bPath.moveTo(width * 0.30, height - 15);
+    bPath.lineTo(width * 0.30, height - 70);
+    bPath.lineTo(width * 0.35, height - 70);
+    bPath.lineTo(width * 0.35, height - 110); // Tall Spire 1
+    bPath.lineTo(width * 0.36, height - 110);
+    bPath.lineTo(width * 0.36, height - 60);
+    bPath.lineTo(width * 0.40, height - 60);
+    bPath.lineTo(width * 0.40, height - 85);
+    bPath.lineTo(width * 0.45, height - 85);
+    bPath.lineTo(width * 0.45, height - 45);
+
+    // Center skyscraper group
+    bPath.lineTo(width * 0.48, height - 45);
+    bPath.lineTo(width * 0.48, height - 100);
+    bPath.lineTo(width * 0.52, height - 100);
+    bPath.lineTo(width * 0.52, height - 125); // Main Tower Spire
+    bPath.lineTo(width * 0.53, height - 125);
+    bPath.lineTo(width * 0.53, height - 80);
+    bPath.lineTo(width * 0.58, height - 80);
+    bPath.lineTo(width * 0.58, height - 115);
+    bPath.lineTo(width * 0.63, height - 115);
+    bPath.lineTo(width * 0.63, height - 55);
+
+    // Right buildings group
+    bPath.lineTo(width * 0.68, height - 55);
+    bPath.lineTo(width * 0.68, height - 90);
+    bPath.lineTo(width * 0.74, height - 90);
+    bPath.lineTo(width * 0.74, height - 130); // Spire Right
+    bPath.lineTo(width * 0.75, height - 130);
+    bPath.lineTo(width * 0.75, height - 75);
+    bPath.lineTo(width * 0.82, height - 75);
+    bPath.lineTo(width * 0.82, height - 105);
+    bPath.lineTo(width * 0.88, height - 105);
+    bPath.lineTo(width * 0.88, height - 40);
+    bPath.lineTo(width * 0.95, height - 40);
+    bPath.lineTo(width * 0.95, height - 70);
+    bPath.lineTo(width, height - 70);
+    bPath.lineTo(width, height);
+
+    canvas.drawPath(path, paint);
+    canvas.drawPath(bPath, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _CitySkylinePainter oldDelegate) {
+    return oldDelegate.color != color;
+  }
 }

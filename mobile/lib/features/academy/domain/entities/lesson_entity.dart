@@ -76,17 +76,17 @@ class LessonEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        durationMinutes,
-        contentType,
-        contentText,
-        imageUrl,
-        codeSnippet,
-        codeLanguage,
-        checklist,
-        isCompleted,
-        order,
-        quizId,
-      ];
+    id,
+    title,
+    durationMinutes,
+    contentType,
+    contentText,
+    imageUrl,
+    codeSnippet,
+    codeLanguage,
+    checklist,
+    isCompleted,
+    order,
+    quizId,
+  ];
 }

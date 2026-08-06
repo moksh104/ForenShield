@@ -10,7 +10,7 @@ class ProfileRemoteDataSource {
   /// Fetches profile data from backend API.
   Future<ProfileModel> getProfile() async {
     try {
-      final response = await _apiClient.get<Map<String, dynamic>>('/profile');
+      final response = await _apiClient.get<Map<String, dynamic>>('/profile.php');
       if (response.data != null) {
         return ProfileModel.fromJson(response.data!);
       }
@@ -26,8 +26,8 @@ class ProfileRemoteDataSource {
     required String email,
   }) async {
     try {
-      final response = await _apiClient.put<Map<String, dynamic>>(
-        '/profile/update',
+      final response = await _apiClient.post<Map<String, dynamic>>(
+        '/update_profile.php',
         data: {'full_name': fullName, 'email': email},
       );
       if (response.data != null) {

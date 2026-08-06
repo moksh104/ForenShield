@@ -25,9 +25,8 @@ class CourseState {
     this.errorMessage,
   });
 
-  factory CourseState.initial() => const CourseState(
-        status: CourseStatus.initial,
-      );
+  factory CourseState.initial() =>
+      const CourseState(status: CourseStatus.initial);
 
   CourseState copyWith({
     CourseStatus? status,
@@ -48,8 +47,7 @@ class CourseState {
 
 // ── Dependency Providers ─────────────────────────────────────────────────────
 
-final courseRemoteDataSourceProvider =
-    Provider<CourseRemoteDataSource>((ref) {
+final courseRemoteDataSourceProvider = Provider<CourseRemoteDataSource>((ref) {
   final apiClient = ref.watch(apiClientProvider);
   return CourseRemoteDataSource(apiClient);
 });
@@ -90,11 +88,12 @@ class CourseNotifier extends StateNotifier<CourseState> {
       searchQuery: state.searchQuery,
     );
 
+    if (!mounted) return;
+
     result.when(
       success: (courses) {
         state = state.copyWith(
-          status:
-              courses.isEmpty ? CourseStatus.empty : CourseStatus.success,
+          status: courses.isEmpty ? CourseStatus.empty : CourseStatus.success,
           courses: courses,
         );
       },
@@ -114,11 +113,12 @@ class CourseNotifier extends StateNotifier<CourseState> {
       searchQuery: state.searchQuery,
     );
 
+    if (!mounted) return;
+
     result.when(
       success: (courses) {
         state = state.copyWith(
-          status:
-              courses.isEmpty ? CourseStatus.empty : CourseStatus.success,
+          status: courses.isEmpty ? CourseStatus.empty : CourseStatus.success,
           courses: courses,
         );
       },
@@ -144,6 +144,6 @@ class CourseNotifier extends StateNotifier<CourseState> {
 
 final courseProvider =
     StateNotifierProvider.autoDispose<CourseNotifier, CourseState>((ref) {
-  final useCase = ref.watch(loadCoursesUseCaseProvider);
-  return CourseNotifier(useCase);
-});
+      final useCase = ref.watch(loadCoursesUseCaseProvider);
+      return CourseNotifier(useCase);
+    });

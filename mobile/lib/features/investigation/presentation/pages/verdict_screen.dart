@@ -5,12 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/effects/particle_background.dart';
-import '../../../../core/effects/scanner_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../providers/investigation_provider.dart';
 
@@ -61,10 +59,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
     if (c == null || idx == null) return;
 
     final submitUseCase = ref.read(submitVerdictUseCaseProvider);
-    final result = await submitUseCase(
-      caseId: c.id,
-      selectedVerdictIndex: idx,
-    );
+    final result = await submitUseCase(caseId: c.id, selectedVerdictIndex: idx);
 
     result.when(
       success: (score) {
@@ -93,25 +88,17 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: ScannerEffect(
-                  color: primaryColor,
-                  child: const Center(
-                    child: Icon(Icons.gavel, size: 48, color: AppColors.logoGold),
-                  ),
-                ),
+              const SizedBox(
+                width: 36,
+                height: 36,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'INITIALIZING VERDICT MATRIX...',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
-                  letterSpacing: 1.0,
+                'Preparing verdict…',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren.textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -147,7 +134,6 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
           duration: const Duration(seconds: 18),
           child: Stack(
             children: [
-              const Positioned.fill(child: BackgroundGrid()),
               SafeArea(
                 child: Center(
                   child: Padding(
@@ -157,7 +143,9 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                       blurY: 16.0,
                       opacity: 0.12,
                       border: Border.all(
-                        color: isCorrect ? foren.success.t500 : foren.critical.t500,
+                        color: isCorrect
+                            ? foren.success.t500
+                            : foren.critical.t500,
                         width: 1.0,
                       ),
                       borderRadius: AppRadius.borderRadiusXl,
@@ -167,7 +155,9 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                           mainAxisSize: MainAxisSize.min,
                           children: [
                             GlowEffect(
-                              glowColor: isCorrect ? foren.success.t500 : foren.critical.t500,
+                              glowColor: isCorrect
+                                  ? foren.success.t500
+                                  : foren.critical.t500,
                               blurRadius: 24,
                               animate: true,
                               borderRadius: BorderRadius.circular(40),
@@ -175,20 +165,32 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                                 padding: const EdgeInsets.all(16),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
-                                  color: (isCorrect ? foren.success.t500 : foren.critical.t500).withValues(alpha: 0.15),
+                                  color:
+                                      (isCorrect
+                                              ? foren.success.t500
+                                              : foren.critical.t500)
+                                          .withValues(alpha: 0.15),
                                 ),
                                 child: Icon(
-                                  isCorrect ? Icons.verified : Icons.cancel_outlined,
-                                  color: isCorrect ? foren.success.t500 : foren.critical.t500,
+                                  isCorrect
+                                      ? Icons.verified
+                                      : Icons.cancel_outlined,
+                                  color: isCorrect
+                                      ? foren.success.t500
+                                      : foren.critical.t500,
                                   size: 54,
                                 ),
                               ),
                             ),
                             const SizedBox(height: AppSpacing.md),
                             Text(
-                              isCorrect ? 'CASE SOLVED SUCCESSFULLY' : 'VERDICT INCORRECT',
+                              isCorrect
+                                  ? 'CASE SOLVED SUCCESSFULLY'
+                                  : 'VERDICT INCORRECT',
                               style: TextStyle(
-                                color: isCorrect ? foren.success.t500 : foren.critical.t500,
+                                color: isCorrect
+                                    ? foren.success.t500
+                                    : foren.critical.t500,
                                 fontSize: 18,
                                 fontWeight: FontWeight.w800,
                                 fontFamily: 'monospace',
@@ -199,7 +201,10 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
 
                             // Score Count-Up
                             TweenAnimationBuilder<double>(
-                              tween: Tween<double>(begin: 0, end: _scorePercent.toDouble()),
+                              tween: Tween<double>(
+                                begin: 0,
+                                end: _scorePercent.toDouble(),
+                              ),
                               duration: const Duration(milliseconds: 1200),
                               curve: Curves.easeOutCubic,
                               builder: (context, animatedVal, child) {
@@ -222,10 +227,14 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                             Container(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               decoration: BoxDecoration(
-                                color: foren.surfaceRaised1.withValues(alpha: 0.6),
+                                color: foren.surfaceRaised1.withValues(
+                                  alpha: 0.6,
+                                ),
                                 borderRadius: AppRadius.borderRadiusMd,
                                 border: Border.all(
-                                  color: foren.borderSubtle.withValues(alpha: 0.3),
+                                  color: foren.borderSubtle.withValues(
+                                    alpha: 0.3,
+                                  ),
                                 ),
                               ),
                               child: Text(
@@ -244,14 +253,20 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: invColor,
                                 foregroundColor: theme.scaffoldBackgroundColor,
-                                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 12,
+                                ),
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: AppRadius.borderRadiusMd,
                                 ),
                               ),
                               child: const Text(
                                 'RETURN TO LABORATORY',
-                                style: TextStyle(fontWeight: FontWeight.w800, fontFamily: 'monospace'),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily: 'monospace',
+                                ),
                               ),
                             ),
                           ],
@@ -290,7 +305,6 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: Column(
                 children: [
@@ -302,27 +316,27 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                         children: [
                           // Summary Banner Card
                           GlassEffect(
-                            blurX: 14.0,
-                            blurY: 14.0,
-                            opacity: 0.12,
-                            border: Border.all(
-                              color: primaryColor.withValues(alpha: 0.35),
-                              width: 1.0,
-                            ),
-                            borderRadius: AppRadius.borderRadiusLg,
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Text(
-                                verdict.summaryText,
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w700,
-                                  height: 1.4,
+                                blurX: 14.0,
+                                blurY: 14.0,
+                                opacity: 0.12,
+                                border: Border.all(
+                                  color: primaryColor.withValues(alpha: 0.35),
+                                  width: 1.0,
                                 ),
-                              ),
-                            ),
-                          )
+                                borderRadius: AppRadius.borderRadiusLg,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  child: Text(
+                                    verdict.summaryText,
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                      height: 1.4,
+                                    ),
+                                  ),
+                                ),
+                              )
                               .animate()
                               .fadeIn(duration: 400.ms)
                               .slideY(begin: -0.1, end: 0),
@@ -338,9 +352,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                               fontFamily: 'monospace',
                               letterSpacing: 0.8,
                             ),
-                          )
-                              .animate(delay: 100.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
 
                           const SizedBox(height: AppSpacing.sm),
 
@@ -348,52 +360,70 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                           ...List.generate(verdict.options.length, (idx) {
                             final isSelected = _selectedIndex == idx;
                             return Padding(
-                              padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-                              child: InkWell(
-                                onTap: () {
-                                  setState(() => _selectedIndex = idx);
-                                },
-                                borderRadius: AppRadius.borderRadiusMd,
-                                child: GlassEffect(
-                                  blurX: 10.0,
-                                  blurY: 10.0,
-                                  opacity: isSelected ? 0.20 : 0.10,
-                                  border: Border.all(
-                                    color: isSelected ? invColor : foren.borderSubtle,
-                                    width: 1.0,
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppSpacing.sm,
                                   ),
-                                  borderRadius: AppRadius.borderRadiusMd,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(AppSpacing.md),
-                                    child: Row(
-                                      children: [
-                                        Icon(
-                                          isSelected ? Icons.radio_button_checked : Icons.radio_button_off,
-                                          color: isSelected ? invColor : foren.textSecondary,
-                                          size: 18,
+                                  child: InkWell(
+                                    onTap: () {
+                                      setState(() => _selectedIndex = idx);
+                                    },
+                                    borderRadius: AppRadius.borderRadiusMd,
+                                    child: GlassEffect(
+                                      blurX: 10.0,
+                                      blurY: 10.0,
+                                      opacity: isSelected ? 0.20 : 0.10,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? invColor
+                                            : foren.borderSubtle,
+                                        width: 1.0,
+                                      ),
+                                      borderRadius: AppRadius.borderRadiusMd,
+                                      child: Padding(
+                                        padding: const EdgeInsets.all(
+                                          AppSpacing.md,
                                         ),
-                                        const SizedBox(width: AppSpacing.sm),
-                                        Expanded(
-                                          child: Text(
-                                            verdict.options[idx],
-                                            style: TextStyle(
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              isSelected
+                                                  ? Icons.radio_button_checked
+                                                  : Icons.radio_button_off,
                                               color: isSelected
                                                   ? invColor
-                                                  : theme.colorScheme.onSurface,
-                                              fontSize: 13,
-                                              fontWeight: isSelected
-                                                  ? FontWeight.w800
-                                                  : FontWeight.w500,
+                                                  : foren.textSecondary,
+                                              size: 18,
                                             ),
-                                          ),
+                                            const SizedBox(
+                                              width: AppSpacing.sm,
+                                            ),
+                                            Expanded(
+                                              child: Text(
+                                                verdict.options[idx],
+                                                style: TextStyle(
+                                                  color: isSelected
+                                                      ? invColor
+                                                      : theme
+                                                            .colorScheme
+                                                            .onSurface,
+                                                  fontSize: 13,
+                                                  fontWeight: isSelected
+                                                      ? FontWeight.w800
+                                                      : FontWeight.w500,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
-                                      ],
+                                      ),
                                     ),
                                   ),
-                                ),
-                              ),
-                            )
-                                .animate(delay: Duration(milliseconds: 150 + (idx * 80)))
+                                )
+                                .animate(
+                                  delay: Duration(
+                                    milliseconds: 150 + (idx * 80),
+                                  ),
+                                )
                                 .fadeIn(duration: 400.ms)
                                 .slideX(begin: -0.05, end: 0);
                           }),
@@ -414,7 +444,9 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton.icon(
-                          onPressed: _selectedIndex == null ? null : _submitVerdict,
+                          onPressed: _selectedIndex == null
+                              ? null
+                              : _submitVerdict,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: invColor,
                             foregroundColor: theme.scaffoldBackgroundColor,
@@ -425,7 +457,11 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                           icon: const Icon(Icons.gavel, size: 18),
                           label: const Text(
                             'SUBMIT VERDICT FOR ANALYSIS',
-                            style: TextStyle(fontSize: 14, fontWeight: FontWeight.w800, fontFamily: 'monospace'),
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'monospace',
+                            ),
                           ),
                         ),
                       ),

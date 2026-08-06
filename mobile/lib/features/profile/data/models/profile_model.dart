@@ -44,7 +44,7 @@ class AchievementBadgeModel extends AchievementBadgeEntity {
 
   factory AchievementBadgeModel.fromJson(Map<String, dynamic> json) {
     return AchievementBadgeModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       iconName: json['icon_name'] as String? ?? 'shield',
@@ -78,7 +78,7 @@ class XpHistoryItemModel extends XpHistoryItemEntity {
 
   factory XpHistoryItemModel.fromJson(Map<String, dynamic> json) {
     return XpHistoryItemModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       source: json['source'] as String? ?? '',
       xpAmount: json['xp_amount'] as int? ?? 50,
@@ -117,7 +117,7 @@ class ProfileModel extends ProfileEntity {
 
   factory ProfileModel.fromJson(Map<String, dynamic> json) {
     return ProfileModel(
-      id: json['id'] as String? ?? 'usr_101',
+      id: (json['id'] ?? 'usr_101').toString(),
       fullName: json['full_name'] as String? ?? 'Agent Moksh',
       email: json['email'] as String? ?? 'moksh@forenshield.com',
       role: json['role'] as String? ?? 'Forensic Specialist',
@@ -131,14 +131,19 @@ class ProfileModel extends ProfileEntity {
       stats: json['stats'] != null
           ? UserStatsModel.fromJson(json['stats'] as Map<String, dynamic>)
           : _defaultStats,
-      badges: (json['badges'] as List<dynamic>?)
-              ?.map((e) =>
-                  AchievementBadgeModel.fromJson(e as Map<String, dynamic>))
+      badges:
+          (json['badges'] as List<dynamic>?)
+              ?.map(
+                (e) =>
+                    AchievementBadgeModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           _defaultBadges,
-      xpHistory: (json['xp_history'] as List<dynamic>?)
-              ?.map((e) =>
-                  XpHistoryItemModel.fromJson(e as Map<String, dynamic>))
+      xpHistory:
+          (json['xp_history'] as List<dynamic>?)
+              ?.map(
+                (e) => XpHistoryItemModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           _defaultXpHistory,
     );
@@ -158,10 +163,12 @@ class ProfileModel extends ProfileEntity {
       'level': level,
       'next_level_xp': nextLevelXp,
       'stats': (stats as UserStatsModel).toJson(),
-      'badges':
-          badges.map((b) => (b as AchievementBadgeModel).toJson()).toList(),
-      'xp_history':
-          xpHistory.map((x) => (x as XpHistoryItemModel).toJson()).toList(),
+      'badges': badges
+          .map((b) => (b as AchievementBadgeModel).toJson())
+          .toList(),
+      'xp_history': xpHistory
+          .map((x) => (x as XpHistoryItemModel).toJson())
+          .toList(),
     };
   }
 

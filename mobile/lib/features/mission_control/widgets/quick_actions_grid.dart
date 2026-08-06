@@ -11,37 +11,37 @@ class QuickActionsGrid extends StatelessWidget {
   const QuickActionsGrid({super.key, this.actions = const []});
 
   static List<QuickAction> get defaults => const [
-        QuickAction(
-          icon: Icons.search_outlined,
-          label: 'New Scan',
-          color: AppColors.success,
-        ),
-        QuickAction(
-          icon: Icons.folder_open_outlined,
-          label: 'Evidence',
-          color: AppColors.logoBlue,
-        ),
-        QuickAction(
-          icon: Icons.bar_chart_outlined,
-          label: 'Reports',
-          color: AppColors.warning,
-        ),
-        QuickAction(
-          icon: Icons.fingerprint_outlined,
-          label: 'Forensics',
-          color: AppColors.info,
-        ),
-        QuickAction(
-          icon: Icons.shield_outlined,
-          label: 'Threats',
-          color: AppColors.error,
-        ),
-        QuickAction(
-          icon: Icons.settings_outlined,
-          label: 'Settings',
-          color: AppColors.textSecondary,
-        ),
-      ];
+    QuickAction(
+      icon: Icons.search_outlined,
+      label: 'New Scan',
+      color: AppColors.success,
+    ),
+    QuickAction(
+      icon: Icons.folder_open_outlined,
+      label: 'Evidence',
+      color: AppColors.logoBlue,
+    ),
+    QuickAction(
+      icon: Icons.bar_chart_outlined,
+      label: 'Reports',
+      color: AppColors.warning,
+    ),
+    QuickAction(
+      icon: Icons.fingerprint_outlined,
+      label: 'Forensics',
+      color: AppColors.info,
+    ),
+    QuickAction(
+      icon: Icons.shield_outlined,
+      label: 'Threats',
+      color: AppColors.error,
+    ),
+    QuickAction(
+      icon: Icons.settings_outlined,
+      label: 'Settings',
+      color: AppColors.textSecondary,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {

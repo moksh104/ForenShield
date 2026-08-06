@@ -59,9 +59,7 @@ class AchievementBadgeCard extends StatelessWidget {
                   const SizedBox(width: AppSpacing.sm),
                   Icon(
                     unlocked ? Icons.check_circle : Icons.lock,
-                    color: unlocked
-                        ? foren.success.t500
-                        : foren.textSecondary,
+                    color: unlocked ? foren.success.t500 : foren.textSecondary,
                     size: 20,
                   ),
                 ],

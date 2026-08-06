@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/providers/app_preferences_provider.dart';
-import '../../../core/theme/foren_theme.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
 import '../../../routes/route_constants.dart';
 import '../providers/onboarding_provider.dart';
 import '../presentation/config/onboarding_animation_config.dart';
@@ -63,18 +64,16 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final state = ref.watch(onboardingProvider);
     final notifier = ref.read(onboardingProvider.notifier);
 
-    ref.listen(
-      onboardingProvider.select((s) => s.currentPage),
-      (_, next) {
-        final current = _pageController.hasClients
-            ? _pageController.page?.round()
-            : null;
-        if (current != next) _animateToPage(next);
-      },
-    );
+    ref.listen(onboardingProvider.select((s) => s.currentPage), (_, next) {
+      final current = _pageController.hasClients
+          ? _pageController.page?.round()
+          : null;
+      if (current != next) _animateToPage(next);
+    });
 
     final actionBar = OnboardingActionBar(
       currentPage: state.currentPage,
@@ -94,16 +93,54 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
       child: Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         body: SafeArea(
-          bottom: false,
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              final isWide = constraints.maxWidth >= OnboardingLayoutConfig.desktopWidthThreshold &&
-                  constraints.maxHeight >= OnboardingLayoutConfig.desktopHeightThreshold;
-              if (isWide) {
-                return _buildWideLayout(state, notifier, actionBar);
-              }
-              return _buildNarrowLayout(state, notifier, actionBar);
-            },
+          child: Column(
+            children: [
+              // Top Bar: Skip Button (Right-aligned)
+              Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.xxs,
+                ),
+                child: Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _handleGetStarted,
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: AppSpacing.sm,
+                      ),
+                    ),
+                    child: Text(
+                      'Skip',
+                      style: theme.textTheme.labelMedium?.copyWith(
+                        color: isDark
+                            ? AppColors.textSecondary
+                            : AppColors.lightTextSecondary,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+
+              // Main Onboarding PageView + Bottom Action Bar
+              Expanded(
+                child: LayoutBuilder(
+                  builder: (context, constraints) {
+                    final isWide =
+                        constraints.maxWidth >=
+                            OnboardingLayoutConfig.desktopWidthThreshold &&
+                        constraints.maxHeight >=
+                            OnboardingLayoutConfig.desktopHeightThreshold;
+                    if (isWide) {
+                      return _buildWideLayout(state, notifier, actionBar);
+                    }
+                    return _buildNarrowLayout(state, notifier, actionBar);
+                  },
+                ),
+              ),
+            ],
           ),
         ),
       ),
@@ -117,9 +154,7 @@ class _OnboardingScreenState extends ConsumerState<OnboardingScreen> {
   ) {
     return Column(
       children: [
-        Expanded(
-          child: _buildPageView(state, notifier),
-        ),
+        Expanded(child: _buildPageView(state, notifier)),
         actionBar,
       ],
     );
@@ -175,14 +210,18 @@ class _OnboardingPageSlot extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
+    final isDark = theme.brightness == Brightness.dark;
 
     return ColoredBox(
       color: theme.scaffoldBackgroundColor,
       child: Center(
         child: Text(
           'Page ${pageIndex + 1}',
-          style: TextStyle(color: foren.textDisabled),
+          style: TextStyle(
+            color: isDark
+                ? AppColors.textSecondary
+                : AppColors.lightTextSecondary,
+          ),
         ),
       ),
     );

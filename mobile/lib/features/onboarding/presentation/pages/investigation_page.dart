@@ -33,7 +33,9 @@ class InvestigationPage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final illustrationHeight =
-            OnboardingLayoutConfig.computeIllustrationHeight(constraints.maxHeight);
+            OnboardingLayoutConfig.computeIllustrationHeight(
+              constraints.maxHeight,
+            );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,17 +154,17 @@ class InvestigationPage extends StatelessWidget {
             child: reduceMotion
                 ? _EvidenceLine(item: _evidenceItems[i])
                 : _EvidenceLine(item: _evidenceItems[i])
-                    .animate(delay: delays[i])
-                    .fadeIn(
-                      duration: OnboardingAnimationConfig.textLineDuration,
-                      curve: AppMotion.decelerate,
-                    )
-                    .slideX(
-                      begin: 0.08, // Slide from right (file entering board)
-                      end: 0,
-                      duration: OnboardingAnimationConfig.textLineDuration,
-                      curve: AppMotion.decelerate,
-                    ),
+                      .animate(delay: delays[i])
+                      .fadeIn(
+                        duration: OnboardingAnimationConfig.textLineDuration,
+                        curve: AppMotion.decelerate,
+                      )
+                      .slideX(
+                        begin: 0.08, // Slide from right (file entering board)
+                        end: 0,
+                        duration: OnboardingAnimationConfig.textLineDuration,
+                        curve: AppMotion.decelerate,
+                      ),
           ),
       ],
     );
@@ -205,7 +207,9 @@ class _EvidenceLine extends StatelessWidget {
         const SizedBox(width: AppSpacing.md),
         Text(
           label,
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );

@@ -4,14 +4,11 @@ import '../../../../models/user_model.dart';
 import 'auth_repository.dart';
 
 /// Offline mock implementation of [AuthRepository].
-///
-/// Simulates realistic network latency (800ms) and provides mock
-/// user authentication data for offline development and testing.
 class MockAuthRepository implements AuthRepository {
   static final UserModel _mockUser = UserModel(
     id: 'user_mock_001',
-    email: 'moksh@forenshield.io',
-    displayName: 'Moksh Patel',
+    email: 'samlee.mobbin@gmail.com',
+    displayName: 'Sam Lee',
     avatarUrl: null,
     totalXp: 4250,
     rank: 'Senior Cyber Investigator',
@@ -62,7 +59,29 @@ class MockAuthRepository implements AuthRepository {
   }
 
   @override
-  Future<Result<void>> logout() async {
+  Future<Result<bool>> forgotPassword({required String email}) async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    return const Success(true);
+  }
+
+  @override
+  Future<Result<AuthResponseModel>> verifyOtp({
+    required String email,
+    required String otpCode,
+  }) async {
+    await Future.delayed(const Duration(milliseconds: 600));
+    final customUser = _mockUser.copyWith(email: email);
+    return Success(
+      AuthResponseModel(
+        accessToken: _mockAuthResponse.accessToken,
+        refreshToken: _mockAuthResponse.refreshToken,
+        user: customUser,
+      ),
+    );
+  }
+
+  @override
+  Future<Result<void>> logout({String? refreshToken}) async {
     await Future.delayed(const Duration(milliseconds: 400));
     return const Success(null);
   }

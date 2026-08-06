@@ -153,16 +153,13 @@ Jul 26 13:58:02 BASTION-01 sshd[1284]: Failed password for root from 198.51.100.
 Jul 26 13:58:05 BASTION-01 sshd[1289]: Failed password for root from 198.51.100.42 port 52212 ssh2
 ''';
     } else {
-      responseText = 'bash: command not found: $input. Type "help" for valid lab commands.';
+      responseText =
+          'bash: command not found: $input. Type "help" for valid lab commands.';
       responseType = TerminalLineType.error;
     }
 
     updatedLines.add(
-      TerminalLine(
-        text: responseText,
-        type: responseType,
-        timestamp: now,
-      ),
+      TerminalLine(text: responseText, type: responseType, timestamp: now),
     );
 
     // Check objective completion rules
@@ -184,7 +181,9 @@ Jul 26 13:58:05 BASTION-01 sshd[1289]: Failed password for root from 198.51.100.
 
   void completeLabManually() {
     state = state.copyWith(
-      objectives: state.objectives.map((o) => o.copyWith(isCompleted: true)).toList(),
+      objectives: state.objectives
+          .map((o) => o.copyWith(isCompleted: true))
+          .toList(),
       isCompleted: true,
     );
   }
@@ -196,11 +195,13 @@ Jul 26 13:58:05 BASTION-01 sshd[1289]: Failed password for root from 198.51.100.
   }
 }
 
-final simulationRunnerProvider = StateNotifierProvider.family<
-    SimulationRunnerNotifier,
-    SimulationRunnerState,
-    String>((ref, scenarioId) {
-  final notifier = SimulationRunnerNotifier();
-  notifier.initScenario(scenarioId);
-  return notifier;
-});
+final simulationRunnerProvider =
+    StateNotifierProvider.family<
+      SimulationRunnerNotifier,
+      SimulationRunnerState,
+      String
+    >((ref, scenarioId) {
+      final notifier = SimulationRunnerNotifier();
+      notifier.initScenario(scenarioId);
+      return notifier;
+    });

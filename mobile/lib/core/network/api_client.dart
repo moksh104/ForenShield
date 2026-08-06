@@ -79,15 +79,14 @@ class ApiClient {
     return _dio.patch<T>(path, data: data);
   }
 
-  Future<Response<T>> postMultipart<T>(String path, {required FormData data}) async {
+  Future<Response<T>> postMultipart<T>(
+    String path, {
+    required FormData data,
+  }) async {
     return _dio.post<T>(
       path,
       data: data,
-      options: Options(
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
-      ),
+      options: Options(headers: {'Content-Type': 'multipart/form-data'}),
     );
   }
 }

@@ -23,7 +23,7 @@ class ForenShieldCatalogApp extends StatefulWidget {
 }
 
 class _ForenShieldCatalogAppState extends State<ForenShieldCatalogApp> {
-  ThemeMode _mode = ThemeMode.dark; // dark is the primary experience
+  ThemeMode _mode = ThemeMode.light;
 
   void _toggleTheme() {
     setState(() {

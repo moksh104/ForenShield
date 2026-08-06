@@ -16,14 +16,16 @@ class PlaygroundStateNotifier extends StateNotifier<Map<String, dynamic>> {
 
   /// Updates a specific property value and triggers a rebuild of the Live Preview.
   void updateProperty(String name, dynamic value) {
-    state = {
-      ...state,
-      name: value,
-    };
+    state = {...state, name: value};
   }
 }
 
 /// Provider exposing the playground state controls isolated by component name.
-final playgroundStateProvider = StateNotifierProvider.family<PlaygroundStateNotifier, Map<String, dynamic>, String>((ref, componentName) {
-  return PlaygroundStateNotifier();
-});
+final playgroundStateProvider =
+    StateNotifierProvider.family<
+      PlaygroundStateNotifier,
+      Map<String, dynamic>,
+      String
+    >((ref, componentName) {
+      return PlaygroundStateNotifier();
+    });

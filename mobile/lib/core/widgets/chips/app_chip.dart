@@ -96,7 +96,9 @@ class AppChip extends StatelessWidget {
     } else if (isSelected) {
       color = theme.colorScheme.primary;
     }
-    return (theme.textTheme.labelMedium ?? const TextStyle()).copyWith(color: color);
+    return (theme.textTheme.labelMedium ?? const TextStyle()).copyWith(
+      color: color,
+    );
   }
 
   Color _getIconColor(ThemeData theme, ForenColors foren) {

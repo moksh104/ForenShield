@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/mission_control_entity.dart';
 
-/// Achievement and Level Progress Card with glassmorphism, count-up animations, and glow effects.
+/// Achievement and Level Progress Card with clean surface and count-up animations.
 class AchievementCard extends StatefulWidget {
   final int currentLevel;
   final int currentXp;
@@ -28,8 +27,6 @@ class AchievementCard extends StatefulWidget {
 }
 
 class _AchievementCardState extends State<AchievementCard> {
-  bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -37,147 +34,127 @@ class _AchievementCardState extends State<AchievementCard> {
     final primaryColor = theme.colorScheme.primary;
     final warningColor = foren.warning.t500;
 
-    final levelProgress =
-        (widget.nextLevelXp > 0) ? (widget.currentXp / widget.nextLevelXp).clamp(0.0, 1.0) : 1.0;
+    final levelProgress = (widget.nextLevelXp > 0)
+        ? (widget.currentXp / widget.nextLevelXp).clamp(0.0, 1.0)
+        : 1.0;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-      child: MouseRegion(
-        onEnter: (_) => setState(() => _isHovered = true),
-        onExit: (_) => setState(() => _isHovered = false),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          transform: Matrix4.translationValues(0, _isHovered ? -3 : 0, 0),
-          child: GlassEffect(
-            blurX: 16.0,
-            blurY: 16.0,
-            opacity: _isHovered ? 0.16 : 0.12,
-            borderRadius: AppRadius.borderRadiusLg,
-            border: Border.all(
-              color: _isHovered
-                  ? warningColor.withValues(alpha: 0.5)
-                  : foren.borderSubtle.withValues(alpha: 0.4),
-              width: _isHovered ? 1.5 : 1.0,
-            ),
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Level progress header
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        GlowEffect(
-                          glowColor: warningColor,
-                          blurRadius: 10.0,
-                          spreadRadius: 2.0,
-                          animate: true,
-                          borderRadius: BorderRadius.circular(20),
-                          child: Container(
-                            padding: const EdgeInsets.all(6),
-                            decoration: BoxDecoration(
-                              color: warningColor,
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.military_tech,
-                              size: 16,
-                              color: theme.scaffoldBackgroundColor,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'LEVEL ${widget.currentLevel} SPECIALIST',
-                              style: TextStyle(
-                                color: theme.colorScheme.onSurface,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                              ),
-                            ),
-                            TweenAnimationBuilder<double>(
-                              tween: Tween<double>(begin: 0, end: widget.currentXp.toDouble()),
-                              duration: const Duration(milliseconds: 1200),
-                              curve: Curves.easeOutCubic,
-                              builder: (context, xpVal, child) {
-                                return Text(
-                                  '${xpVal.toInt()} / ${widget.nextLevelXp} XP to Level ${widget.currentLevel + 1}',
-                                  style: TextStyle(
-                                    color: foren.textDisabled,
-                                    fontSize: 11,
-                                  ),
-                                );
-                              },
-                            ),
-                          ],
-                        ),
-                      ],
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        borderRadius: AppRadius.borderRadiusLg,
+        border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.4)),
+        boxShadow: AppShadows.forBrightness(
+          brightness: theme.brightness,
+          level: ElevationLevel.low,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Level progress header
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                      color: warningColor,
+                      shape: BoxShape.circle,
                     ),
-                    InkWell(
-                      onTap: widget.onViewAllTap,
-                      child: Text(
-                        'Wall',
-                        style: TextStyle(
-                          color: primaryColor,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w600,
+                    child: Icon(
+                      Icons.military_tech,
+                      size: 16,
+                      color: theme.scaffoldBackgroundColor,
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Level ${widget.currentLevel} Specialist',
+                        style: theme.textTheme.titleSmall?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w800,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                ClipRRect(
-                  borderRadius: AppRadius.borderRadiusXs,
-                  child: TweenAnimationBuilder<double>(
-                    tween: Tween<double>(begin: 0, end: levelProgress),
-                    duration: const Duration(milliseconds: 1200),
-                    curve: Curves.easeOutCubic,
-                    builder: (context, progressVal, child) {
-                      return LinearProgressIndicator(
-                        value: progressVal,
-                        minHeight: 6,
-                        backgroundColor: foren.surfaceRaised1,
-                        valueColor: AlwaysStoppedAnimation<Color>(
-                          warningColor,
+                      TweenAnimationBuilder<double>(
+                        tween: Tween<double>(
+                          begin: 0,
+                          end: widget.currentXp.toDouble(),
                         ),
-                      );
-                    },
+                        duration: const Duration(milliseconds: 1200),
+                        curve: Curves.easeOutCubic,
+                        builder: (context, xpVal, child) {
+                          return Text(
+                            '${xpVal.toInt()} / ${widget.nextLevelXp} XP to Level ${widget.currentLevel + 1}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: foren.textDisabled,
+                            ),
+                          );
+                        },
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+              InkWell(
+                onTap: widget.onViewAllTap,
+                child: Text(
+                  'Wall',
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: primaryColor,
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.md),
-                Text(
-                  'Unlocked Badges & Rewards',
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                // Badges row
-                SizedBox(
-                  height: 72,
-                  child: ListView.separated(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: widget.achievements.length,
-                    separatorBuilder: (_, _) =>
-                        const SizedBox(width: AppSpacing.sm),
-                    itemBuilder: (context, index) {
-                      final item = widget.achievements[index];
-                      return _BadgeItem(item: item);
-                    },
-                  ),
-                ),
-              ],
+              ),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.sm),
+          ClipRRect(
+            borderRadius: BorderRadius.circular(100),
+            child: TweenAnimationBuilder<double>(
+              tween: Tween<double>(begin: 0, end: levelProgress),
+              duration: const Duration(milliseconds: 1200),
+              curve: Curves.easeOutCubic,
+              builder: (context, progressVal, child) {
+                return LinearProgressIndicator(
+                  value: progressVal,
+                  minHeight: 6,
+                  borderRadius: BorderRadius.circular(100),
+                  backgroundColor: foren.surfaceRaised1,
+                  valueColor: AlwaysStoppedAnimation<Color>(warningColor),
+                );
+              },
             ),
           ),
-        ),
+          const SizedBox(height: AppSpacing.md),
+          Text(
+            'Unlocked Badges & Rewards',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xs),
+          // Badges row
+          SizedBox(
+            height: 72,
+            child: ListView.separated(
+              scrollDirection: Axis.horizontal,
+              itemCount: widget.achievements.length,
+              separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
+              itemBuilder: (context, index) {
+                final item = widget.achievements[index];
+                return _BadgeItem(item: item);
+              },
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -193,7 +170,7 @@ class _BadgeItem extends StatefulWidget {
 }
 
 class _BadgeItemState extends State<_BadgeItem> {
-  bool _isHovered = false;
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
@@ -202,36 +179,27 @@ class _BadgeItemState extends State<_BadgeItem> {
     final primaryColor = theme.colorScheme.primary;
     final warningColor = foren.warning.t500;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
+    return InkWell(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCirc,
         width: 160,
         padding: const EdgeInsets.all(8),
-        transform: Matrix4.translationValues(0, _isHovered ? -2 : 0, 0),
         decoration: BoxDecoration(
-          color: _isHovered
+          color: _isPressed
               ? (widget.item.isUnlocked
-                  ? warningColor.withValues(alpha: 0.12)
-                  : foren.surfaceRaised2)
+                    ? warningColor.withValues(alpha: 0.12)
+                    : foren.surfaceRaised2)
               : foren.surfaceRaised1.withValues(alpha: 0.6),
           borderRadius: AppRadius.borderRadiusMd,
           border: Border.all(
             color: widget.item.isUnlocked
-                ? ( _isHovered ? warningColor : warningColor.withValues(alpha: 0.4) )
+                ? warningColor.withValues(alpha: 0.4)
                 : foren.borderSubtle.withValues(alpha: 0.3),
-            width: _isHovered ? 1.5 : 1.0,
           ),
-          boxShadow: _isHovered && widget.item.isUnlocked
-              ? [
-                  BoxShadow(
-                    color: warningColor.withValues(alpha: 0.25),
-                    blurRadius: 10,
-                    spreadRadius: 1,
-                  ),
-                ]
-              : null,
         ),
         child: Row(
           children: [
@@ -260,11 +228,10 @@ class _BadgeItemState extends State<_BadgeItem> {
                 children: [
                   Text(
                     widget.item.title,
-                    style: TextStyle(
+                    style: theme.textTheme.bodySmall?.copyWith(
                       color: widget.item.isUnlocked
                           ? theme.colorScheme.onSurface
                           : foren.textDisabled,
-                      fontSize: 11,
                       fontWeight: FontWeight.w700,
                     ),
                     maxLines: 1,
@@ -272,9 +239,8 @@ class _BadgeItemState extends State<_BadgeItem> {
                   ),
                   Text(
                     '+${widget.item.xpReward} XP',
-                    style: TextStyle(
+                    style: theme.textTheme.labelSmall?.copyWith(
                       color: primaryColor,
-                      fontSize: 10,
                       fontWeight: FontWeight.w600,
                     ),
                   ),

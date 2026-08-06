@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/course_entity.dart';
 
-/// Reusable Course Card for Cyber Academy list.
+/// Reusable Course Card for Cyber Academy matching exact design spec screenshot.
 class CourseCard extends StatelessWidget {
   final CourseEntity course;
   final VoidCallback? onTap;
@@ -20,175 +21,188 @@ class CourseCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = AppColors.primary;
+    final textPrimary = isDark
+        ? AppColors.textPrimary
+        : const Color(0xFF0F172A);
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : const Color(0xFF64748B);
     final foren = theme.extension<ForenColors>()!;
-    final academyColor = foren.academy.t500;
-    final primaryColor = theme.colorScheme.primary;
-    final diffColor = _getDifficultyColor(foren, course.difficulty);
+
+    final config = _getTopicConfig(course.title);
+    final int lessonsCount = course.modules.fold(
+      0,
+      (sum, m) => sum + m.lessons.length,
+    );
+    final int displayLessons = lessonsCount > 0 ? lessonsCount : 12;
+
+    final int hours = course.durationMinutes ~/ 60;
+    final int mins = course.durationMinutes % 60;
+    final String timeStr = mins > 0 ? '${hours}h ${mins}m' : '${hours}h';
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Container(
         decoration: BoxDecoration(
-          color: theme.colorScheme.surface,
+          color: isDark ? AppColors.surface : Colors.white,
           borderRadius: AppRadius.borderRadiusLg,
           border: Border.all(
-            color: foren.borderSubtle.withValues(alpha: 0.4),
+            color: isDark ? foren.borderSubtle : const Color(0xFFE2E8F0),
           ),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
         ),
         child: InkWell(
           onTap: onTap,
           borderRadius: AppRadius.borderRadiusLg,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
-            child: Column(
+            child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Top Tag Row
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
-                      decoration: BoxDecoration(
-                        color: academyColor.withValues(alpha: 0.15),
-                        borderRadius: AppRadius.borderRadiusXs,
-                      ),
-                      child: Text(
-                        course.category.toUpperCase(),
-                        style: TextStyle(
-                          color: academyColor,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.xs),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: diffColor.withValues(alpha: 0.15),
-                        borderRadius: AppRadius.borderRadiusXs,
-                      ),
-                      child: Text(
-                        course.difficulty.toUpperCase(),
-                        style: TextStyle(
-                          color: diffColor,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    Icon(
-                      Icons.schedule_outlined,
-                      size: 13,
-                      color: foren.textDisabled,
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '${course.durationMinutes} min',
-                      style: TextStyle(
-                        color: foren.textDisabled,
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.sm),
-                // Course Title
-                Text(
-                  course.title,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w700,
+                // ── Left Large Topic Icon Box ──
+                Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: isDark ? config.darkBg : config.lightBg,
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-                const SizedBox(height: 4),
-                // Description
-                Text(
-                  course.description,
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 12,
+                  child: Center(
+                    child: _buildTopicIcon(config.iconType, config.iconColor),
                   ),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: AppSpacing.md),
-                // Progress Bar & CTA
-                Row(
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${(course.completionPercentage * 100).toInt()}% Completed',
-                                style: TextStyle(
-                                  color: foren.textSecondary,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              Text(
-                                '+${course.totalXp} XP',
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontSize: 11,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
+                const SizedBox(width: 14),
+
+                // ── Middle Column ──
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // Level Badge Pill
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
+                        decoration: BoxDecoration(
+                          color: config.badgeBg,
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          course.difficulty,
+                          style: TextStyle(
+                            color: config.badgeTextColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
                           ),
-                          const SizedBox(height: 6),
-                          ClipRRect(
-                            borderRadius: AppRadius.borderRadiusXs,
-                            child: LinearProgressIndicator(
-                              value: course.completionPercentage,
-                              minHeight: 5,
-                              backgroundColor: foren.surfaceRaised1,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                academyColor,
-                              ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Title
+                      Text(
+                        course.title,
+                        style: TextStyle(
+                          color: textPrimary,
+                          fontSize: 15,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Outfit',
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 3),
+
+                      // Subtitle / Description
+                      Text(
+                        course.description,
+                        style: TextStyle(
+                          color: textSecondary,
+                          fontSize: 11.5,
+                          height: 1.25,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+
+                      // Progress Bar
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(3),
+                        child: LinearProgressIndicator(
+                          value: course.completionPercentage,
+                          minHeight: 4,
+                          backgroundColor: isDark
+                              ? AppColors.surfaceRaised1
+                              : const Color(0xFFE2E8F0),
+                          valueColor: AlwaysStoppedAnimation<Color>(
+                            primaryColor,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Bottom Metadata Row: Percent Complete | Lessons | Time
+                      Row(
+                        children: [
+                          Text(
+                            '${(course.completionPercentage * 100).toInt()}% Complete',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                          const Spacer(),
+                          Text(
+                            '$displayLessons Lessons',
+                            style: TextStyle(
+                              color: textSecondary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Icon(
+                            Icons.access_time_rounded,
+                            size: 13,
+                            color: textSecondary,
+                          ),
+                          const SizedBox(width: 3),
+                          Text(
+                            timeStr,
+                            style: TextStyle(
+                              color: textSecondary,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    ElevatedButton(
-                      onPressed: onContinueTap ?? onTap,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: academyColor,
-                        foregroundColor: theme.scaffoldBackgroundColor,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                          vertical: 8,
-                        ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderRadiusMd,
-                        ),
-                        elevation: 0,
-                      ),
-                      child: Text(
-                        course.completionPercentage > 0
-                            ? 'Continue'
-                            : 'Start',
-                        style: const TextStyle(
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(width: 6),
+
+                // ── Top Right Chevron ──
+                Padding(
+                  padding: const EdgeInsets.only(top: 2),
+                  child: Icon(
+                    Icons.chevron_right_rounded,
+                    color: textSecondary,
+                    size: 20,
+                  ),
                 ),
               ],
             ),
@@ -198,15 +212,136 @@ class CourseCard extends StatelessWidget {
     );
   }
 
-  Color _getDifficultyColor(ForenColors foren, String diff) {
-    switch (diff.toLowerCase()) {
-      case 'advanced':
-        return foren.critical.t500;
-      case 'intermediate':
-        return foren.warning.t500;
-      case 'beginner':
-      default:
-        return foren.success.t500;
+  Widget _buildTopicIcon(_IconType type, Color iconColor) {
+    switch (type) {
+      case _IconType.digitalForensics:
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(
+              Icons.fingerprint,
+              size: 36,
+              color: iconColor.withValues(alpha: 0.7),
+            ),
+            Positioned(
+              bottom: 4,
+              right: 4,
+              child: Icon(Icons.search, size: 22, color: iconColor),
+            ),
+          ],
+        );
+      case _IconType.malwareAnalysis:
+        return Icon(Icons.bug_report_outlined, size: 38, color: iconColor);
+      case _IconType.phishing:
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.mail_outline_rounded, size: 34, color: iconColor),
+            Positioned(
+              top: 2,
+              right: 4,
+              child: Icon(Icons.phishing, size: 20, color: iconColor),
+            ),
+          ],
+        );
+      case _IconType.networkSecurity:
+        return Icon(Icons.hub_outlined, size: 36, color: iconColor);
+      case _IconType.linuxForensics:
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.desktop_windows_outlined, size: 38, color: iconColor),
+            Icon(Icons.terminal_rounded, size: 18, color: iconColor),
+          ],
+        );
+      case _IconType.mobileForensics:
+        return Icon(Icons.smartphone_outlined, size: 36, color: iconColor);
     }
   }
+
+  _TopicConfig _getTopicConfig(String title) {
+    final t = title.toLowerCase();
+    if (t.contains('digital') || t.contains('ram') || t.contains('memory')) {
+      return const _TopicConfig(
+        iconType: _IconType.digitalForensics,
+        lightBg: Color(0xFFEFF6FF),
+        darkBg: Color(0xFF1E293B),
+        iconColor: Color(0xFF1E3A8A),
+        badgeBg: Color(0xFFEFF6FF),
+        badgeTextColor: Color(0xFF2563EB),
+      );
+    } else if (t.contains('malware') || t.contains('reverse')) {
+      return const _TopicConfig(
+        iconType: _IconType.malwareAnalysis,
+        lightBg: Color(0xFFF0FDF4),
+        darkBg: Color(0xFF162E21),
+        iconColor: Color(0xFF14532D),
+        badgeBg: Color(0xFFF0FDF4),
+        badgeTextColor: Color(0xFF16A34A),
+      );
+    } else if (t.contains('phishing')) {
+      return const _TopicConfig(
+        iconType: _IconType.phishing,
+        lightBg: Color(0xFFFFF7ED),
+        darkBg: Color(0xFF331F14),
+        iconColor: Color(0xFFC2410C),
+        badgeBg: Color(0xFFFFF7ED),
+        badgeTextColor: Color(0xFFEA580C),
+      );
+    } else if (t.contains('network')) {
+      return const _TopicConfig(
+        iconType: _IconType.networkSecurity,
+        lightBg: Color(0xFFFAF5FF),
+        darkBg: Color(0xFF2E1A47),
+        iconColor: Color(0xFF6B21A8),
+        badgeBg: Color(0xFFEFF6FF),
+        badgeTextColor: Color(0xFF2563EB),
+      );
+    } else if (t.contains('linux')) {
+      return const _TopicConfig(
+        iconType: _IconType.linuxForensics,
+        lightBg: Color(0xFFFEFCE8),
+        darkBg: Color(0xFF333014),
+        iconColor: Color(0xFFA16207),
+        badgeBg: Color(0xFFFFF7ED),
+        badgeTextColor: Color(0xFFEA580C),
+      );
+    } else {
+      return const _TopicConfig(
+        iconType: _IconType.mobileForensics,
+        lightBg: Color(0xFFEFF6FF),
+        darkBg: Color(0xFF1E293B),
+        iconColor: Color(0xFF1E3A8A),
+        badgeBg: Color(0xFFEFF6FF),
+        badgeTextColor: Color(0xFF2563EB),
+      );
+    }
+  }
+}
+
+enum _IconType {
+  digitalForensics,
+  malwareAnalysis,
+  phishing,
+  networkSecurity,
+  linuxForensics,
+  mobileForensics,
+}
+
+class _TopicConfig {
+  final _IconType iconType;
+  final Color lightBg;
+  final Color darkBg;
+  final Color iconColor;
+  final Color badgeBg;
+  final Color badgeTextColor;
+
+  const _TopicConfig({
+    required this.iconType,
+    required this.lightBg,
+    required this.darkBg,
+    required this.iconColor,
+    required this.badgeBg,
+    required this.badgeTextColor,
+  });
 }

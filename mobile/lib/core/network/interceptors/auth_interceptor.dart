@@ -1,34 +1,47 @@
 import 'dart:async';
 import 'package:dio/dio.dart';
-import '../../storage/storage_service.dart';
 import '../../config/api_config.dart';
 import '../../constants/api_endpoints.dart';
 import '../../logger/app_logger.dart';
+import '../../storage/storage_service.dart';
+import '../../../features/authentication/services/token_service.dart';
 
-/// JWT auth interceptor for the ForenShield PHP REST API.
+/// JWT auth interceptor for the ForenShield PHP REST API using Dio and FlutterSecureStorage.
 ///
-/// - Injects a Bearer token on every non-auth request.
-/// - On 401, exchanges the refresh token for a new access token and retries.
-/// - Queues multiple requests if a refresh is already in progress.
-/// - Prevents infinite retry loops using an `extra` flag.
+/// Features:
+/// - Injects the Bearer access token from [TokenService] (FlutterSecureStorage) into headers for non-auth requests.
+/// - On 401 Unauthorized responses, automatically sends a `POST /refresh_token.php` request to renew the token.
+/// - Stores the new access token (and refresh token, if returned) securely via [TokenService].
+/// - Retries the original failed HTTP request with the new access token.
+/// - If token refresh fails (or refresh token is expired/invalid), clears secure storage and triggers session cleanup.
 class AuthInterceptor extends Interceptor {
   final StorageService _storage;
+  final TokenService _tokenService;
+  final void Function()? _onSessionExpired;
 
-  AuthInterceptor(this._storage);
+  AuthInterceptor(
+    this._storage, {
+    TokenService? tokenService,
+    this._onSessionExpired,
+  })  : _tokenService = tokenService ?? TokenService();
 
-  // Dedicated Dio instances for specific tasks to avoid interceptor loops
-  final Dio _refreshDio = Dio(BaseOptions(
-    baseUrl: ApiConfig.baseUrl,
-    connectTimeout: ApiConfig.timeout,
-    receiveTimeout: ApiConfig.timeout,
-    sendTimeout: ApiConfig.timeout,
-  ));
-  final Dio _retryDio = Dio(BaseOptions(
-    baseUrl: ApiConfig.baseUrl,
-    connectTimeout: ApiConfig.timeout,
-    receiveTimeout: ApiConfig.timeout,
-    sendTimeout: ApiConfig.timeout,
-  ));
+  final Dio _refreshDio = Dio(
+    BaseOptions(
+      baseUrl: ApiConfig.baseUrl,
+      connectTimeout: ApiConfig.timeout,
+      receiveTimeout: ApiConfig.timeout,
+      sendTimeout: ApiConfig.timeout,
+    ),
+  );
+
+  final Dio _retryDio = Dio(
+    BaseOptions(
+      baseUrl: ApiConfig.baseUrl,
+      connectTimeout: ApiConfig.timeout,
+      receiveTimeout: ApiConfig.timeout,
+      sendTimeout: ApiConfig.timeout,
+    ),
+  );
 
   bool _isRefreshing = false;
   Completer<String?>? _refreshCompleter;
@@ -38,12 +51,12 @@ class AuthInterceptor extends Interceptor {
     RequestOptions options,
     RequestInterceptorHandler handler,
   ) async {
-    // Skip token injection for auth endpoints
+    // Skip token injection for public auth endpoints
     if (_isAuthEndpoint(options.path)) {
       return handler.next(options);
     }
 
-    final token = await _storage.getAccessToken();
+    final token = await _tokenService.getToken() ?? await _storage.getAccessToken();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -55,18 +68,19 @@ class AuthInterceptor extends Interceptor {
   void onError(DioException err, ErrorInterceptorHandler handler) async {
     final requestOptions = err.requestOptions;
 
-    // Handle 401 Unauthorized - attempt token refresh
-    // Prevent infinite loops by checking the 'retried' extra flag
+    // Intercept 401 Unauthorized errors on non-auth requests
     if (err.response?.statusCode == 401 &&
         !_isAuthEndpoint(requestOptions.path) &&
         requestOptions.extra['retried'] != true) {
-      final refreshToken = await _storage.getRefreshToken();
+      
+      final refreshToken = await _tokenService.getRefreshToken() ?? await _storage.getRefreshToken();
+
       if (refreshToken == null || refreshToken.isEmpty) {
+        await _handleSessionExpired();
         return handler.next(err);
       }
 
       if (_isRefreshing) {
-        // Wait for the ongoing refresh to complete
         final newToken = await _refreshCompleter?.future;
         if (newToken != null) {
           return _retryRequest(requestOptions, newToken, handler);
@@ -79,40 +93,44 @@ class AuthInterceptor extends Interceptor {
       _refreshCompleter = Completer<String?>();
 
       try {
-        AppLogger.i('Attempting token refresh...');
+        AppLogger.i('Attempting automatic JWT refresh via POST /refresh_token.php...');
+
         final response = await _refreshDio.post(
           ApiEndpoints.refresh,
           data: {'refreshToken': refreshToken},
         );
 
-        if (response.statusCode == 200 &&
-            response.data is Map<String, dynamic>) {
+        if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
           final data = response.data as Map<String, dynamic>;
           final newAccessToken = data['accessToken'] as String?;
           final newRefreshToken = data['refreshToken'] as String?;
 
           if (newAccessToken != null && newAccessToken.isNotEmpty) {
+            // Save newly issued tokens securely via FlutterSecureStorage & StorageService
+            await _tokenService.saveToken(newAccessToken);
             await _storage.saveAccessToken(newAccessToken);
+
             if (newRefreshToken != null && newRefreshToken.isNotEmpty) {
+              await _tokenService.saveRefreshToken(newRefreshToken);
               await _storage.saveRefreshToken(newRefreshToken);
             }
 
+            AppLogger.i('Token refresh successful. Replacing expired token.');
             _refreshCompleter?.complete(newAccessToken);
             return _retryRequest(requestOptions, newAccessToken, handler);
           }
         }
 
-        // Refresh failed (invalid response format or missing token)
+        // Refresh token failed or returned unexpected payload
         _refreshCompleter?.complete(null);
-        await _storage.clearSession();
-      } on DioException catch (e) {
-        AppLogger.e('Token refresh failed (API Error)', e);
-        _refreshCompleter?.complete(null);
-        await _storage.clearSession();
+        await _handleSessionExpired();
+        return handler.next(err);
+
       } catch (e, stackTrace) {
-        AppLogger.e('Token refresh failed (Unexpected Error)', e, stackTrace);
+        AppLogger.e('Automatic token refresh failed', e, stackTrace);
         _refreshCompleter?.complete(null);
-        await _storage.clearSession();
+        await _handleSessionExpired();
+        return handler.next(err);
       } finally {
         _isRefreshing = false;
         _refreshCompleter = null;
@@ -122,12 +140,18 @@ class AuthInterceptor extends Interceptor {
     }
   }
 
+  Future<void> _handleSessionExpired() async {
+    AppLogger.w('Refresh token expired or invalid. Clearing session and redirecting to login.');
+    await _tokenService.removeToken();
+    await _storage.clearSession();
+    _onSessionExpired?.call();
+  }
+
   Future<void> _retryRequest(
     RequestOptions requestOptions,
     String token,
     ErrorInterceptorHandler handler,
   ) async {
-    // Mark this request as retried to prevent infinite loops
     requestOptions.extra['retried'] = true;
     requestOptions.headers['Authorization'] = 'Bearer $token';
 
@@ -155,6 +179,8 @@ class AuthInterceptor extends Interceptor {
   bool _isAuthEndpoint(String path) {
     return path.contains(ApiEndpoints.login) ||
         path.contains(ApiEndpoints.register) ||
-        path.contains(ApiEndpoints.refresh);
+        path.contains(ApiEndpoints.refresh) ||
+        path.contains(ApiEndpoints.verifyOtp) ||
+        path.contains(ApiEndpoints.forgotPassword);
   }
 }

@@ -33,7 +33,12 @@ class CatalogSection extends StatelessWidget {
         children: [
           Text(title, style: theme.textTheme.headlineLarge),
           const SizedBox(height: ForenSpace.xs),
-          Text(description, style: theme.textTheme.bodyMedium?.copyWith(color: foren.textSecondary)),
+          Text(
+            description,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
           const SizedBox(height: ForenSpace.lg),
           child,
         ],
@@ -47,7 +52,11 @@ class CatalogSubsection extends StatelessWidget {
   final String label;
   final Widget child;
 
-  const CatalogSubsection({super.key, required this.label, required this.child});
+  const CatalogSubsection({
+    super.key,
+    required this.label,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +70,10 @@ class CatalogSubsection extends StatelessWidget {
         children: [
           Text(
             label.toUpperCase(),
-            style: theme.textTheme.labelMedium?.copyWith(color: foren.textSecondary, letterSpacing: 0.06),
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: foren.textSecondary,
+              letterSpacing: 0.06,
+            ),
           ),
           const SizedBox(height: ForenSpace.sm),
           child,
@@ -77,7 +89,11 @@ class CatalogPropRow extends StatelessWidget {
   final List<Widget> children;
   final double spacing;
 
-  const CatalogPropRow({super.key, required this.children, this.spacing = ForenSpace.sm});
+  const CatalogPropRow({
+    super.key,
+    required this.children,
+    this.spacing = ForenSpace.sm,
+  });
 
   @override
   Widget build(BuildContext context) {

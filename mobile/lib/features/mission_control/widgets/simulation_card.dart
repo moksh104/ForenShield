@@ -35,9 +35,7 @@ class SimulationCard extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
           ),
-          border: Border.all(
-            color: AppColors.logoBlue.withValues(alpha: 0.2),
-          ),
+          border: Border.all(color: AppColors.logoBlue.withValues(alpha: 0.2)),
         ),
         child: InkWell(
           onTap: onLaunchTap,
@@ -81,7 +79,9 @@ class SimulationCard extends StatelessWidget {
                           const SizedBox(width: 8),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 6, vertical: 2),
+                              horizontal: 6,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: difficultyColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(4),

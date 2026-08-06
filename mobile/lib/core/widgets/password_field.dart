@@ -106,11 +106,7 @@ class _PasswordFieldState extends State<PasswordField> {
               padding: const EdgeInsets.only(bottom: AppSpacing.xxs),
               child: Row(
                 children: [
-                  Icon(
-                    Icons.circle,
-                    size: 4,
-                    color: foren.textSecondary,
-                  ),
+                  Icon(Icons.circle, size: 4, color: foren.textSecondary),
                   const SizedBox(width: AppSpacing.sm),
                   Expanded(
                     child: Text(

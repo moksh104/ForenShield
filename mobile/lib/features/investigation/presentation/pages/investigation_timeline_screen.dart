@@ -5,12 +5,10 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/effects/particle_background.dart';
-import '../../../../core/effects/scanner_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../../domain/entities/timeline_entity.dart';
 import '../providers/investigation_provider.dart';
@@ -73,7 +71,6 @@ class _InvestigationTimelineScreenState
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
     final invColor = foren.investigation.t500;
-    final primaryColor = theme.colorScheme.primary;
 
     if (_isLoading) {
       return Scaffold(
@@ -82,25 +79,17 @@ class _InvestigationTimelineScreenState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: ScannerEffect(
-                  color: primaryColor,
-                  child: const Center(
-                    child: Icon(Icons.timeline, size: 48, color: AppColors.logoGold),
-                  ),
-                ),
+              const SizedBox(
+                width: 36,
+                height: 36,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'BUILDING CHRONOLOGICAL TIMELINE...',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
-                  letterSpacing: 1.0,
+                'Loading timeline…',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren.textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -155,7 +144,6 @@ class _InvestigationTimelineScreenState
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: Column(
                 children: [
@@ -163,7 +151,9 @@ class _InvestigationTimelineScreenState
                   Padding(
                     padding: const EdgeInsets.all(AppSpacing.md),
                     child: Row(
-                      children: ['All', 'Critical', 'High', 'Medium'].map((sev) {
+                      children: ['All', 'Critical', 'High', 'Medium'].map((
+                        sev,
+                      ) {
                         final isSelected = _selectedSeverityFilter == sev;
                         return Padding(
                           padding: const EdgeInsets.only(right: 8),
@@ -178,7 +168,9 @@ class _InvestigationTimelineScreenState
                             shape: RoundedRectangleBorder(
                               borderRadius: AppRadius.borderRadiusSm,
                               side: BorderSide(
-                                color: isSelected ? invColor : foren.borderSubtle,
+                                color: isSelected
+                                    ? invColor
+                                    : foren.borderSubtle,
                                 width: 1.0,
                               ),
                             ),
@@ -187,8 +179,9 @@ class _InvestigationTimelineScreenState
                                   ? theme.scaffoldBackgroundColor
                                   : foren.textSecondary,
                               fontSize: 11,
-                              fontWeight:
-                                  isSelected ? FontWeight.w800 : FontWeight.w500,
+                              fontWeight: isSelected
+                                  ? FontWeight.w800
+                                  : FontWeight.w500,
                               fontFamily: 'monospace',
                             ),
                             showCheckmark: false,
@@ -196,9 +189,7 @@ class _InvestigationTimelineScreenState
                         );
                       }).toList(),
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 400.ms),
+                  ).animate().fadeIn(duration: 400.ms),
 
                   // Timeline Tree View
                   Expanded(
@@ -208,122 +199,155 @@ class _InvestigationTimelineScreenState
                       itemBuilder: (context, index) {
                         final event = filteredTimeline[index];
                         final isLast = index == filteredTimeline.length - 1;
-                        final sevColor = _getSeverityColor(foren, event.severity);
+                        final sevColor = _getSeverityColor(
+                          foren,
+                          event.severity,
+                        );
 
                         return IntrinsicHeight(
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // Timeline Node & Connector Line
-                              Column(
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  GlowEffect(
-                                    glowColor: sevColor,
-                                    blurRadius: 8,
-                                    animate: true,
-                                    borderRadius: BorderRadius.circular(10),
-                                    child: Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        color: sevColor,
-                                        shape: BoxShape.circle,
+                                  // Timeline Node & Connector Line
+                                  Column(
+                                    children: [
+                                      GlowEffect(
+                                        glowColor: sevColor,
+                                        blurRadius: 8,
+                                        animate: true,
+                                        borderRadius: BorderRadius.circular(10),
+                                        child: Container(
+                                          width: 12,
+                                          height: 12,
+                                          decoration: BoxDecoration(
+                                            color: sevColor,
+                                            shape: BoxShape.circle,
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      if (!isLast)
+                                        Expanded(
+                                          child: Container(
+                                            width: 2,
+                                            color: foren.borderSubtle
+                                                .withValues(alpha: 0.4),
+                                          ),
+                                        ),
+                                    ],
                                   ),
-                                  if (!isLast)
-                                    Expanded(
-                                      child: Container(
-                                        width: 2,
-                                        color: foren.borderSubtle.withValues(alpha: 0.4),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                              const SizedBox(width: AppSpacing.md),
+                                  const SizedBox(width: AppSpacing.md),
 
-                              // Event Card Block
-                              Expanded(
-                                child: Padding(
-                                  padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                                  child: GlassEffect(
-                                    blurX: 12.0,
-                                    blurY: 12.0,
-                                    opacity: 0.10,
-                                    border: Border.all(
-                                      color: foren.borderSubtle.withValues(alpha: 0.4),
-                                      width: 1.0,
-                                    ),
-                                    borderRadius: AppRadius.borderRadiusMd,
-                                    child: InkWell(
-                                      onTap: () => _toggleExpand(index),
-                                      borderRadius: AppRadius.borderRadiusMd,
-                                      child: Padding(
-                                        padding: const EdgeInsets.all(AppSpacing.md),
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                  // Event Card Block
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                        bottom: AppSpacing.md,
+                                      ),
+                                      child: GlassEffect(
+                                        blurX: 12.0,
+                                        blurY: 12.0,
+                                        opacity: 0.10,
+                                        border: Border.all(
+                                          color: foren.borderSubtle.withValues(
+                                            alpha: 0.4,
+                                          ),
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: AppRadius.borderRadiusMd,
+                                        child: InkWell(
+                                          onTap: () => _toggleExpand(index),
+                                          borderRadius:
+                                              AppRadius.borderRadiusMd,
+                                          child: Padding(
+                                            padding: const EdgeInsets.all(
+                                              AppSpacing.md,
+                                            ),
+                                            child: Column(
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.start,
                                               children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .spaceBetween,
+                                                  children: [
+                                                    Text(
+                                                      event.timestamp,
+                                                      style: TextStyle(
+                                                        color:
+                                                            foren.textSecondary,
+                                                        fontSize: 10,
+                                                        fontFamily: 'monospace',
+                                                      ),
+                                                    ),
+                                                    Container(
+                                                      padding:
+                                                          const EdgeInsets.symmetric(
+                                                            horizontal: 6,
+                                                            vertical: 2,
+                                                          ),
+                                                      decoration: BoxDecoration(
+                                                        color: sevColor
+                                                            .withValues(
+                                                              alpha: 0.15,
+                                                            ),
+                                                        borderRadius: AppRadius
+                                                            .borderRadiusXs,
+                                                        border: Border.all(
+                                                          color: sevColor
+                                                              .withValues(
+                                                                alpha: 0.3,
+                                                              ),
+                                                        ),
+                                                      ),
+                                                      child: Text(
+                                                        event.severity
+                                                            .toUpperCase(),
+                                                        style: TextStyle(
+                                                          color: sevColor,
+                                                          fontSize: 9,
+                                                          fontWeight:
+                                                              FontWeight.w800,
+                                                          fontFamily:
+                                                              'monospace',
+                                                        ),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                                const SizedBox(height: 6),
                                                 Text(
-                                                  event.timestamp,
+                                                  event.title,
                                                   style: TextStyle(
-                                                    color: foren.textSecondary,
-                                                    fontSize: 10,
-                                                    fontFamily: 'monospace',
+                                                    color: theme
+                                                        .colorScheme
+                                                        .onSurface,
+                                                    fontSize: 14,
+                                                    fontWeight: FontWeight.w700,
                                                   ),
                                                 ),
-                                                Container(
-                                                  padding: const EdgeInsets.symmetric(
-                                                      horizontal: 6, vertical: 2),
-                                                  decoration: BoxDecoration(
-                                                    color: sevColor.withValues(alpha: 0.15),
-                                                    borderRadius: AppRadius.borderRadiusXs,
-                                                    border: Border.all(color: sevColor.withValues(alpha: 0.3)),
-                                                  ),
-                                                  child: Text(
-                                                    event.severity.toUpperCase(),
+                                                if (event.isExpanded) ...[
+                                                  const SizedBox(height: 8),
+                                                  Text(
+                                                    event.description,
                                                     style: TextStyle(
-                                                      color: sevColor,
-                                                      fontSize: 9,
-                                                      fontWeight: FontWeight.w800,
-                                                      fontFamily: 'monospace',
+                                                      color:
+                                                          foren.textSecondary,
+                                                      fontSize: 12,
+                                                      height: 1.4,
                                                     ),
                                                   ),
-                                                ),
+                                                ],
                                               ],
                                             ),
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              event.title,
-                                              style: TextStyle(
-                                                color: theme.colorScheme.onSurface,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w700,
-                                              ),
-                                            ),
-                                            if (event.isExpanded) ...[
-                                              const SizedBox(height: 8),
-                                              Text(
-                                                event.description,
-                                                style: TextStyle(
-                                                  color: foren.textSecondary,
-                                                  fontSize: 12,
-                                                  height: 1.4,
-                                                ),
-                                              ),
-                                            ],
-                                          ],
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
+                                ],
                               ),
-                            ],
-                          ),
-                        )
+                            )
                             .animate(delay: Duration(milliseconds: index * 80))
                             .fadeIn(duration: 400.ms)
                             .slideY(begin: 0.08, end: 0);

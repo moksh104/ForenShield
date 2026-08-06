@@ -13,7 +13,7 @@ class TimelineEventModel extends TimelineEventEntity {
 
   factory TimelineEventModel.fromJson(Map<String, dynamic> json) {
     return TimelineEventModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       timestamp: json['timestamp'] as String? ?? '',

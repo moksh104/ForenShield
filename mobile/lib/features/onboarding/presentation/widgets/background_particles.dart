@@ -78,7 +78,11 @@ class _ParticlePainter extends CustomPainter {
     for (final s in _seeds) {
       final y = ((s.yBase - (progress * s.speed + s.phase)) % 1.0 + 1.0) % 1.0;
       paint.color = AppColors.secondary.withValues(alpha: s.opacity);
-      canvas.drawCircle(Offset(s.x * size.width, y * size.height), s.radius, paint);
+      canvas.drawCircle(
+        Offset(s.x * size.width, y * size.height),
+        s.radius,
+        paint,
+      );
     }
   }
 

@@ -1,5 +1,6 @@
 import 'package:flutter/widgets.dart';
 import 'package:go_router/go_router.dart';
+import '../core/logger/app_logger.dart';
 import 'route_constants.dart';
 import 'router_notifier.dart';
 
@@ -7,14 +8,13 @@ import 'router_notifier.dart';
 ///
 /// Intercepts all navigation events and enforces:
 /// 1. The Onboarding flow (ensures new users complete onboarding).
-/// 2. The Authentication flow (protects private routes and redirects logged-in users).
-///
-/// Consumes state supplied by [RouterNotifier] without making Riverpod `ref.read` or
-/// `ref.watch` calls inside the redirect callback.
+/// 2. Protected Routes (Dashboard, Mission Control, Cyber Academy, Reports,
+///    Investigation Lab, Simulation Lab).
+/// 3. Redirection of unauthenticated users to the Login screen.
 class AuthGuard {
   AuthGuard._();
 
-  /// Evaluates the current state provided by [notifier] and returns a redirect location if necessary.
+  /// Evaluates current state provided by [notifier] and returns a redirect location if necessary.
   ///
   /// Returning `null` means no redirect is required and navigation should proceed.
   static String? redirect(
@@ -24,18 +24,18 @@ class AuthGuard {
   ) {
     final location = state.matchedLocation;
 
-    // Never redirect away from the internal developer tool catalog.
+    // 1. Never redirect away from the internal developer tool catalog.
     if (_isInternalRoute(location)) return null;
 
     final isSplash = _isSplashRoute(location);
     final isOnboarding = _isOnboardingRoute(location);
     final isAuthRoute = _isAuthRoute(location);
+    final isProtectedRoute = _isProtectedRoute(location);
 
     final hasSeenOnboardingAsync = notifier.hasSeenOnboarding;
     final authState = notifier.authState;
 
-    // 1. Wait for critical state to initialize.
-    // Keep user on Splash screen until both onboarding and auth states have finished loading.
+    // 2. Wait for critical state to initialize.
     if (hasSeenOnboardingAsync.isLoading || authState.isLoading) {
       return isSplash ? null : RouteConstants.splash;
     }
@@ -43,31 +43,46 @@ class AuthGuard {
     final hasSeenOnboarding = hasSeenOnboardingAsync.value ?? false;
     final isLoggedIn = authState.value != null;
 
-    // 2. Enforce Onboarding Flow
-    if (!hasSeenOnboarding) {
-      if (!isOnboarding && !isSplash) return RouteConstants.onboarding;
-      if (isSplash) return RouteConstants.onboarding;
+    AppLogger.d(
+      '[AuthGuard] Redirect evaluation -> Location: "$location" | '
+      'isLoggedIn: $isLoggedIn | hasSeenOnboarding: $hasSeenOnboarding | '
+      'user: ${authState.value?.email}',
+    );
+
+    // 3. Enforce Authentication Flow for Authenticated Users FIRST
+    if (isLoggedIn) {
+      if (isSplash || isOnboarding || isAuthRoute) {
+        AppLogger.d('[AuthGuard] Authenticated user on non-protected page "$location". Redirecting to Mission Control.');
+        return RouteConstants.missionControl;
+      }
       return null;
     }
 
-    // 3. Enforce Authentication Flow
-    if (isLoggedIn) {
-      // Authenticated users shouldn't see splash, onboarding, or auth screens.
-      if (isSplash || isOnboarding || isAuthRoute) {
-        return RouteConstants.missionControl; // Default authenticated route
+    // 4. Enforce Onboarding Flow for Unauthenticated Users
+    if (!hasSeenOnboarding) {
+      if (!isOnboarding && !isSplash) {
+        AppLogger.d('[AuthGuard] Unauthenticated user needs onboarding. Redirecting to Onboarding.');
+        return RouteConstants.onboarding;
       }
-      return null;
-    } else {
-      // Unauthenticated users trying to access protected routes go to login.
-      if (!isAuthRoute && !isSplash && !isOnboarding) {
-        return RouteConstants.login;
-      }
-      // If they are on splash or onboarding (and already saw onboarding), send them to login.
-      if (isSplash || isOnboarding) {
-        return RouteConstants.login;
+      if (isSplash) {
+        AppLogger.d('[AuthGuard] Splash route with uncompleted onboarding. Redirecting to Onboarding.');
+        return RouteConstants.onboarding;
       }
       return null;
     }
+
+    // 5. Unauthenticated users accessing protected routes must be redirected to login.
+    if (isProtectedRoute || (!isAuthRoute && !isSplash && !isOnboarding)) {
+      AppLogger.d('[AuthGuard] Unauthenticated user attempting to access protected route "$location". Redirecting to Login.');
+      return RouteConstants.login;
+    }
+
+    if (isSplash || isOnboarding) {
+      AppLogger.d('[AuthGuard] Onboarding complete. Redirecting splash/onboarding to Login.');
+      return RouteConstants.login;
+    }
+
+    return null;
   }
 
   // ── Private Route Classifiers ───────────────────────────────────────────────
@@ -87,7 +102,29 @@ class AuthGuard {
   static bool _isAuthRoute(String location) {
     return location == RouteConstants.login ||
         location == RouteConstants.register ||
+        location == RouteConstants.otp ||
         location == RouteConstants.forgotPassword ||
         location == RouteConstants.forgotPasswordSuccess;
+  }
+
+  /// Returns whether a location requires an authenticated user session.
+  ///
+  /// Protected domains:
+  /// - Dashboard (`/dashboard`)
+  /// - Mission Control (`/mission-control`)
+  /// - Cyber Academy (`/academy`)
+  /// - Reports (`/reports`)
+  /// - Investigation Lab (`/investigation`)
+  /// - Simulation Lab (`/simulation`)
+  /// - Profile & Settings
+  static bool _isProtectedRoute(String location) {
+    return location.startsWith(RouteConstants.dashboard) ||
+        location.startsWith(RouteConstants.missionControl) ||
+        location.startsWith(RouteConstants.academy) ||
+        location.startsWith(RouteConstants.reports) ||
+        location.startsWith(RouteConstants.investigation) ||
+        location.startsWith(RouteConstants.simulation) ||
+        location.startsWith(RouteConstants.profile) ||
+        location == RouteConstants.settings;
   }
 }

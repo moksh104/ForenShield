@@ -12,7 +12,8 @@ class ForenTimelineItem extends StatelessWidget {
   final String time;
   final String title;
   final bool isLast;
-  final bool isCritical; // highlights the pivotal step (e.g. "C2 Communication")
+  final bool
+  isCritical; // highlights the pivotal step (e.g. "C2 Communication")
 
   const ForenTimelineItem({
     super.key,
@@ -26,7 +27,9 @@ class ForenTimelineItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
-    final dotColor = isCritical ? foren.critical.t500 : foren.investigation.t500;
+    final dotColor = isCritical
+        ? foren.critical.t500
+        : foren.investigation.t500;
 
     return IntrinsicHeight(
       child: Row(
@@ -36,7 +39,9 @@ class ForenTimelineItem extends StatelessWidget {
             width: 56,
             child: Text(
               time,
-              style: theme.textTheme.labelSmall?.copyWith(color: foren.textSecondary),
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: foren.textSecondary,
+              ),
             ),
           ),
           Column(
@@ -44,9 +49,13 @@ class ForenTimelineItem extends StatelessWidget {
               Container(
                 width: 10,
                 height: 10,
-                decoration: BoxDecoration(color: dotColor, shape: BoxShape.circle),
+                decoration: BoxDecoration(
+                  color: dotColor,
+                  shape: BoxShape.circle,
+                ),
               ),
-              if (!isLast) Expanded(child: Container(width: 2, color: foren.borderSubtle)),
+              if (!isLast)
+                Expanded(child: Container(width: 2, color: foren.borderSubtle)),
             ],
           ),
           const SizedBox(width: ForenSpace.sm),
@@ -93,18 +102,32 @@ class ForenActivityFeedItem extends StatelessWidget {
         padding: const EdgeInsets.symmetric(vertical: ForenSpace.sm),
         child: Row(
           children: [
-            Icon(icon, size: ForenIconSize.defaultSize, color: iconColor ?? foren.textSecondary),
+            Icon(
+              icon,
+              size: ForenIconSize.defaultSize,
+              color: iconColor ?? foren.textSecondary,
+            ),
             const SizedBox(width: ForenSpace.sm),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(title, style: theme.textTheme.bodyMedium),
-                  Text(subtitle, style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary)),
+                  Text(
+                    subtitle,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: foren.textSecondary,
+                    ),
+                  ),
                 ],
               ),
             ),
-            Text(time, style: theme.textTheme.labelSmall?.copyWith(color: foren.textDisabled)),
+            Text(
+              time,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: foren.textDisabled,
+              ),
+            ),
           ],
         ),
       ),
@@ -129,13 +152,13 @@ class ForenEvidenceListItem extends StatelessWidget {
   });
 
   IconData get _icon => switch (type) {
-        ForenEvidenceType.email => Icons.mail_outline,
-        ForenEvidenceType.pdf => Icons.description_outlined,
-        ForenEvidenceType.pcap => Icons.public,
-        ForenEvidenceType.memoryDump => Icons.memory,
-        ForenEvidenceType.screenshot => Icons.photo_camera_outlined,
-        ForenEvidenceType.other => Icons.insert_drive_file_outlined,
-      };
+    ForenEvidenceType.email => Icons.mail_outline,
+    ForenEvidenceType.pdf => Icons.description_outlined,
+    ForenEvidenceType.pcap => Icons.public,
+    ForenEvidenceType.memoryDump => Icons.memory,
+    ForenEvidenceType.screenshot => Icons.photo_camera_outlined,
+    ForenEvidenceType.other => Icons.insert_drive_file_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -149,7 +172,10 @@ class ForenEvidenceListItem extends StatelessWidget {
       contentPadding: EdgeInsets.zero,
       leading: Icon(_icon, color: accent),
       title: Text(filename, style: theme.textTheme.bodyMedium),
-      trailing: Text(meta, style: theme.textTheme.labelSmall?.copyWith(color: foren.textSecondary)),
+      trailing: Text(
+        meta,
+        style: theme.textTheme.labelSmall?.copyWith(color: foren.textSecondary),
+      ),
       minLeadingWidth: 0,
     );
   }
@@ -185,7 +211,10 @@ class ForenCourseListItem extends StatelessWidget {
         child: Icon(Icons.menu_book_outlined, color: accent, size: 18),
       ),
       title: Text(title, style: theme.textTheme.bodyMedium),
-      subtitle: Text('$lessonCount lessons', style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary)),
+      subtitle: Text(
+        '$lessonCount lessons',
+        style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary),
+      ),
       trailing: Text(
         '${(progress * 100).round()}%',
         style: theme.textTheme.labelMedium?.copyWith(color: accent),

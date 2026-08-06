@@ -52,7 +52,9 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
   Future<void> _toggleChecklist(int index) async {
     final lesson = _lesson;
     if (lesson == null) return;
-    final updatedChecklist = List<LessonChecklistItemEntity>.from(lesson.checklist);
+    final updatedChecklist = List<LessonChecklistItemEntity>.from(
+      lesson.checklist,
+    );
     final current = updatedChecklist[index];
     updatedChecklist[index] = current.copyWith(isChecked: !current.isChecked);
 
@@ -86,7 +88,10 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
       },
       failure: (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: foren.critical.t500),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: foren.critical.t500,
+          ),
         );
       },
     );
@@ -111,7 +116,10 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(backgroundColor: theme.scaffoldBackgroundColor),
         body: Center(
-          child: Text('Lesson not found.', style: TextStyle(color: foren.textDisabled)),
+          child: Text(
+            'Lesson not found.',
+            style: TextStyle(color: foren.textDisabled),
+          ),
         ),
       );
     }
@@ -245,7 +253,9 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                     const SizedBox(width: AppSpacing.md),
                     ElevatedButton.icon(
                       onPressed: () {
-                        context.push('${RouteConstants.quizScreen}/${lesson.quizId}');
+                        context.push(
+                          '${RouteConstants.quizScreen}/${lesson.quizId}',
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: academyColor,
@@ -255,7 +265,10 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                         ),
                       ),
                       icon: const Icon(Icons.quiz_outlined, size: 16),
-                      label: const Text('Take Quiz', style: TextStyle(fontWeight: FontWeight.w700)),
+                      label: const Text(
+                        'Take Quiz',
+                        style: TextStyle(fontWeight: FontWeight.w700),
+                      ),
                     ),
                   ],
                 ],
@@ -312,7 +325,10 @@ class _CodeSnippetCard extends StatelessWidget {
                   children: [
                     Icon(Icons.copy, size: 12, color: foren.textDisabled),
                     const SizedBox(width: 4),
-                    Text('Copy', style: TextStyle(color: foren.textDisabled, fontSize: 10)),
+                    Text(
+                      'Copy',
+                      style: TextStyle(color: foren.textDisabled, fontSize: 10),
+                    ),
                   ],
                 ),
               ),

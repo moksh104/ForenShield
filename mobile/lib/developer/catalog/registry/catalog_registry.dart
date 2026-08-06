@@ -8,7 +8,7 @@ import 'components/badge_progress_registry.dart';
 import 'components/token_registry.dart';
 
 /// Centralized data registry containing every component in the ForenShield catalog.
-/// 
+///
 /// Future components are added here; the UI automatically indexes and renders them.
 class CatalogRegistry {
   CatalogRegistry._();

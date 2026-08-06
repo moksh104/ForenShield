@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 
-/// Glassmorphic Filter & Search Bar for Investigation Cases.
+/// Filter & Search Bar for Investigation Cases.
 class InvestigationFilterBar extends StatelessWidget {
   final List<String> statusFilters;
   final String selectedStatus;
@@ -31,11 +30,8 @@ class InvestigationFilterBar extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Column(
         children: [
-          // Glassmorphic Search Input Field
+          // Search Input Field
           GlassEffect(
-            blurX: 12.0,
-            blurY: 12.0,
-            opacity: 0.10,
             border: Border.all(
               color: primaryColor.withValues(alpha: 0.3),
               width: 1.0,
@@ -43,25 +39,17 @@ class InvestigationFilterBar extends StatelessWidget {
             borderRadius: AppRadius.borderRadiusMd,
             child: TextField(
               onChanged: onSearchSubmitted,
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 13,
-              ),
+              style: theme.textTheme.bodyMedium,
               decoration: InputDecoration(
                 hintText: 'Search cases by title, code, or artifact...',
-                hintStyle: TextStyle(
+                hintStyle: theme.textTheme.bodySmall?.copyWith(
                   color: foren.textSecondary,
-                  fontSize: 12,
                 ),
-                prefixIcon: Icon(
-                  Icons.search,
-                  color: primaryColor,
-                  size: 20,
-                ),
+                prefixIcon: Icon(Icons.search, color: primaryColor, size: 20),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(
                   horizontal: AppSpacing.md,
-                  vertical: 12,
+                  vertical: AppSpacing.sm,
                 ),
               ),
             ),
@@ -74,7 +62,8 @@ class InvestigationFilterBar extends StatelessWidget {
             child: ListView.separated(
               scrollDirection: Axis.horizontal,
               itemCount: statusFilters.length,
-              separatorBuilder: (context, index) => const SizedBox(width: AppSpacing.xs),
+              separatorBuilder: (context, index) =>
+                  const SizedBox(width: AppSpacing.xs),
               itemBuilder: (context, index) {
                 final status = statusFilters[index];
                 final isSelected = selectedStatus == status;
@@ -84,7 +73,7 @@ class InvestigationFilterBar extends StatelessWidget {
                   selected: isSelected,
                   onSelected: (_) => onStatusSelected(status),
                   selectedColor: invColor,
-                  backgroundColor: AppColors.surface,
+                  backgroundColor: theme.colorScheme.surface,
                   shape: RoundedRectangleBorder(
                     borderRadius: AppRadius.borderRadiusSm,
                     side: BorderSide(
@@ -92,13 +81,11 @@ class InvestigationFilterBar extends StatelessWidget {
                       width: 1.0,
                     ),
                   ),
-                  labelStyle: TextStyle(
+                  labelStyle: theme.textTheme.labelMedium?.copyWith(
                     color: isSelected
                         ? theme.scaffoldBackgroundColor
                         : foren.textSecondary,
-                    fontSize: 11,
-                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-                    fontFamily: 'monospace',
+                    fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
                   ),
                   showCheckmark: false,
                 );

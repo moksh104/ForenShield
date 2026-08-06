@@ -74,7 +74,11 @@ class ComponentDefinition {
 
   /// The rendering function for the Live Playground.
   /// Receives the active [activeProperties] state to render variations.
-  final Widget Function(BuildContext context, Map<String, dynamic> activeProperties) builder;
+  final Widget Function(
+    BuildContext context,
+    Map<String, dynamic> activeProperties,
+  )
+  builder;
 
   const ComponentDefinition({
     required this.name,

@@ -33,7 +33,9 @@ class AcademyRepository {
   /// Marks a lesson as completed.
   ///
   /// Returns the updated [LessonProgressModel] on success.
-  Future<Result<LessonProgressModel>> markLessonComplete(String lessonId) async {
+  Future<Result<LessonProgressModel>> markLessonComplete(
+    String lessonId,
+  ) async {
     return _execute(() => _remoteDataSource.completeLesson(lessonId));
   }
 

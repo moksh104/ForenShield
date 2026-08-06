@@ -32,7 +32,6 @@ class EnvConfig {
     }
   }
 
-
   /// Returns true if the application is running in debug mode.
   static bool get isDebug => kDebugMode;
 

@@ -6,11 +6,10 @@ import '../../../core/models/failure.dart' as core_fail;
 // Note: In a real implementation, you would use Dependency Injection (e.g. get_it or a provider block)
 // to inject the UseCases. We leave them uninitialized here for template purposes.
 
-final featureProvider = StateNotifierProvider.autoDispose<FeatureNotifier, FeatureState>((
-  ref,
-) {
-  throw UnimplementedError('Provide GetFeaturesUseCase via DI');
-});
+final featureProvider =
+    StateNotifierProvider.autoDispose<FeatureNotifier, FeatureState>((ref) {
+      throw UnimplementedError('Provide GetFeaturesUseCase via DI');
+    });
 
 /// Manages the state of the Feature screen.
 class FeatureNotifier extends StateNotifier<FeatureState> {

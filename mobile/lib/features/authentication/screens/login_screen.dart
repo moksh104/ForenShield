@@ -7,8 +7,10 @@ import '../../../core/effects/particle_background.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/foren_theme.dart';
+import '../../../core/exceptions/app_exceptions.dart';
 import '../../../core/validators/form_validators.dart';
 import '../../../routes/route_constants.dart';
+import '../../../core/logger/app_logger.dart';
 import '../presentation/widgets/auth_button.dart';
 import '../presentation/widgets/auth_logo.dart';
 import '../presentation/widgets/auth_text_field.dart';
@@ -45,6 +47,8 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
+    AppLogger.d('[LoginScreen] User clicked login. Validated form for email: ${_emailController.text}');
+
     setState(() {
       _isLoading = true;
       _errorMessage = null;
@@ -60,11 +64,14 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
     result.when(
       success: (_) {
-        // AuthGuard will automatically redirect to Mission Control
+        AppLogger.d('[LoginScreen] Login returned success result. AuthGuard redirect will handle navigation.');
       },
       failure: (exception) {
+        AppLogger.w('[LoginScreen] Login returned failure result: $exception');
         setState(() {
-          _errorMessage = exception.toString();
+          _errorMessage = exception is AppException
+              ? exception.userMessage
+              : exception.toString();
         });
       },
     );

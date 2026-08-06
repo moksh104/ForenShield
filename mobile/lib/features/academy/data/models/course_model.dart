@@ -13,10 +13,11 @@ class ModuleModel extends ModuleEntity {
 
   factory ModuleModel.fromJson(Map<String, dynamic> json) {
     return ModuleModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
-      lessons: (json['lessons'] as List<dynamic>?)
+      lessons:
+          (json['lessons'] as List<dynamic>?)
               ?.map((e) => LessonModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
@@ -56,7 +57,7 @@ class CourseModel extends CourseEntity {
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
     return CourseModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       category: json['category'] as String? ?? 'Forensics',
@@ -64,15 +65,18 @@ class CourseModel extends CourseEntity {
       durationMinutes: json['duration_minutes'] as int? ?? 120,
       instructorName: json['instructor_name'] as String? ?? 'Dr. Alex Vance',
       thumbnailUrl: json['thumbnail_url'] as String? ?? '',
-      prerequisites: (json['prerequisites'] as List<dynamic>?)
+      prerequisites:
+          (json['prerequisites'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const ['Basic Networking', 'Linux Command Line'],
-      learningOutcomes: (json['learning_outcomes'] as List<dynamic>?)
+      learningOutcomes:
+          (json['learning_outcomes'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const ['Analyze RAM dumps', 'Extract registry artifacts'],
-      modules: (json['modules'] as List<dynamic>?)
+      modules:
+          (json['modules'] as List<dynamic>?)
               ?.map((e) => ModuleModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],

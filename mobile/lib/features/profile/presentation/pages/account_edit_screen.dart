@@ -96,15 +96,30 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
               const SizedBox(height: 12),
               ListTile(
                 leading: Icon(Icons.camera_alt_outlined, color: primaryColor),
-                title: Text('Camera', style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14)),
+                title: Text(
+                  'Camera',
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 14,
+                  ),
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
                   await _pickImageSource(ImageSource.camera);
                 },
               ),
               ListTile(
-                leading: Icon(Icons.photo_library_outlined, color: primaryColor),
-                title: Text('Gallery', style: TextStyle(color: theme.colorScheme.onSurface, fontSize: 14)),
+                leading: Icon(
+                  Icons.photo_library_outlined,
+                  color: primaryColor,
+                ),
+                title: Text(
+                  'Gallery',
+                  style: TextStyle(
+                    color: theme.colorScheme.onSurface,
+                    fontSize: 14,
+                  ),
+                ),
                 onTap: () async {
                   Navigator.pop(ctx);
                   await _pickImageSource(ImageSource.gallery);
@@ -115,7 +130,11 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                   leading: Icon(Icons.delete_outline, color: criticalColor),
                   title: Text(
                     'Remove Photo',
-                    style: TextStyle(color: criticalColor, fontSize: 14, fontWeight: FontWeight.w600),
+                    style: TextStyle(
+                      color: criticalColor,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   onTap: () async {
                     Navigator.pop(ctx);
@@ -191,7 +210,10 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
       },
       failure: (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: foren.critical.t500),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: foren.critical.t500,
+          ),
         );
       },
     );
@@ -225,7 +247,10 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
       },
       failure: (e) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.toString()), backgroundColor: foren.critical.t500),
+          SnackBar(
+            content: Text(e.toString()),
+            backgroundColor: foren.critical.t500,
+          ),
         );
       },
     );
@@ -248,7 +273,13 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
     final profile = ref.watch(profileProvider).profile;
     final avatarUrl = profile?.avatarUrl ?? '';
     final initials = (profile?.fullName ?? 'Agent').isNotEmpty
-        ? profile!.fullName.trim().split(' ').map((e) => e[0]).take(2).join().toUpperCase()
+        ? profile!.fullName
+              .trim()
+              .split(' ')
+              .map((e) => e[0])
+              .take(2)
+              .join()
+              .toUpperCase()
         : 'A';
 
     return Scaffold(
@@ -290,7 +321,11 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                           border: Border.all(color: primaryColor, width: 2),
                         ),
                         child: ClipOval(
-                          child: _buildAvatarWidget(avatarUrl, initials, primaryColor),
+                          child: _buildAvatarWidget(
+                            avatarUrl,
+                            initials,
+                            primaryColor,
+                          ),
                         ),
                       ),
                       Positioned(
@@ -383,7 +418,9 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Text('Save Details'),
                       ),
@@ -434,7 +471,9 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                     Align(
                       alignment: Alignment.centerRight,
                       child: ElevatedButton(
-                        onPressed: _isSavingPassword ? null : _handleChangePassword,
+                        onPressed: _isSavingPassword
+                            ? null
+                            : _handleChangePassword,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: foren.simulation.t500,
                           foregroundColor: theme.colorScheme.onSurface,
@@ -443,7 +482,9 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                             ? const SizedBox(
                                 width: 16,
                                 height: 16,
-                                child: CircularProgressIndicator(strokeWidth: 2),
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                ),
                               )
                             : const Text('Update Password'),
                       ),
@@ -477,7 +518,11 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                   children: [
                     Text(
                       'Session Type: JWT Authenticated',
-                      style: TextStyle(color: primaryColor, fontSize: 12, fontWeight: FontWeight.w700),
+                      style: TextStyle(
+                        color: primaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -528,13 +573,18 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
     );
   }
 
-  Widget _buildAvatarWidget(String avatarUrl, String initials, Color primaryColor) {
+  Widget _buildAvatarWidget(
+    String avatarUrl,
+    String initials,
+    Color primaryColor,
+  ) {
     if (avatarUrl.isNotEmpty) {
       if (kIsWeb || avatarUrl.startsWith('http')) {
         return Image.network(
           avatarUrl,
           fit: BoxFit.cover,
-          errorBuilder: (ctx, err, stack) => _buildInitials(initials, primaryColor),
+          errorBuilder: (ctx, err, stack) =>
+              _buildInitials(initials, primaryColor),
         );
       } else {
         final file = File(avatarUrl);
@@ -542,7 +592,8 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
           return Image.file(
             file,
             fit: BoxFit.cover,
-            errorBuilder: (ctx, err, stack) => _buildInitials(initials, primaryColor),
+            errorBuilder: (ctx, err, stack) =>
+                _buildInitials(initials, primaryColor),
           );
         }
       }

@@ -15,7 +15,7 @@ class SuspectModel extends SuspectEntity {
 
   factory SuspectModel.fromJson(Map<String, dynamic> json) {
     return SuspectModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       name: json['name'] as String? ?? '',
       role: json['role'] as String? ?? '',
       avatarUrl: json['avatar_url'] as String? ?? '',
@@ -57,7 +57,7 @@ class CaseModel extends InvestigationEntity {
 
   factory CaseModel.fromJson(Map<String, dynamic> json) {
     return CaseModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       caseCode: json['case_code'] as String? ?? '#FSC-000',
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
@@ -66,20 +66,26 @@ class CaseModel extends InvestigationEntity {
       status: json['status'] as String? ?? 'Open',
       assignedDate: json['assigned_date'] as String? ?? '',
       progress: (json['progress'] as num?)?.toDouble() ?? 0.0,
-      evidenceList: (json['evidence_list'] as List<dynamic>?)
+      evidenceList:
+          (json['evidence_list'] as List<dynamic>?)
               ?.map((e) => EvidenceModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
-      timeline: (json['timeline'] as List<dynamic>?)
-              ?.map((e) => TimelineEventModel.fromJson(e as Map<String, dynamic>))
+      timeline:
+          (json['timeline'] as List<dynamic>?)
+              ?.map(
+                (e) => TimelineEventModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           const [],
-      suspects: (json['suspects'] as List<dynamic>?)
+      suspects:
+          (json['suspects'] as List<dynamic>?)
               ?.map((e) => SuspectModel.fromJson(e as Map<String, dynamic>))
               .toList() ??
           const [],
       notes: json['notes'] as String? ?? '',
-      objectives: (json['objectives'] as List<dynamic>?)
+      objectives:
+          (json['objectives'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],
@@ -100,12 +106,13 @@ class CaseModel extends InvestigationEntity {
       'status': status,
       'assigned_date': assignedDate,
       'progress': progress,
-      'evidence_list':
-          evidenceList.map((e) => (e as EvidenceModel).toJson()).toList(),
-      'timeline':
-          timeline.map((t) => (t as TimelineEventModel).toJson()).toList(),
-      'suspects':
-          suspects.map((s) => (s as SuspectModel).toJson()).toList(),
+      'evidence_list': evidenceList
+          .map((e) => (e as EvidenceModel).toJson())
+          .toList(),
+      'timeline': timeline
+          .map((t) => (t as TimelineEventModel).toJson())
+          .toList(),
+      'suspects': suspects.map((s) => (s as SuspectModel).toJson()).toList(),
       'notes': notes,
       'objectives': objectives,
       'verdict': verdict != null ? (verdict as VerdictModel).toJson() : null,

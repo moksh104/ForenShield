@@ -41,9 +41,7 @@ class ActiveInvestigationCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHigh,
           borderRadius: AppRadius.cardRadius,
-          border: Border.all(
-            color: statusColor.withValues(alpha: 0.35),
-          ),
+          border: Border.all(color: statusColor.withValues(alpha: 0.35)),
         ),
         child: InkWell(
           onTap: onContinueTap,
@@ -57,7 +55,9 @@ class ActiveInvestigationCard extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: statusColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(AppRadius.xs),
@@ -87,16 +87,20 @@ class ActiveInvestigationCard extends StatelessWidget {
                       ),
                     ),
                     const Spacer(),
-                    Icon(Icons.access_time_outlined,
-                        size: 13,
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.45)),
+                    Icon(
+                      Icons.access_time_outlined,
+                      size: 13,
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.45,
+                      ),
+                    ),
                     const SizedBox(width: 4),
                     Text(
                       timeActive,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                   ],
@@ -117,8 +121,9 @@ class ActiveInvestigationCard extends StatelessWidget {
                     Text(
                       caseId,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.45),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.45,
+                        ),
                         fontFamily: 'monospace',
                       ),
                     ),
@@ -127,8 +132,9 @@ class ActiveInvestigationCard extends StatelessWidget {
                       width: 3,
                       height: 3,
                       decoration: BoxDecoration(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.3),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.3,
+                        ),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -136,8 +142,9 @@ class ActiveInvestigationCard extends StatelessWidget {
                     Text(
                       caseType,
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.55),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.55,
+                        ),
                       ),
                     ),
                   ],
@@ -162,8 +169,9 @@ class ActiveInvestigationCard extends StatelessWidget {
                               Text(
                                 'objectives',
                                 style: theme.textTheme.labelSmall?.copyWith(
-                                  color: theme.colorScheme.onSurface
-                                      .withValues(alpha: 0.5),
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.5,
+                                  ),
                                 ),
                               ),
                             ],
@@ -188,11 +196,12 @@ class ActiveInvestigationCard extends StatelessWidget {
                     FilledButton.tonal(
                       onPressed: onContinueTap,
                       style: FilledButton.styleFrom(
-                        backgroundColor:
-                            statusColor.withValues(alpha: 0.15),
+                        backgroundColor: statusColor.withValues(alpha: 0.15),
                         foregroundColor: statusColor,
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 14, vertical: 8),
+                          horizontal: 14,
+                          vertical: 8,
+                        ),
                         minimumSize: Size.zero,
                         tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                         shape: RoundedRectangleBorder(

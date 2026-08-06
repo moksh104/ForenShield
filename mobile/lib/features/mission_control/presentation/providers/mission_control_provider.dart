@@ -9,7 +9,14 @@ import '../../domain/repositories/mission_control_repository.dart';
 import '../../domain/usecases/load_dashboard_use_case.dart';
 
 /// Status enum for Mission Control state.
-enum MissionControlStatus { initial, loading, refreshing, success, empty, error }
+enum MissionControlStatus {
+  initial,
+  loading,
+  refreshing,
+  success,
+  empty,
+  error,
+}
 
 /// Immutable state for Mission Control Dashboard.
 class MissionControlState {
@@ -23,9 +30,8 @@ class MissionControlState {
     this.errorMessage,
   });
 
-  factory MissionControlState.initial() => const MissionControlState(
-        status: MissionControlStatus.initial,
-      );
+  factory MissionControlState.initial() =>
+      const MissionControlState(status: MissionControlStatus.initial);
 
   MissionControlState copyWith({
     MissionControlStatus? status,
@@ -39,16 +45,18 @@ class MissionControlState {
     );
   }
 }
+
 /// Provider for Remote Data Source.
 final missionControlRemoteDataSourceProvider =
     Provider<MissionControlRemoteDataSource>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return MissionControlRemoteDataSource(apiClient);
-});
+      final apiClient = ref.watch(apiClientProvider);
+      return MissionControlRemoteDataSource(apiClient);
+    });
 
 /// Provider for Repository contract.
-final missionControlRepositoryProvider =
-    Provider<MissionControlRepository>((ref) {
+final missionControlRepositoryProvider = Provider<MissionControlRepository>((
+  ref,
+) {
   if (ApiConfig.useMockApi) {
     return MockMissionControlRepository();
   }
@@ -67,7 +75,7 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
   final LoadDashboardUseCase _loadDashboardUseCase;
 
   MissionControlNotifier(this._loadDashboardUseCase)
-      : super(MissionControlState.initial()) {
+    : super(MissionControlState.initial()) {
     loadDashboard();
   }
 
@@ -75,6 +83,7 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
   Future<void> loadDashboard() async {
     state = state.copyWith(status: MissionControlStatus.loading);
     final result = await _loadDashboardUseCase();
+    if (!mounted) return;
     result.when(
       success: (data) {
         state = state.copyWith(
@@ -95,6 +104,7 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
   Future<void> refreshDashboard() async {
     state = state.copyWith(status: MissionControlStatus.refreshing);
     final result = await _loadDashboardUseCase();
+    if (!mounted) return;
     result.when(
       success: (data) {
         state = state.copyWith(
@@ -114,7 +124,10 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
 
 /// Main StateNotifierProvider for Mission Control.
 final missionControlProvider =
-    StateNotifierProvider.autoDispose<MissionControlNotifier, MissionControlState>((ref) {
-  final useCase = ref.watch(loadDashboardUseCaseProvider);
-  return MissionControlNotifier(useCase);
-});
+    StateNotifierProvider.autoDispose<
+      MissionControlNotifier,
+      MissionControlState
+    >((ref) {
+      final useCase = ref.watch(loadDashboardUseCaseProvider);
+      return MissionControlNotifier(useCase);
+    });

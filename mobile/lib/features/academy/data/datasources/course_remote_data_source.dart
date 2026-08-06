@@ -1,7 +1,7 @@
+import '../../../../core/config/api_config.dart';
 import '../../../../core/network/api_client.dart';
 import '../models/course_model.dart';
 import '../models/lesson_model.dart';
-import '../models/quiz_model.dart';
 
 /// Remote Data Source for Cyber Academy API calls.
 class CourseRemoteDataSource {
@@ -14,13 +14,15 @@ class CourseRemoteDataSource {
     String? category,
     String? searchQuery,
   }) async {
+    if (ApiConfig.useMockApi) {
+      return _getFallbackCourses(category: category, searchQuery: searchQuery);
+    }
     try {
       final response = await _apiClient.get<List<dynamic>>(
-        '/academy/courses',
+        '/academy_courses.php',
         queryParameters: {
           if (category != null && category != 'All') 'category': category,
-          if (searchQuery != null && searchQuery.isNotEmpty)
-            'q': searchQuery,
+          if (searchQuery != null && searchQuery.isNotEmpty) 'q': searchQuery,
         },
       );
       if (response.data != null) {
@@ -36,9 +38,14 @@ class CourseRemoteDataSource {
 
   /// Fetches course details.
   Future<CourseModel> getCourseDetail(String courseId) async {
+    if (ApiConfig.useMockApi) {
+      final all = _getFallbackCourses();
+      return all.firstWhere((c) => c.id == courseId, orElse: () => all.first);
+    }
     try {
       final response = await _apiClient.get<Map<String, dynamic>>(
-        '/academy/courses/$courseId',
+        '/academy_course_detail.php',
+        queryParameters: {'id': courseId},
       );
       if (response.data != null) {
         return CourseModel.fromJson(response.data!);
@@ -52,9 +59,13 @@ class CourseRemoteDataSource {
 
   /// Fetches lesson details.
   Future<LessonModel> getLesson(String lessonId) async {
+    if (ApiConfig.useMockApi) {
+      return _fallbackLesson;
+    }
     try {
       final response = await _apiClient.get<Map<String, dynamic>>(
-        '/academy/lessons/$lessonId',
+        '/academy_lesson.php',
+        queryParameters: {'id': lessonId},
       );
       if (response.data != null) {
         return LessonModel.fromJson(response.data!);
@@ -70,10 +81,13 @@ class CourseRemoteDataSource {
     required String quizId,
     required Map<String, int> selectedOptions,
   }) async {
+    if (ApiConfig.useMockApi) {
+      return 85;
+    }
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
-        '/academy/quizzes/$quizId/submit',
-        data: {'answers': selectedOptions},
+        '/academy_quiz_submit.php',
+        data: {'quiz_id': quizId, 'answers': selectedOptions},
       );
       if (response.data != null && response.data!['score'] != null) {
         return response.data!['score'] as int;
@@ -86,14 +100,14 @@ class CourseRemoteDataSource {
 
   static final LessonModel _fallbackLesson = LessonModel(
     id: 'les_101',
-    title: 'Volatile Memory Extraction via Volatility 3',
+    title: 'Digital Forensics Acquisition Techniques',
     durationMinutes: 20,
     contentType: 'text',
     contentText:
         'Memory forensics is the analysis of an acquired memory dump from a physical machine. When investigating an active C2 infection, RAM artifacts contain unencrypted network sockets, injected DLLs, and plaintext credentials.',
     imageUrl: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5',
     codeSnippet:
-      '# Run Volatility 3 plugin for Windows processes\npython3 vol.py -f memory.raw windows.pslist\npython3 vol.py -f memory.raw windows.netscan',
+        '# Run Volatility 3 plugin for Windows processes\npython3 vol.py -f memory.raw windows.pslist\npython3 vol.py -f memory.raw windows.netscan',
     codeLanguage: 'bash',
     checklist: const [
       LessonChecklistItemModel(
@@ -124,130 +138,196 @@ class CourseRemoteDataSource {
     final list = [
       CourseModel(
         id: 'crs_1',
-        title: 'RAM & Memory Forensics Masterclass',
+        title: 'Digital Forensics Fundamentals',
         description:
-            'Deep dive into Volatility 3, Windows memory artifacts, process injection detection, and kernel rootkits.',
-        category: 'Memory Forensics',
-        difficulty: 'Intermediate',
-        durationMinutes: 180,
+            'Learn the basics of digital evidence, acquisition, and analysis techniques.',
+        category: 'Digital Forensics',
+        difficulty: 'Beginner',
+        durationMinutes: 150,
         instructorName: 'Dr. Alex Vance',
         thumbnailUrl: '',
-        prerequisites: const ['Basic C/OS Concepts', 'Command Line Proficiency'],
+        prerequisites: const ['Basic OS Concepts', 'Command Line Proficiency'],
         learningOutcomes: const [
-          'Acquire RAM safely using DumpIt and FTK Imager',
-          'Detect DLL injection and process hollowing',
-          'Analyze malware network connections in memory',
+          'Acquire disk and memory evidence safely',
+          'Identify file system artifacts',
+          'Analyze browser & system logs',
         ],
-        modules: [
-          ModuleModel(
-            id: 'mod_1',
-            title: 'Module 1: Fundamentals of RAM Acquisition',
-            description: 'Preserving volatile evidence adhering to RFC 3227.',
+        modules: List.generate(
+          12,
+          (i) => ModuleModel(
+            id: 'mod_${i + 1}',
+            title: 'Module ${i + 1}: Forensics Core Concepts',
+            description: 'Essential techniques for evidence handling.',
             lessons: [_fallbackLesson],
-            order: 1,
+            order: i + 1,
           ),
-          ModuleModel(
-            id: 'mod_2',
-            title: 'Module 2: Malfind & Process Injection',
-            description: 'Locating unbacked executable memory pages.',
-            lessons: [
-              LessonModel(
-                id: 'les_102',
-                title: 'Detecting Process Hollowing in SVCHOST',
-                durationMinutes: 25,
-                contentType: 'text',
-                contentText:
-                    'Process hollowing occurs when a legitimate process (e.g. svchost.exe) is spawned in a suspended state, its code unmapped, and malicious code injected before resuming execution.',
-                codeSnippet: 'python3 vol.py -f mem.raw windows.malfind',
-                codeLanguage: 'bash',
-                checklist: const [],
-                isCompleted: true,
-                order: 2,
-              ),
-            ],
-            order: 2,
-          ),
-        ],
-        isEnrolled: true,
-        completionPercentage: 0.50,
-        totalXp: 600,
-        quiz: const QuizModel(
-          id: 'qz_101',
-          title: 'Memory Forensics Knowledge Check',
-          passingScorePercent: 75,
-          questions: [
-            QuizQuestionModel(
-              id: 'q1',
-              questionText:
-                  'Which Volatility 3 plugin displays active network connections in a Windows memory dump?',
-              options: ['windows.pslist', 'windows.netscan', 'windows.filescan', 'windows.cmdline'],
-              correctOptionIndex: 1,
-              explanation:
-                  'windows.netscan scans memory pools for socket structures to enumerate network connections.',
-            ),
-            QuizQuestionModel(
-              id: 'q2',
-              questionText:
-                  'What is the primary indicator of process hollowing in malfind output?',
-              options: [
-                'Unbacked memory pages with PAGE_EXECUTE_READWRITE permissions',
-                'High CPU utilization',
-                'Duplicate PID numbers',
-                'Missing system environment variables'
-              ],
-              correctOptionIndex: 0,
-              explanation:
-                  'Malfind detects VAD regions containing executable code that are not backed by a disk file, typically marked PAGE_EXECUTE_READWRITE (0x40).',
-            ),
-          ],
         ),
+        isEnrolled: true,
+        completionPercentage: 0.75,
+        totalXp: 500,
       ),
       CourseModel(
         id: 'crs_2',
-        title: 'Reverse Engineering Ransomware Binaries',
+        title: 'Malware Analysis Essentials',
         description:
-            'Decompile, disassemble, and analyze malware samples using Ghidra and x64dbg.',
-        category: 'Reverse Engineering',
-        difficulty: 'Advanced',
-        durationMinutes: 240,
+            'Understand malware behavior, static & dynamic analysis and reverse engineering.',
+        category: 'Malware Analysis',
+        difficulty: 'Intermediate',
+        durationMinutes: 190,
         instructorName: 'Elena Rostova',
         thumbnailUrl: '',
-        prerequisites: const ['x86 Assembly Basics', 'C Programming'],
+        prerequisites: const ['Assembly Basics', 'C Programming'],
         learningOutcomes: const [
-          'Unpack XOR / AES obfuscated payloads',
-          'Bypass anti-analysis routines',
-          'Extract C2 IP addresses & encryption keys',
+          'Static PE header analysis',
+          'Dynamic sandbox behavior tracking',
+          'Decompiling binaries with Ghidra',
         ],
-        modules: const [],
-        isEnrolled: false,
-        completionPercentage: 0.0,
-        totalXp: 850,
+        modules: List.generate(
+          15,
+          (i) => ModuleModel(
+            id: 'mod_${i + 1}',
+            title: 'Module ${i + 1}: Reverse Engineering',
+            description: 'Analyzing malicious payloads.',
+            lessons: [_fallbackLesson],
+            order: i + 1,
+          ),
+        ),
+        isEnrolled: true,
+        completionPercentage: 0.45,
+        totalXp: 650,
       ),
       CourseModel(
         id: 'crs_3',
-        title: 'Network Traffic Analysis & Wireshark',
+        title: 'Phishing Detection & Prevention',
         description:
-            'Capture PCAPs, analyze covert C2 channels, and decrypt TLS traffic with session keys.',
-        category: 'Network Defense',
-        difficulty: 'Beginner',
-        durationMinutes: 120,
+            'Identify phishing attacks, analyze techniques and stay protected.',
+        category: 'Phishing Detection',
+        difficulty: 'Intermediate',
+        durationMinutes: 140,
         instructorName: 'Marcus Thorne',
+        thumbnailUrl: '',
+        prerequisites: const ['Email Protocols', 'SPF/DKIM/DMARC Basics'],
+        learningOutcomes: const [
+          'Analyze email headers & MIME structures',
+          'Extract suspicious URLs & attachments',
+          'Implement defense rules',
+        ],
+        modules: List.generate(
+          10,
+          (i) => ModuleModel(
+            id: 'mod_${i + 1}',
+            title: 'Module ${i + 1}: Phishing Vectors',
+            description: 'Social engineering countermeasures.',
+            lessons: [_fallbackLesson],
+            order: i + 1,
+          ),
+        ),
+        isEnrolled: true,
+        completionPercentage: 0.30,
+        totalXp: 450,
+      ),
+      CourseModel(
+        id: 'crs_4',
+        title: 'Network Security Fundamentals',
+        description:
+            'Learn networking concepts, common vulnerabilities and defense strategies.',
+        category: 'Network Security',
+        difficulty: 'Beginner',
+        durationMinutes: 200,
+        instructorName: 'Sarah Jenkins',
         thumbnailUrl: '',
         prerequisites: const ['TCP/IP Fundamentals'],
         learningOutcomes: const [
-          'Filter DNS tunneling attacks',
-          'Identify HTTP POST exfiltration vectors',
+          'Configure firewalls & IDS/IPS',
+          'Analyze Wireshark PCAP files',
+          'Detect scanning & intrusion attempts',
         ],
-        modules: const [],
+        modules: List.generate(
+          8,
+          (i) => ModuleModel(
+            id: 'mod_${i + 1}',
+            title: 'Module ${i + 1}: Network Defense',
+            description: 'Securing network infrastructure.',
+            lessons: [_fallbackLesson],
+            order: i + 1,
+          ),
+        ),
         isEnrolled: true,
-        completionPercentage: 0.85,
-        totalXp: 450,
+        completionPercentage: 0.60,
+        totalXp: 550,
+      ),
+      CourseModel(
+        id: 'crs_5',
+        title: 'Linux Forensics',
+        description:
+            'Master Linux systems, logs, artifacts and forensic techniques.',
+        category: 'Linux Forensics',
+        difficulty: 'Intermediate',
+        durationMinutes: 250,
+        instructorName: 'David Miller',
+        thumbnailUrl: '',
+        prerequisites: const ['Linux CLI Mastery', 'Bash Scripting'],
+        learningOutcomes: const [
+          'Inspect systemd journal logs & auth.log',
+          'Analyze persistence mechanisms in cron',
+          'Audit user activity & bash history',
+        ],
+        modules: List.generate(
+          14,
+          (i) => ModuleModel(
+            id: 'mod_${i + 1}',
+            title: 'Module ${i + 1}: Linux Artifacts',
+            description: 'Investigating Linux environments.',
+            lessons: [_fallbackLesson],
+            order: i + 1,
+          ),
+        ),
+        isEnrolled: true,
+        completionPercentage: 0.50,
+        totalXp: 700,
+      ),
+      CourseModel(
+        id: 'crs_6',
+        title: 'Mobile Forensics',
+        description: 'Extract, analyze and interpret data from mobile devices.',
+        category: 'Mobile Forensics',
+        difficulty: 'Intermediate',
+        durationMinutes: 220,
+        instructorName: 'Amara Chen',
+        thumbnailUrl: '',
+        prerequisites: const ['Android/iOS Architecture Basics'],
+        learningOutcomes: const [
+          'Extract SQLite databases from app data',
+          'Analyze location & communication artifacts',
+          'Decode backup files & keychain items',
+        ],
+        modules: List.generate(
+          12,
+          (i) => ModuleModel(
+            id: 'mod_${i + 1}',
+            title: 'Module ${i + 1}: Mobile Data Extraction',
+            description: 'Analyzing iOS & Android evidence.',
+            lessons: [_fallbackLesson],
+            order: i + 1,
+          ),
+        ),
+        isEnrolled: true,
+        completionPercentage: 0.40,
+        totalXp: 600,
       ),
     ];
 
     return list.where((c) {
-      if (category != null && category != 'All' && c.category != category) {
-        return false;
+      if (category != null && category != 'All') {
+        if (category == 'Beginner' && c.difficulty != 'Beginner') {
+          return false;
+        }
+        if (category == 'Intermediate' && c.difficulty != 'Intermediate') {
+          return false;
+        }
+        if (category == 'Advanced' && c.difficulty != 'Advanced') {
+          return false;
+        }
       }
       if (searchQuery != null && searchQuery.isNotEmpty) {
         final q = searchQuery.toLowerCase();

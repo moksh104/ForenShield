@@ -18,12 +18,12 @@ class UserStatsEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        totalLearningHours,
-        casesSolved,
-        coursesCompleted,
-        currentStreakDays,
-        securityScore,
-      ];
+    totalLearningHours,
+    casesSolved,
+    coursesCompleted,
+    currentStreakDays,
+    securityScore,
+  ];
 }
 
 /// Achievement badge entity.
@@ -48,14 +48,14 @@ class AchievementBadgeEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        iconName,
-        unlockedDate,
-        xpReward,
-        isUnlocked,
-      ];
+    id,
+    title,
+    description,
+    iconName,
+    unlockedDate,
+    xpReward,
+    isUnlocked,
+  ];
 }
 
 /// XP log item entity.
@@ -145,21 +145,21 @@ class ProfileEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        fullName,
-        email,
-        role,
-        avatarUrl,
-        bio,
-        phone,
-        xpPoints,
-        rankTitle,
-        memberSince,
-        accountStatus,
-        level,
-        nextLevelXp,
-        stats,
-        badges,
-        xpHistory,
-      ];
+    id,
+    fullName,
+    email,
+    role,
+    avatarUrl,
+    bio,
+    phone,
+    xpPoints,
+    rankTitle,
+    memberSince,
+    accountStatus,
+    level,
+    nextLevelXp,
+    stats,
+    badges,
+    xpHistory,
+  ];
 }

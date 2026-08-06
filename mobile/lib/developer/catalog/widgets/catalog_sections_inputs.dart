@@ -20,8 +20,9 @@ class InputsSection extends StatelessWidget {
           const CatalogSubsection(
             label: 'Search Bar',
             child: SizedBox(
-                width: 360,
-                child: ForenSearchBar(hint: 'Search cases, evidence, courses...')),
+              width: 360,
+              child: ForenSearchBar(hint: 'Search cases, evidence, courses...'),
+            ),
           ),
           const CatalogSubsection(
             label: 'Filter Chip (toggleable)',
@@ -70,7 +71,12 @@ class _FilterChipPreview extends StatefulWidget {
 }
 
 class _FilterChipPreviewState extends State<_FilterChipPreview> {
-  final _selected = {'Critical': true, 'High': false, 'This week': false, 'Active': true};
+  final _selected = {
+    'Critical': true,
+    'High': false,
+    'This week': false,
+    'Active': true,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -96,7 +102,12 @@ class _DropdownPreview extends StatefulWidget {
 }
 
 class _DropdownPreviewState extends State<_DropdownPreview> {
-  final _options = ['Email Phishing', 'Malware Analysis', 'Network Intrusion', 'Data Exfiltration'];
+  final _options = [
+    'Email Phishing',
+    'Malware Analysis',
+    'Network Intrusion',
+    'Data Exfiltration',
+  ];
   String? _selected;
 
   @override

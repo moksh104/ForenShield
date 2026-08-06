@@ -1,21 +1,16 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/profile_entity.dart';
-import '../pages/profile_screen.dart';
 
-/// Cybersecurity Statistics Dashboard Grid with count-up numeric animations and glassmorphism.
+/// Statistics dashboard grid with count-up numeric animations.
 class AnalystStatsGrid extends StatelessWidget {
   final ProfileEntity profile;
 
-  const AnalystStatsGrid({
-    super.key,
-    required this.profile,
-  });
+  const AnalystStatsGrid({super.key, required this.profile});
 
   @override
   Widget build(BuildContext context) {
@@ -26,47 +21,47 @@ class AnalystStatsGrid extends StatelessWidget {
 
     final statItems = [
       _StatItemData(
-        title: 'CASES SOLVED',
+        title: 'Cases solved',
         value: stats.casesSolved.toDouble(),
         suffix: '',
         icon: Icons.biotech_outlined,
         color: foren.investigation.t500,
       ),
       _StatItemData(
-        title: 'SIMULATIONS',
+        title: 'Simulations',
         value: stats.coursesCompleted.toDouble(),
         suffix: '',
         icon: Icons.alt_route_outlined,
         color: foren.simulation.t500,
       ),
       _StatItemData(
-        title: 'STREAK MISSIONS',
+        title: 'Streak days',
         value: stats.currentStreakDays.toDouble(),
-        suffix: ' Days',
+        suffix: 'd',
         icon: Icons.local_fire_department_outlined,
         color: foren.warning.t500,
       ),
       _StatItemData(
-        title: 'SECURITY SCORE',
+        title: 'Security score',
         value: stats.securityScore.toDouble(),
         suffix: '/100',
         icon: Icons.shield_outlined,
         color: foren.success.t500,
       ),
       _StatItemData(
-        title: 'INVESTIGATION HRS',
+        title: 'Learning hours',
         value: stats.totalLearningHours,
-        suffix: ' hrs',
+        suffix: 'h',
         isDecimal: true,
         icon: Icons.timer_outlined,
         color: AppColors.primary,
       ),
       _StatItemData(
-        title: 'BADGES UNLOCKED',
+        title: 'Badges unlocked',
         value: unlockedBadges.toDouble(),
         suffix: '',
         icon: Icons.emoji_events_outlined,
-        color: AppColors.logoGold,
+        color: AppColors.primary,
       ),
     ];
 
@@ -123,103 +118,85 @@ class _StatCardState extends State<_StatCard> {
     final foren = theme.extension<ForenColors>()!;
     final data = widget.data;
 
-    final Widget cardBody = GlassEffect(
-      blurX: 12.0,
-      blurY: 12.0,
-      opacity: 0.10,
-      border: Border.all(
-        color: _isHovered ? data.color : foren.borderSubtle,
-        width: 1.0,
-      ),
-      borderRadius: AppRadius.borderRadiusLg,
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  data.title,
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'monospace',
-                    letterSpacing: 0.6,
-                  ),
-                ),
-                Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: data.color.withValues(alpha: 0.15),
-                    borderRadius: AppRadius.borderRadiusSm,
-                  ),
-                  child: Icon(data.icon, color: data.color, size: 16),
-                ),
-              ],
-            ),
-
-            // Animated Count-Up Number
-            TweenAnimationBuilder<double>(
-              tween: Tween<double>(begin: 0, end: data.value),
-              duration: const Duration(milliseconds: 1400),
-              curve: Curves.easeOutCubic,
-              builder: (context, animatedVal, child) {
-                final displayVal = data.isDecimal
-                    ? animatedVal.toStringAsFixed(1)
-                    : animatedVal.toInt().toString();
-
-                return Row(
-                  crossAxisAlignment: CrossAxisAlignment.baseline,
-                  textBaseline: TextBaseline.alphabetic,
-                  children: [
-                    Text(
-                      displayVal,
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface,
-                        fontSize: 22,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'Geist',
-                      ),
-                    ),
-                    if (data.suffix.isNotEmpty)
-                      Text(
-                        data.suffix,
-                        style: TextStyle(
-                          color: data.color,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'monospace',
-                        ),
-                      ),
-                  ],
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-    );
-
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 180),
-        transform: Matrix4.translationValues(0, _isHovered ? -3 : 0, 0),
-        child: ProfileScreen.enableAdvancedEffects
-            ? GlowEffect(
-                glowColor: _isHovered ? data.color : Colors.transparent,
-                blurRadius: 16,
-                spreadRadius: 1,
-                animate: _isHovered,
-                borderRadius: AppRadius.borderRadiusLg,
-                child: cardBody,
-              )
-            : cardBody,
+        curve: Curves.easeOutCubic,
+        transform: Matrix4.translationValues(0, _isHovered ? -2 : 0, 0),
+        child: GlassEffect(
+          border: Border.all(
+            color: _isHovered
+                ? data.color.withValues(alpha: 0.6)
+                : foren.borderSubtle,
+            width: 1.0,
+          ),
+          borderRadius: AppRadius.borderRadiusLg,
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      data.title,
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: foren.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: data.color.withValues(alpha: 0.15),
+                        borderRadius: AppRadius.borderRadiusSm,
+                      ),
+                      child: Icon(data.icon, color: data.color, size: 16),
+                    ),
+                  ],
+                ),
+
+                // Animated Count-Up Number
+                TweenAnimationBuilder<double>(
+                  tween: Tween<double>(begin: 0, end: data.value),
+                  duration: const Duration(milliseconds: 900),
+                  curve: Curves.easeOutCubic,
+                  builder: (context, animatedVal, child) {
+                    final displayVal = data.isDecimal
+                        ? animatedVal.toStringAsFixed(1)
+                        : animatedVal.toInt().toString();
+
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.baseline,
+                      textBaseline: TextBaseline.alphabetic,
+                      children: [
+                        Text(
+                          displayVal,
+                          style: theme.textTheme.headlineSmall?.copyWith(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w800,
+                          ),
+                        ),
+                        if (data.suffix.isNotEmpty)
+                          Text(
+                            data.suffix,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: data.color,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                      ],
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

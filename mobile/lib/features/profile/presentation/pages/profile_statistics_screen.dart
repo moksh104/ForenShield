@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/effects/particle_background.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../domain/entities/profile_entity.dart';
 import '../providers/profile_provider.dart';
 
@@ -23,7 +20,8 @@ class ProfileStatisticsScreen extends ConsumerWidget {
     final foren = theme.extension<ForenColors>()!;
     final primaryColor = theme.colorScheme.primary;
 
-    final stats = ref.watch(profileProvider).profile?.stats ??
+    final stats =
+        ref.watch(profileProvider).profile?.stats ??
         const UserStatsEntity(
           totalLearningHours: 0.0,
           casesSolved: 0,
@@ -83,11 +81,9 @@ class ProfileStatisticsScreen extends ConsumerWidget {
         ),
         title: Text(
           'Analyst Forensic Statistics',
-          style: TextStyle(
+          style: theme.textTheme.titleLarge?.copyWith(
             color: theme.colorScheme.onSurface,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'Geist',
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
@@ -97,7 +93,6 @@ class ProfileStatisticsScreen extends ConsumerWidget {
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -106,10 +101,7 @@ class ProfileStatisticsScreen extends ConsumerWidget {
                     tiles.length,
                     (index) => Padding(
                       padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: _StatBigTile(data: tiles[index])
-                          .animate(delay: Duration(milliseconds: index * 100))
-                          .fadeIn(duration: 400.ms)
-                          .slideY(begin: 0.1, end: 0),
+                      child: _StatBigTile(data: tiles[index]),
                     ),
                   ),
                 ),
@@ -165,9 +157,6 @@ class _StatBigTileState extends State<_StatBigTile> {
         duration: const Duration(milliseconds: 180),
         transform: Matrix4.translationValues(_isHovered ? 4 : 0, 0, 0),
         child: GlassEffect(
-          blurX: 14.0,
-          blurY: 14.0,
-          opacity: 0.12,
           border: Border.all(
             color: _isHovered ? data.color : foren.borderSubtle,
             width: 1.0,
@@ -177,19 +166,13 @@ class _StatBigTileState extends State<_StatBigTile> {
             padding: const EdgeInsets.all(AppSpacing.md),
             child: Row(
               children: [
-                GlowEffect(
-                  glowColor: _isHovered ? data.color : Colors.transparent,
-                  blurRadius: 12,
-                  animate: _isHovered,
-                  borderRadius: AppRadius.borderRadiusMd,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: data.color.withValues(alpha: 0.15),
-                      borderRadius: AppRadius.borderRadiusMd,
-                    ),
-                    child: Icon(data.icon, color: data.color, size: 24),
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: data.color.withValues(alpha: 0.15),
+                    borderRadius: AppRadius.borderRadiusMd,
                   ),
+                  child: Icon(data.icon, color: data.color, size: 24),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(
@@ -198,7 +181,7 @@ class _StatBigTileState extends State<_StatBigTile> {
                     children: [
                       TweenAnimationBuilder<double>(
                         tween: Tween<double>(begin: 0, end: data.value),
-                        duration: const Duration(milliseconds: 1200),
+                        duration: const Duration(milliseconds: 900),
                         curve: Curves.easeOutCubic,
                         builder: (context, animatedVal, child) {
                           final displayVal = data.isDecimal
@@ -211,20 +194,16 @@ class _StatBigTileState extends State<_StatBigTile> {
                             children: [
                               Text(
                                 displayVal,
-                                style: TextStyle(
+                                style: theme.textTheme.titleLarge?.copyWith(
                                   color: data.color,
-                                  fontSize: 20,
                                   fontWeight: FontWeight.w800,
-                                  fontFamily: 'Geist',
                                 ),
                               ),
                               Text(
                                 data.suffix,
-                                style: TextStyle(
+                                style: theme.textTheme.labelLarge?.copyWith(
                                   color: data.color,
-                                  fontSize: 13,
                                   fontWeight: FontWeight.w700,
-                                  fontFamily: 'monospace',
                                 ),
                               ),
                             ],
@@ -234,12 +213,9 @@ class _StatBigTileState extends State<_StatBigTile> {
                       const SizedBox(height: 2),
                       Text(
                         data.label,
-                        style: TextStyle(
+                        style: theme.textTheme.labelSmall?.copyWith(
                           color: foren.textSecondary,
-                          fontSize: 10,
                           fontWeight: FontWeight.w700,
-                          fontFamily: 'monospace',
-                          letterSpacing: 0.6,
                         ),
                       ),
                     ],

@@ -19,7 +19,10 @@ class _ForenDialogShell extends StatelessWidget {
       insetPadding: const EdgeInsets.all(ForenSpace.lg),
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 420),
-        child: Padding(padding: const EdgeInsets.all(ForenSpace.lg), child: child),
+        child: Padding(
+          padding: const EdgeInsets.all(ForenSpace.lg),
+          child: child,
+        ),
       ),
     );
   }
@@ -48,7 +51,9 @@ class ForenMissionBriefDialog extends StatelessWidget {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
     final isDark = theme.brightness == Brightness.dark;
-    final accent = isDark ? foren.missionControl.t300 : foren.missionControl.t700;
+    final accent = isDark
+        ? foren.missionControl.t300
+        : foren.missionControl.t700;
 
     return _ForenDialogShell(
       child: Column(
@@ -59,17 +64,30 @@ class ForenMissionBriefDialog extends StatelessWidget {
             children: [
               Icon(Icons.shield_outlined, color: accent),
               const SizedBox(width: ForenSpace.sm),
-              Text('MISSION BRIEF', style: theme.textTheme.titleMedium?.copyWith(color: accent)),
+              Text(
+                'MISSION BRIEF',
+                style: theme.textTheme.titleMedium?.copyWith(color: accent),
+              ),
               const Spacer(),
               ForenThreatBadge(level: priority),
             ],
           ),
           const SizedBox(height: ForenSpace.md),
-          Text('Incident', style: theme.textTheme.labelMedium?.copyWith(color: foren.textSecondary)),
+          Text(
+            'Incident',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
           const SizedBox(height: 4),
           Text(incidentSummary, style: theme.textTheme.bodyLarge),
           const SizedBox(height: ForenSpace.md),
-          Text('Your objective', style: theme.textTheme.labelMedium?.copyWith(color: foren.textSecondary)),
+          Text(
+            'Your objective',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
           const SizedBox(height: 4),
           for (final o in objectives)
             Padding(
@@ -132,12 +150,26 @@ class ForenInvestigationSummaryDialog extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Icon(Icons.fact_check_outlined, color: accent, size: ForenIconSize.hero),
+          Icon(
+            Icons.fact_check_outlined,
+            color: accent,
+            size: ForenIconSize.hero,
+          ),
           const SizedBox(height: ForenSpace.sm),
           Text('Case Closed', style: theme.textTheme.headlineSmall),
-          Text(caseTitle, style: theme.textTheme.bodyMedium?.copyWith(color: foren.textSecondary)),
+          Text(
+            caseTitle,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
           const SizedBox(height: ForenSpace.md),
-          Text('Key findings', style: theme.textTheme.labelMedium?.copyWith(color: foren.textSecondary)),
+          Text(
+            'Key findings',
+            style: theme.textTheme.labelMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
           for (final f in findings)
             Padding(
               padding: const EdgeInsets.only(top: 4),
@@ -147,7 +179,10 @@ class ForenInvestigationSummaryDialog extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text('Accuracy: ${(accuracy * 100).round()}%', style: theme.textTheme.titleSmall),
+              Text(
+                'Accuracy: ${(accuracy * 100).round()}%',
+                style: theme.textTheme.titleSmall,
+              ),
               ForenXpChip(amount: xpEarned, showPlus: true),
             ],
           ),
@@ -193,15 +228,28 @@ class ForenSuccessDialog extends StatelessWidget {
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(color: foren.success.t500.withValues(alpha: 0.14), shape: BoxShape.circle),
-            child: Icon(Icons.check_circle_outline, color: foren.success.t500, size: 32),
+            decoration: BoxDecoration(
+              color: foren.success.t500.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.check_circle_outline,
+              color: foren.success.t500,
+              size: 32,
+            ),
           ),
           const SizedBox(height: ForenSpace.md),
-          Text(title, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
+          Text(
+            title,
+            style: theme.textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: ForenSpace.xs),
           Text(
             message,
-            style: theme.textTheme.bodyMedium?.copyWith(color: foren.textSecondary),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: ForenSpace.lg),
@@ -250,15 +298,28 @@ class ForenWarningDialog extends StatelessWidget {
           Container(
             width: 56,
             height: 56,
-            decoration: BoxDecoration(color: ramp.t500.withValues(alpha: 0.14), shape: BoxShape.circle),
-            child: Icon(Icons.warning_amber_rounded, color: ramp.t500, size: 32),
+            decoration: BoxDecoration(
+              color: ramp.t500.withValues(alpha: 0.14),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(
+              Icons.warning_amber_rounded,
+              color: ramp.t500,
+              size: 32,
+            ),
           ),
           const SizedBox(height: ForenSpace.md),
-          Text(title, style: theme.textTheme.headlineSmall, textAlign: TextAlign.center),
+          Text(
+            title,
+            style: theme.textTheme.headlineSmall,
+            textAlign: TextAlign.center,
+          ),
           const SizedBox(height: ForenSpace.xs),
           Text(
             message,
-            style: theme.textTheme.bodyMedium?.copyWith(color: foren.textSecondary),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: ForenSpace.lg),

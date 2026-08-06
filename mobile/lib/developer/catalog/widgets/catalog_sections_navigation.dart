@@ -45,7 +45,10 @@ class NavigationSection extends StatelessWidget {
                 feature: ForenFeature.investigation,
                 actions: [
                   IconButton(
-                    icon: Icon(Icons.notifications_outlined, color: foren.textSecondary),
+                    icon: Icon(
+                      Icons.notifications_outlined,
+                      color: foren.textSecondary,
+                    ),
                     onPressed: () {},
                   ),
                 ],
@@ -103,7 +106,10 @@ class _SideNavPreviewState extends State<_SideNavPreview> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        ForenSideNav(currentIndex: _index, onTap: (i) => setState(() => _index = i)),
+        ForenSideNav(
+          currentIndex: _index,
+          onTap: (i) => setState(() => _index = i),
+        ),
         const VerticalDivider(width: 1),
         Expanded(
           child: Center(
@@ -122,7 +128,8 @@ class _SideNavExtendedPreview extends StatefulWidget {
   const _SideNavExtendedPreview();
 
   @override
-  State<_SideNavExtendedPreview> createState() => _SideNavExtendedPreviewState();
+  State<_SideNavExtendedPreview> createState() =>
+      _SideNavExtendedPreviewState();
 }
 
 class _SideNavExtendedPreviewState extends State<_SideNavExtendedPreview> {
@@ -132,7 +139,11 @@ class _SideNavExtendedPreviewState extends State<_SideNavExtendedPreview> {
   Widget build(BuildContext context) {
     return Row(
       children: [
-        ForenSideNav(extended: true, currentIndex: _index, onTap: (i) => setState(() => _index = i)),
+        ForenSideNav(
+          extended: true,
+          currentIndex: _index,
+          onTap: (i) => setState(() => _index = i),
+        ),
         const VerticalDivider(width: 1),
         Expanded(
           child: Center(

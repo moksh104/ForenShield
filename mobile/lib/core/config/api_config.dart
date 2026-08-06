@@ -21,7 +21,7 @@ class ApiConfig {
         return envMock == 'true' || envMock == '1';
       }
     }
-    return true;
+    return false;
   }
 
   /// Resolves the base URL automatically based on the platform and environment.
@@ -81,7 +81,7 @@ class ApiConfig {
 
   /// Default headers to include in all API requests.
   static Map<String, String> get defaultHeaders => {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      };
+    'Accept': 'application/json',
+    'Content-Type': 'application/json',
+  };
 }

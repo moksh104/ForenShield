@@ -1,21 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/investigation_entity.dart';
-import '../pages/case_list_screen.dart';
 
-/// Digital Forensics Command Center Dashboard Header.
+/// Digital Forensics Investigation Lab header with summary metrics.
 class InvestigationDashboardHeader extends StatelessWidget {
   final List<InvestigationEntity> cases;
 
-  const InvestigationDashboardHeader({
-    super.key,
-    required this.cases,
-  });
+  const InvestigationDashboardHeader({super.key, required this.cases});
 
   @override
   Widget build(BuildContext context) {
@@ -24,86 +18,75 @@ class InvestigationDashboardHeader extends StatelessWidget {
     final primaryColor = theme.colorScheme.primary;
 
     final totalCases = cases.length;
-    final criticalCases = cases.where((c) => c.priority.toLowerCase() == 'critical').length;
-    final totalEvidence = cases.fold<int>(0, (sum, c) => sum + c.evidenceList.length);
-    final solvedCases = cases.where((c) => c.status.toLowerCase() == 'solved' || c.status.toLowerCase() == 'completed').length;
-    final solveRatePercent = totalCases > 0 ? ((solvedCases / totalCases) * 100).toInt() : 0;
+    final criticalCases = cases
+        .where((c) => c.priority.toLowerCase() == 'critical')
+        .length;
+    final totalEvidence = cases.fold<int>(
+      0,
+      (sum, c) => sum + c.evidenceList.length,
+    );
+    final solvedCases = cases
+        .where(
+          (c) =>
+              c.status.toLowerCase() == 'solved' ||
+              c.status.toLowerCase() == 'completed',
+        )
+        .length;
+    final solveRatePercent = totalCases > 0
+        ? ((solvedCases / totalCases) * 100).toInt()
+        : 0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: GlassEffect(
-        blurX: 16.0,
-        blurY: 16.0,
-        opacity: 0.12,
-        border: Border.all(
-          color: primaryColor.withValues(alpha: 0.4),
-          width: 1.0,
-        ),
         borderRadius: AppRadius.borderRadiusXl,
+        border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.4)),
         child: Padding(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top SOC Telemetry Badge Row
+              // Top status + count row
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Row(
                     children: [
-                      if (CaseListScreen.enableAdvancedEffects)
-                        GlowEffect(
-                          glowColor: foren.success.t500,
-                          blurRadius: 8,
-                          animate: true,
-                          borderRadius: BorderRadius.circular(10),
-                          child: Container(
-                            width: 8,
-                            height: 8,
-                            decoration: BoxDecoration(
-                              color: foren.success.t500,
-                              shape: BoxShape.circle,
-                            ),
-                          ),
-                        )
-                      else
-                        Container(
-                          width: 8,
-                          height: 8,
-                          decoration: BoxDecoration(
-                            color: foren.success.t500,
-                            shape: BoxShape.circle,
-                          ),
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                          color: foren.success.t500,
+                          shape: BoxShape.circle,
                         ),
-                      const SizedBox(width: 8),
-                      const Text(
-                        'SOC FORENSIC WORKSTATION · ACTIVE',
-                        style: TextStyle(
-                          color: AppColors.logoGold,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'monospace',
-                          letterSpacing: 0.8,
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        'Workstation online',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: foren.textSecondary,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ],
                   ),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.xs,
+                      vertical: 3,
+                    ),
                     decoration: BoxDecoration(
-                      color: primaryColor.withValues(alpha: 0.15),
+                      color: primaryColor.withValues(alpha: 0.12),
                       borderRadius: AppRadius.borderRadiusSm,
                       border: Border.all(
                         color: primaryColor.withValues(alpha: 0.3),
                       ),
                     ),
                     child: Text(
-                      '$totalCases ACTIVE INVESTIGATIONS',
-                      style: TextStyle(
+                      '$totalCases active investigations',
+                      style: theme.textTheme.labelSmall?.copyWith(
                         color: primaryColor,
-                        fontSize: 9,
                         fontWeight: FontWeight.w700,
-                        fontFamily: 'monospace',
                       ),
                     ),
                   ),
@@ -112,30 +95,30 @@ class InvestigationDashboardHeader extends StatelessWidget {
 
               const SizedBox(height: AppSpacing.md),
 
-              // Animated Statistics Telemetry Grid Row
+              // Summary metrics grid
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
                   _HeaderMetric(
-                    label: 'TOTAL CASES',
+                    label: 'Total cases',
                     value: totalCases.toDouble(),
                     suffix: '',
                     color: primaryColor,
                   ),
                   _HeaderMetric(
-                    label: 'CRITICAL THREATS',
+                    label: 'Critical',
                     value: criticalCases.toDouble(),
                     suffix: '',
                     color: foren.critical.t500,
                   ),
                   _HeaderMetric(
-                    label: 'EVIDENCE ARTIFACTS',
+                    label: 'Evidence',
                     value: totalEvidence.toDouble(),
                     suffix: '',
-                    color: AppColors.logoGold,
+                    color: foren.warning.t500,
                   ),
                   _HeaderMetric(
-                    label: 'SOLVED RATE',
+                    label: 'Solved rate',
                     value: solveRatePercent.toDouble(),
                     suffix: '%',
                     color: foren.success.t500,
@@ -172,16 +155,14 @@ class _HeaderMetric extends StatelessWidget {
       children: [
         TweenAnimationBuilder<double>(
           tween: Tween<double>(begin: 0, end: value),
-          duration: const Duration(milliseconds: 1200),
+          duration: const Duration(milliseconds: 900),
           curve: Curves.easeOutCubic,
           builder: (context, animatedVal, child) {
             return Text(
               '${animatedVal.toInt()}$suffix',
-              style: TextStyle(
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: color,
-                fontSize: 18,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'Geist',
               ),
             );
           },
@@ -189,12 +170,9 @@ class _HeaderMetric extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
+          style: theme.textTheme.labelSmall?.copyWith(
             color: foren.textSecondary,
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'monospace',
-            letterSpacing: 0.4,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],

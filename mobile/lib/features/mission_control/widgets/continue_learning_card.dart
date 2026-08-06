@@ -47,7 +47,9 @@ class ContinueLearningCard extends StatelessWidget {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 3),
+                          horizontal: 8,
+                          vertical: 3,
+                        ),
                         decoration: BoxDecoration(
                           color: theme.colorScheme.primaryContainer,
                           borderRadius: BorderRadius.circular(6),
@@ -55,9 +57,11 @@ class ContinueLearningCard extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.school_outlined,
-                                size: 11,
-                                color: theme.colorScheme.onPrimaryContainer),
+                            Icon(
+                              Icons.school_outlined,
+                              size: 11,
+                              color: theme.colorScheme.onPrimaryContainer,
+                            ),
                             const SizedBox(width: 4),
                             Text(
                               'ACADEMY',
@@ -75,8 +79,9 @@ class ContinueLearningCard extends StatelessWidget {
                       Text(
                         timeRemaining,
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                     ],
@@ -95,8 +100,9 @@ class ContinueLearningCard extends StatelessWidget {
                   Text(
                     moduleTitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color:
-                          theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                      color: theme.colorScheme.onSurface.withValues(
+                        alpha: 0.55,
+                      ),
                     ),
                   ),
                   const SizedBox(height: 14),
@@ -125,8 +131,9 @@ class ContinueLearningCard extends StatelessWidget {
                       Text(
                         'Resume →',
                         style: theme.textTheme.labelSmall?.copyWith(
-                          color: theme.colorScheme.onSurface
-                              .withValues(alpha: 0.5),
+                          color: theme.colorScheme.onSurface.withValues(
+                            alpha: 0.5,
+                          ),
                         ),
                       ),
                     ],

@@ -7,6 +7,7 @@ import '../../../core/effects/particle_background.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/foren_theme.dart';
+import '../../../core/exceptions/app_exceptions.dart';
 import '../../../core/validators/form_validators.dart';
 import '../presentation/widgets/auth_button.dart';
 import '../presentation/widgets/auth_logo.dart';
@@ -84,7 +85,9 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       },
       failure: (exception) {
         setState(() {
-          _errorMessage = exception.toString();
+          _errorMessage = exception is AppException
+              ? exception.userMessage
+              : exception.toString();
         });
       },
     );

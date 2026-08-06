@@ -10,35 +10,35 @@ class RecentActivitySection extends StatelessWidget {
   const RecentActivitySection({super.key, this.items = const []});
 
   static List<ActivityItem> get defaults => const [
-        ActivityItem(
-          icon: Icons.check_circle_outline,
-          title: 'Completed: Chain of Custody Lab',
-          subtitle: 'Academy · Module 2',
-          time: '2h ago',
-          color: AppColors.success,
-        ),
-        ActivityItem(
-          icon: Icons.search_outlined,
-          title: 'Ran hash verification scan',
-          subtitle: 'Evidence · evidence_disk_01.img',
-          time: '5h ago',
-          color: AppColors.logoBlue,
-        ),
-        ActivityItem(
-          icon: Icons.flag_outlined,
-          title: 'Opened new case: #FSC-0091',
-          subtitle: 'Investigation · Ransomware',
-          time: '7h ago',
-          color: AppColors.warning,
-        ),
-        ActivityItem(
-          icon: Icons.login_outlined,
-          title: 'Session started',
-          subtitle: 'Login · Mumbai, IN',
-          time: '8h ago',
-          color: AppColors.textSecondary,
-        ),
-      ];
+    ActivityItem(
+      icon: Icons.check_circle_outline,
+      title: 'Completed: Chain of Custody Lab',
+      subtitle: 'Academy · Module 2',
+      time: '2h ago',
+      color: AppColors.success,
+    ),
+    ActivityItem(
+      icon: Icons.search_outlined,
+      title: 'Ran hash verification scan',
+      subtitle: 'Evidence · evidence_disk_01.img',
+      time: '5h ago',
+      color: AppColors.logoBlue,
+    ),
+    ActivityItem(
+      icon: Icons.flag_outlined,
+      title: 'Opened new case: #FSC-0091',
+      subtitle: 'Investigation · Ransomware',
+      time: '7h ago',
+      color: AppColors.warning,
+    ),
+    ActivityItem(
+      icon: Icons.login_outlined,
+      title: 'Session started',
+      subtitle: 'Login · Mumbai, IN',
+      time: '8h ago',
+      color: AppColors.textSecondary,
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -130,8 +130,7 @@ class _ActivityTile extends StatelessWidget {
                 Text(
                   item.subtitle,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.45),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.45),
                     fontSize: 10,
                   ),
                 ),

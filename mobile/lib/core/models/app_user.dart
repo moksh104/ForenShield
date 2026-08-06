@@ -28,11 +28,11 @@ class AppUser extends Equatable {
   /// Parses [AppUser] from a JSON map.
   factory AppUser.fromJson(Map<String, dynamic> json) {
     return AppUser(
-      id: json['id'] as String? ?? '',
-      name: json['name'] as String? ?? '',
-      email: json['email'] as String? ?? '',
-      avatarUrl: json['avatar_url'] as String?,
-      role: json['role'] as String? ?? 'user',
+      id: (json['id'] ?? '').toString(),
+      name: (json['name'] ?? json['displayName'] ?? json['full_name'] ?? '').toString(),
+      email: (json['email'] ?? '').toString(),
+      avatarUrl: json['avatar_url']?.toString() ?? json['avatarUrl']?.toString(),
+      role: (json['role'] ?? 'user').toString(),
     );
   }
 

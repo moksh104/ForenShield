@@ -12,7 +12,14 @@ import '../theme/app_tokens.dart';
 import '../theme/foren_theme.dart';
 
 /// Available button style variants.
-enum ForenButtonVariant { primary, secondary, outlined, destructive, danger, ghost }
+enum ForenButtonVariant {
+  primary,
+  secondary,
+  outlined,
+  destructive,
+  danger,
+  ghost,
+}
 
 /// Button size options.
 enum ForenButtonSize { medium, small }
@@ -135,8 +142,8 @@ class ForenButton extends StatelessWidget {
     this.useHaptics = true,
     this.autofocus = false,
     this.focusNode,
-  })  : variant = ForenButtonVariant.destructive,
-        feature = null;
+  }) : variant = ForenButtonVariant.destructive,
+       feature = null;
 
   const ForenButton.danger({
     super.key,
@@ -155,8 +162,8 @@ class ForenButton extends StatelessWidget {
     this.useHaptics = true,
     this.autofocus = false,
     this.focusNode,
-  })  : variant = ForenButtonVariant.danger,
-        feature = null;
+  }) : variant = ForenButtonVariant.danger,
+       feature = null;
 
   const ForenButton.ghost({
     super.key,
@@ -228,7 +235,7 @@ class ForenButton extends StatelessWidget {
       switch (variant) {
         case ForenButtonVariant.primary:
           bg = AppColors.primary;
-          fg = Colors.black;
+          fg = Colors.white;
           break;
         case ForenButtonVariant.secondary:
           bg = AppColors.surfaceHighlight;
@@ -288,7 +295,10 @@ class ForenButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   loadingText!,
-                  style: textStyle?.copyWith(color: fg, fontWeight: FontWeight.bold),
+                  style: textStyle?.copyWith(
+                    color: fg,
+                    fontWeight: FontWeight.bold,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               )
@@ -296,7 +306,10 @@ class ForenButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   label,
-                  style: textStyle?.copyWith(color: fg, fontWeight: FontWeight.bold),
+                  style: textStyle?.copyWith(
+                    color: fg,
+                    fontWeight: FontWeight.bold,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -309,7 +322,10 @@ class ForenButton extends StatelessWidget {
               Flexible(
                 child: Text(
                   label,
-                  style: textStyle?.copyWith(color: fg, fontWeight: FontWeight.bold),
+                  style: textStyle?.copyWith(
+                    color: fg,
+                    fontWeight: FontWeight.bold,
+                  ),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -322,23 +338,17 @@ class ForenButton extends StatelessWidget {
       ),
     );
 
-    final effectiveRadius = borderRadius ?? AppRadius.buttonRadius;
-
-    Widget button = Material(
-      color: bg,
-      borderRadius: effectiveRadius,
-      child: InkWell(
-        onTap: _isDisabled ? null : _handleTap,
-        autofocus: autofocus,
-        focusNode: focusNode,
-        borderRadius: effectiveRadius,
+    Widget button = _SpringButtonWrapper(
+      isDisabled: _isDisabled,
+      onTap: _handleTap,
+      child: Material(
+        color: bg,
+        shape: AppRadius.buttonShape,
+        clipBehavior: Clip.antiAlias,
         child: Container(
           width: fullWidth ? double.infinity : null,
           padding: EdgeInsets.symmetric(horizontal: hPad, vertical: vPad),
-          decoration: BoxDecoration(
-            borderRadius: effectiveRadius,
-            border: border,
-          ),
+          decoration: BoxDecoration(border: border),
           child: child,
         ),
       ),
@@ -358,6 +368,47 @@ class ForenButton extends StatelessWidget {
     }
 
     return button;
+  }
+}
+
+class _SpringButtonWrapper extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+  final bool isDisabled;
+
+  const _SpringButtonWrapper({
+    required this.child,
+    required this.onTap,
+    required this.isDisabled,
+  });
+
+  @override
+  State<_SpringButtonWrapper> createState() => _SpringButtonWrapperState();
+}
+
+class _SpringButtonWrapperState extends State<_SpringButtonWrapper> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTapDown: widget.isDisabled
+          ? null
+          : (_) => setState(() => _isPressed = true),
+      onTapUp: widget.isDisabled
+          ? null
+          : (_) {
+              setState(() => _isPressed = false);
+              widget.onTap();
+            },
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed && !widget.isDisabled ? 0.95 : 1.0,
+        duration: AppMotion.fast,
+        curve: AppMotion.micro,
+        child: widget.child,
+      ),
+    );
   }
 }
 
@@ -400,12 +451,14 @@ class ForenIconButton extends StatelessWidget {
     if (feature != null && foren != null) {
       final ramp = foren.forFeature(feature!);
       fg = isDark ? ramp.t300 : ramp.t700;
-      bg = variant == ForenButtonVariant.primary ? ramp.t500 : Colors.transparent;
+      bg = variant == ForenButtonVariant.primary
+          ? ramp.t500
+          : Colors.transparent;
     } else {
       switch (variant) {
         case ForenButtonVariant.primary:
           bg = AppColors.primary;
-          fg = Colors.black;
+          fg = Colors.white;
           break;
         case ForenButtonVariant.destructive:
         case ForenButtonVariant.danger:

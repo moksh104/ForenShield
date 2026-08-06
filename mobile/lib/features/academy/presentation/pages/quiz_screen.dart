@@ -100,7 +100,10 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(backgroundColor: theme.scaffoldBackgroundColor),
         body: Center(
-          child: Text('Quiz not available.', style: TextStyle(color: foren.textDisabled)),
+          child: Text(
+            'Quiz not available.',
+            style: TextStyle(color: foren.textDisabled),
+          ),
         ),
       );
     }
@@ -207,7 +210,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen> {
               Expanded(
                 child: ListView.separated(
                   itemCount: question.options.length,
-                  separatorBuilder: (_, _) => const SizedBox(height: AppSpacing.sm),
+                  separatorBuilder: (_, _) =>
+                      const SizedBox(height: AppSpacing.sm),
                   itemBuilder: (context, idx) {
                     final isSelected = selectedIndex == idx;
                     return InkWell(

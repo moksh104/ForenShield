@@ -1,33 +1,33 @@
 import 'package:flutter/material.dart';
 
-/// Defines the spacing scale for the ForenShield application.
-/// Ensures consistent margins and paddings across the app without magic numbers.
+/// Defines the spacing scale for the ForenShield application (Phase 2 UI Optimization).
+/// Single source of truth for all spacing tokens.
 abstract class AppSpacing {
   /// 4.0 pixels
-  static const double xxs = 4.0;
+  static const double xs = 4.0;
 
   /// 8.0 pixels
-  static const double xs = 8.0;
+  static const double sm = 8.0;
 
   /// 12.0 pixels
-  static const double sm = 12.0;
+  static const double md = 12.0;
 
-  /// 16.0 pixels (Base spacing)
-  static const double md = 16.0;
+  /// 16.0 pixels
+  static const double lg = 16.0;
 
   /// 24.0 pixels
-  static const double lg = 24.0;
+  static const double xl = 24.0;
 
   /// 32.0 pixels
-  static const double xl = 32.0;
+  static const double xxl = 32.0;
 
-  /// 40.0 pixels
-  static const double xxl = 40.0;
+  /// 4.0 pixels (backwards compatibility alias)
+  static const double xxs = xs;
 
-  /// 48.0 pixels
+  /// 48.0 pixels (backwards compatibility alias)
   static const double xxxl = 48.0;
 
-  /// 64.0 pixels
+  /// 64.0 pixels (backwards compatibility alias)
   static const double huge = 64.0;
 
   // Semantic padding constants

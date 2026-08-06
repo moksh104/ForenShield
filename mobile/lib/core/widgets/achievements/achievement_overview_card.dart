@@ -70,7 +70,12 @@ class AchievementOverviewCard extends StatelessWidget {
                   '${(completionPercent * 100).toInt()}%',
                   'Completion',
                 ),
-                _buildStatChip(context, Icons.school, '$currentXp XP', 'Total XP'),
+                _buildStatChip(
+                  context,
+                  Icons.school,
+                  '$currentXp XP',
+                  'Total XP',
+                ),
               ],
             ),
             const SizedBox(height: AppSpacing.md),
@@ -85,7 +90,12 @@ class AchievementOverviewCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatChip(BuildContext context, IconData icon, String value, String label) {
+  Widget _buildStatChip(
+    BuildContext context,
+    IconData icon,
+    String value,
+    String label,
+  ) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
 

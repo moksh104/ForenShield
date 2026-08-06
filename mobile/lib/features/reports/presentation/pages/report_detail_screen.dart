@@ -3,17 +3,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/effects/particle_background.dart';
-import '../../../../core/effects/scanner_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../providers/reports_provider.dart';
-
+import '../../../../core/services/upload_service.dart';
 /// Detailed Incident & Forensic Intelligence Report View Screen.
 class ReportDetailScreen extends ConsumerWidget {
   final String reportId;
@@ -48,24 +45,16 @@ class ReportDetailScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: ScannerEffect(
-                  color: primaryColor,
-                  child: const Center(
-                    child: Icon(Icons.find_in_page_outlined, size: 48, color: AppColors.logoGold),
-                  ),
-                ),
+              Icon(
+                Icons.find_in_page_outlined,
+                size: 48,
+                color: foren.textSecondary,
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'REPORT ARTIFACT NOT FOUND',
-                style: TextStyle(
+                'Report not found',
+                style: theme.textTheme.bodyMedium?.copyWith(
                   color: foren.textSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
                 ),
               ),
             ],
@@ -104,46 +93,97 @@ class ReportDetailScreen extends ConsumerWidget {
         ),
       ),
       bottomNavigationBar: GlassEffect(
-        blurX: 14.0,
-        blurY: 14.0,
-        opacity: 0.15,
         border: Border(top: BorderSide(color: foren.borderSubtle)),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: SizedBox(
               height: 48,
-              child: GlowEffect(
-                glowColor: accentColor,
-                blurRadius: 16,
-                animate: true,
-                borderRadius: AppRadius.borderRadiusMd,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Exporting report artifact to PDF / JSON format...'),
-                        backgroundColor: foren.success.t500,
+              child: Row(
+                children: [
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text(
+                              'Exporting report artifact to PDF / JSON format...',
+                            ),
+                            backgroundColor: foren.success.t500,
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: theme.scaffoldBackgroundColor,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.borderRadiusMd,
+                        ),
                       ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: theme.scaffoldBackgroundColor,
-                    shape: const RoundedRectangleBorder(
-                      borderRadius: AppRadius.borderRadiusMd,
+                      icon: const Icon(Icons.download_rounded, size: 18),
+                      label: Text(
+                        'Export',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.scaffoldBackgroundColor,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
-                  icon: const Icon(Icons.download_rounded, size: 18),
-                  label: const Text(
-                    'EXPORT CYBER INTELLIGENCE REPORT',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'monospace',
-                      fontSize: 13,
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final uploadService = ref.read(uploadServiceProvider);
+                        final file = await uploadService.pickFile();
+                        
+                        if (!context.mounted) return;
+                        
+                        if (file != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Uploading attachment...')),
+                          );
+                          final compressed = await uploadService.compressImage(file);
+                          final url = await uploadService.uploadImage(compressed ?? file, folder: 'forenshield/reports');
+                          
+                          if (!context.mounted) return;
+                          
+                          if (url != null) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Attachment uploaded successfully! URL: $url'),
+                                backgroundColor: foren.success.t500,
+                              ),
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: const Text('Failed to upload attachment'),
+                                backgroundColor: foren.critical.t500,
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.surface,
+                        foregroundColor: theme.colorScheme.onSurface,
+                        side: BorderSide(color: foren.borderSubtle),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.borderRadiusMd,
+                        ),
+                      ),
+                      icon: const Icon(Icons.upload_file, size: 18),
+                      label: Text(
+                        'Attach',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: theme.colorScheme.onSurface,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
                   ),
-                ),
+                ],
               ),
             ),
           ),
@@ -155,7 +195,6 @@ class ReportDetailScreen extends ConsumerWidget {
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: ListView(
                 padding: const EdgeInsets.all(AppSpacing.lg),
@@ -179,11 +218,16 @@ class ReportDetailScreen extends ConsumerWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 3,
+                                ),
                                 decoration: BoxDecoration(
                                   color: accentColor.withValues(alpha: 0.15),
                                   borderRadius: AppRadius.borderRadiusXs,
-                                  border: Border.all(color: accentColor.withValues(alpha: 0.4)),
+                                  border: Border.all(
+                                    color: accentColor.withValues(alpha: 0.4),
+                                  ),
                                 ),
                                 child: Text(
                                   'SEVERITY: ${report.severity.toUpperCase()}',
@@ -227,10 +271,7 @@ class ReportDetailScreen extends ConsumerWidget {
                         ],
                       ),
                     ),
-                  )
-                      .animate()
-                      .fadeIn(duration: 400.ms)
-                      .slideY(begin: -0.1, end: 0),
+                  ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
 
                   const SizedBox(height: AppSpacing.lg),
 
@@ -253,9 +294,7 @@ class ReportDetailScreen extends ConsumerWidget {
                         ),
                       ),
                     ],
-                  )
-                      .animate(delay: 100.ms)
-                      .fadeIn(duration: 400.ms),
+                  ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
 
                   const SizedBox(height: AppSpacing.sm),
 
@@ -277,43 +316,47 @@ class ReportDetailScreen extends ConsumerWidget {
                         ),
                       ),
                     ],
-                  )
-                      .animate(delay: 150.ms)
-                      .fadeIn(duration: 400.ms),
+                  ).animate(delay: 150.ms).fadeIn(duration: 400.ms),
 
                   const SizedBox(height: AppSpacing.lg),
 
                   // 3. Key Findings Section
                   _SectionCard(
-                    title: 'KEY FINDINGS & THREAT DIAGNOSIS',
-                    icon: Icons.search_outlined,
-                    accentColor: accentColor,
-                    foren: foren,
-                    children: report.findings
-                        .map(
-                          (finding) => Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(Icons.circle, size: 8, color: accentColor),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    finding,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurface,
-                                      fontSize: 13,
-                                      height: 1.4,
-                                    ),
-                                  ),
+                        title: 'KEY FINDINGS & THREAT DIAGNOSIS',
+                        icon: Icons.search_outlined,
+                        accentColor: accentColor,
+                        foren: foren,
+                        children: report.findings
+                            .map(
+                              (finding) => Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.xs,
                                 ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  )
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.circle,
+                                      size: 8,
+                                      color: accentColor,
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        finding,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface,
+                                          fontSize: 13,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            )
+                            .toList(),
+                      )
                       .animate(delay: 250.ms)
                       .fadeIn(duration: 400.ms)
                       .slideY(begin: 0.08, end: 0),
@@ -322,39 +365,41 @@ class ReportDetailScreen extends ConsumerWidget {
 
                   // 4. Remediation Actions Section
                   _SectionCard(
-                    title: 'REMEDIATION & THREAT MITIGATION',
-                    icon: Icons.verified_user_outlined,
-                    accentColor: foren.simulation.t500,
-                    foren: foren,
-                    children: report.remediationActions
-                        .map(
-                          (action) => Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Icon(
-                                  Icons.check_circle_outline,
-                                  size: 16,
-                                  color: foren.success.t500,
+                        title: 'REMEDIATION & THREAT MITIGATION',
+                        icon: Icons.verified_user_outlined,
+                        accentColor: foren.simulation.t500,
+                        foren: foren,
+                        children: report.remediationActions
+                            .map(
+                              (action) => Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.xs,
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    action,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurface,
-                                      fontSize: 13,
-                                      height: 1.4,
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Icon(
+                                      Icons.check_circle_outline,
+                                      size: 16,
+                                      color: foren.success.t500,
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        action,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface,
+                                          fontSize: 13,
+                                          height: 1.4,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  )
+                              ),
+                            )
+                            .toList(),
+                      )
                       .animate(delay: 350.ms)
                       .fadeIn(duration: 400.ms)
                       .slideY(begin: 0.08, end: 0),
@@ -363,38 +408,40 @@ class ReportDetailScreen extends ConsumerWidget {
 
                   // 5. Extracted Artifacts Section
                   _SectionCard(
-                    title: 'EXTRACTED FORENSIC ARTIFACTS',
-                    icon: Icons.folder_open_outlined,
-                    accentColor: foren.warning.t500,
-                    foren: foren,
-                    children: report.artifacts
-                        .map(
-                          (artifact) => Padding(
-                            padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                            child: Row(
-                              children: [
-                                Icon(
-                                  Icons.description_outlined,
-                                  size: 16,
-                                  color: foren.warning.t500,
+                        title: 'EXTRACTED FORENSIC ARTIFACTS',
+                        icon: Icons.folder_open_outlined,
+                        accentColor: foren.warning.t500,
+                        foren: foren,
+                        children: report.artifacts
+                            .map(
+                              (artifact) => Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.xs,
                                 ),
-                                const SizedBox(width: 8),
-                                Expanded(
-                                  child: Text(
-                                    artifact,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurface,
-                                      fontSize: 13,
-                                      fontFamily: 'monospace',
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      Icons.description_outlined,
+                                      size: 16,
+                                      color: foren.warning.t500,
                                     ),
-                                  ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: Text(
+                                        artifact,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface,
+                                          fontSize: 13,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
-                          ),
-                        )
-                        .toList(),
-                  )
+                              ),
+                            )
+                            .toList(),
+                      )
                       .animate(delay: 450.ms)
                       .fadeIn(duration: 400.ms)
                       .slideY(begin: 0.08, end: 0),

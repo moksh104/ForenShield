@@ -8,10 +8,7 @@ import '../../domain/entities/mission_control_entity.dart';
 class ActivityTileSection extends StatelessWidget {
   final List<DashboardActivity> activities;
 
-  const ActivityTileSection({
-    super.key,
-    required this.activities,
-  });
+  const ActivityTileSection({super.key, required this.activities});
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +25,7 @@ class ActivityTileSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: AppRadius.borderRadiusLg,
-          border: Border.all(
-            color: foren.borderSubtle.withValues(alpha: 0.4),
-          ),
+          border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.4)),
         ),
         child: ListView.separated(
           shrinkWrap: true,
@@ -73,11 +68,7 @@ class _ActivityRow extends StatelessWidget {
               color: typeColor.withValues(alpha: 0.12),
               borderRadius: AppRadius.borderRadiusSm,
             ),
-            child: Icon(
-              _getIcon(item.iconName),
-              color: typeColor,
-              size: 18,
-            ),
+            child: Icon(_getIcon(item.iconName), color: typeColor, size: 18),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -97,10 +88,7 @@ class _ActivityRow extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   item.subtitle,
-                  style: TextStyle(
-                    color: foren.textDisabled,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: foren.textDisabled, fontSize: 11),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -110,10 +98,7 @@ class _ActivityRow extends StatelessWidget {
           const SizedBox(width: 8),
           Text(
             item.timestamp,
-            style: TextStyle(
-              color: foren.textDisabled,
-              fontSize: 10,
-            ),
+            style: TextStyle(color: foren.textDisabled, fontSize: 10),
           ),
         ],
       ),

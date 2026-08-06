@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/foren_theme.dart';
 
-/// Reusable 6-digit animated OTP Verification Field with glassmorphism & focus glow.
+/// Reusable 6-digit OTP Verification Field with clear focus states.
 class AuthOtpField extends StatefulWidget {
   final int length;
   final ValueChanged<String>? onCompleted;
 
-  const AuthOtpField({
-    super.key,
-    this.length = 6,
-    this.onCompleted,
-  });
+  const AuthOtpField({super.key, this.length = 6, this.onCompleted});
 
   @override
   State<AuthOtpField> createState() => _AuthOtpFieldState();
@@ -88,47 +83,35 @@ class _AuthOtpFieldState extends State<AuthOtpField> {
         final Color borderColor = isFocused
             ? primaryColor
             : (hasValue
-                ? foren.success.t500
-                : foren.borderSubtle.withValues(alpha: 0.4));
+                  ? foren.success.t500
+                  : foren.borderSubtle.withValues(alpha: 0.4));
 
         return SizedBox(
           width: 48,
           height: 56,
-          child: GlowEffect(
-            glowColor: primaryColor,
-            blurRadius: isFocused ? 12.0 : 0.0,
-            spreadRadius: isFocused ? 2.0 : 0.0,
-            animate: isFocused,
+          child: GlassEffect(
             borderRadius: AppRadius.borderRadiusMd,
-            child: GlassEffect(
-              blurX: 12.0,
-              blurY: 12.0,
-              opacity: isFocused ? 0.20 : 0.10,
-              borderRadius: AppRadius.borderRadiusMd,
-              border: Border.all(
-                color: borderColor,
-                width: isFocused || hasValue ? 1.5 : 1.0,
-              ),
-              child: Center(
-                child: TextField(
-                  controller: _controllers[index],
-                  focusNode: _focusNodes[index],
-                  keyboardType: TextInputType.number,
-                  textAlign: TextAlign.center,
-                  maxLength: 1,
-                  style: TextStyle(
-                    color: hasValue ? primaryColor : theme.colorScheme.onSurface,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'monospace',
-                  ),
-                  decoration: const InputDecoration(
-                    counterText: '',
-                    border: InputBorder.none,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  onChanged: (val) => _onChanged(index, val),
+            border: Border.all(
+              color: borderColor,
+              width: isFocused || hasValue ? 1.5 : 1.0,
+            ),
+            child: Center(
+              child: TextField(
+                controller: _controllers[index],
+                focusNode: _focusNodes[index],
+                keyboardType: TextInputType.number,
+                textAlign: TextAlign.center,
+                maxLength: 1,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: hasValue ? primaryColor : theme.colorScheme.onSurface,
+                  fontWeight: FontWeight.w800,
                 ),
+                decoration: const InputDecoration(
+                  counterText: '',
+                  border: InputBorder.none,
+                  contentPadding: EdgeInsets.zero,
+                ),
+                onChanged: (val) => _onChanged(index, val),
               ),
             ),
           ),

@@ -22,9 +22,11 @@ class _LivePreviewCardState extends ConsumerState<LivePreviewCard> {
 
   @override
   Widget build(BuildContext context) {
-    final activeState = ref.watch(playgroundStateProvider(widget.component.name));
+    final activeState = ref.watch(
+      playgroundStateProvider(widget.component.name),
+    );
     final Map<String, dynamic> safeState = activeState.isEmpty
-        ? { for (var p in widget.component.properties) p.name: p.defaultValue }
+        ? {for (var p in widget.component.properties) p.name: p.defaultValue}
         : activeState;
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
@@ -40,16 +42,28 @@ class _LivePreviewCardState extends ConsumerState<LivePreviewCard> {
         children: [
           // Toolbar
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.sm,
+              vertical: AppSpacing.xs,
+            ),
             decoration: BoxDecoration(
               border: Border(bottom: BorderSide(color: foren.borderSubtle)),
             ),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Live Preview', style: TextStyle(fontWeight: FontWeight.bold, color: foren.textSecondary)),
+                Text(
+                  'Live Preview',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: foren.textSecondary,
+                  ),
+                ),
                 IconButton(
-                  icon: Icon(_isDark ? Icons.light_mode : Icons.dark_mode, size: 20),
+                  icon: Icon(
+                    _isDark ? Icons.light_mode : Icons.dark_mode,
+                    size: 20,
+                  ),
                   tooltip: 'Toggle Preview Theme',
                   onPressed: () => setState(() => _isDark = !_isDark),
                   color: foren.textSecondary,
@@ -57,13 +71,17 @@ class _LivePreviewCardState extends ConsumerState<LivePreviewCard> {
               ],
             ),
           ),
-          
+
           // Preview Area
           Container(
             padding: const EdgeInsets.all(AppSpacing.xxl),
             decoration: BoxDecoration(
-              color: _isDark ? const Color(0xFF121212) : const Color(0xFFF5F5F5),
-              borderRadius: const BorderRadius.vertical(bottom: Radius.circular(15)),
+              color: _isDark
+                  ? const Color(0xFF121212)
+                  : const Color(0xFFF5F5F5),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(15),
+              ),
             ),
             alignment: Alignment.center,
             // Override the theme locally for this specific preview box

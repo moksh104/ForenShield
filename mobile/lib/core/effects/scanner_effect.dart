@@ -29,10 +29,8 @@ class _ScannerEffectState extends State<ScannerEffect>
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: widget.duration,
-    )..repeat();
+    _controller = AnimationController(vsync: this, duration: widget.duration)
+      ..repeat();
   }
 
   @override
@@ -68,10 +66,7 @@ class _ScannerPainter extends CustomPainter {
   final double progress;
   final Color color;
 
-  _ScannerPainter({
-    required this.progress,
-    required this.color,
-  });
+  _ScannerPainter({required this.progress, required this.color});
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -106,14 +101,13 @@ class _ScannerPainter extends CustomPainter {
       center: Alignment.center,
       startAngle: angle - math.pi / 3,
       endAngle: angle,
-      colors: [
-        color.withValues(alpha: 0.0),
-        color.withValues(alpha: 0.35),
-      ],
+      colors: [color.withValues(alpha: 0.0), color.withValues(alpha: 0.35)],
     );
 
     final sweepPaint = Paint()
-      ..shader = sweepGradient.createShader(Rect.fromCircle(center: center, radius: radius))
+      ..shader = sweepGradient.createShader(
+        Rect.fromCircle(center: center, radius: radius),
+      )
       ..style = PaintingStyle.fill;
 
     canvas.drawCircle(center, radius, sweepPaint);

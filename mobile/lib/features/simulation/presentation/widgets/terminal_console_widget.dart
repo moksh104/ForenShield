@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/terminal_line.dart';
 
-/// Interactive terminal shell component for Simulation Lab scenarios with glassmorphism.
+/// Interactive terminal shell component for Simulation Lab scenarios.
 class TerminalConsoleWidget extends StatefulWidget {
   final List<TerminalLine>? history;
   final List<TerminalLine>? lines;
@@ -68,9 +67,6 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
     final primaryColor = theme.colorScheme.primary;
 
     return GlassEffect(
-      blurX: 14.0,
-      blurY: 14.0,
-      opacity: 0.12,
       border: Border.all(
         color: primaryColor.withValues(alpha: 0.35),
         width: 1.0,
@@ -83,7 +79,9 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
             decoration: BoxDecoration(
               color: AppColors.surfaceHighlight.withValues(alpha: 0.8),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(11)),
+              borderRadius: const BorderRadius.vertical(
+                top: Radius.circular(11),
+              ),
               border: Border(
                 bottom: BorderSide(
                   color: foren.borderSubtle.withValues(alpha: 0.3),
@@ -104,29 +102,22 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
                   ),
                 ),
                 const Spacer(),
-                GlowEffect(
-                  glowColor: AppColors.success,
-                  blurRadius: 8,
-                  animate: true,
-                  borderRadius: BorderRadius.circular(10),
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(
-                      color: AppColors.success,
-                      shape: BoxShape.circle,
-                    ),
+                Container(
+                  width: 8,
+                  height: 8,
+                  decoration: const BoxDecoration(
+                    color: AppColors.success,
+                    shape: BoxShape.circle,
                   ),
                 ),
                 const SizedBox(width: 6),
                 const Text(
-                  'VM ONLINE',
+                  'Connected',
                   style: TextStyle(
                     color: AppColors.success,
                     fontSize: 10,
-                    fontWeight: FontWeight.w800,
+                    fontWeight: FontWeight.w700,
                     fontFamily: 'monospace',
-                    letterSpacing: 0.5,
                   ),
                 ),
               ],
@@ -162,8 +153,9 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
             decoration: BoxDecoration(
               color: AppColors.surface.withValues(alpha: 0.8),
-              borderRadius:
-                  const BorderRadius.vertical(bottom: Radius.circular(11)),
+              borderRadius: const BorderRadius.vertical(
+                bottom: Radius.circular(11),
+              ),
               border: Border(
                 top: BorderSide(
                   color: foren.borderSubtle.withValues(alpha: 0.3),
@@ -191,7 +183,8 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
                       fontFamily: 'monospace',
                     ),
                     decoration: const InputDecoration(
-                      hintText: 'type command (e.g. netstat, pkill, iptables, help)...',
+                      hintText:
+                          'type command (e.g. netstat, pkill, iptables, help)...',
                       hintStyle: TextStyle(
                         color: AppColors.textSecondary,
                         fontSize: 12,

@@ -1,133 +1,116 @@
 import 'package:flutter/material.dart';
+import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/foren_theme.dart';
 
-/// Category filter chips & search input for Cyber Academy.
+/// Clean Category Filter Bar + Filter button matching exact design spec.
 class CategoryFilterBar extends StatelessWidget {
   final List<String> categories;
   final String selectedCategory;
   final ValueChanged<String> onCategorySelected;
-  final ValueChanged<String> onSearchSubmitted;
-  final VoidCallback? onProgressTap;
+  final VoidCallback? onFilterTap;
 
   const CategoryFilterBar({
     super.key,
     required this.categories,
     required this.selectedCategory,
     required this.onCategorySelected,
-    required this.onSearchSubmitted,
-    this.onProgressTap,
+    this.onFilterTap,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    final academyColor = foren.academy.t500;
-    final primaryColor = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = AppColors.primary;
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? AppColors.borderSubtle
+        : const Color(0xFFE2E8F0);
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        // Top Action Row
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  onChanged: onSearchSubmitted,
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 14,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: 'Search courses & topics...',
-                    hintStyle: TextStyle(
-                      color: foren.textDisabled,
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Row(
+        children: [
+          // Filter Chips Horizontal Scroll
+          Expanded(
+            child: SizedBox(
+              height: 38,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                itemCount: categories.length,
+                separatorBuilder: (_, _) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final cat = categories[index];
+                  final isSelected = cat == selectedCategory;
+                  return GestureDetector(
+                    onTap: () => onCategorySelected(cat),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? primaryColor
+                            : (isDark ? AppColors.surface : Colors.white),
+                        borderRadius: AppRadius.borderRadiusSm,
+                        border: Border.all(
+                          color: isSelected ? primaryColor : borderColor,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          cat,
+                          style: TextStyle(
+                            color: isSelected ? Colors.white : textSecondary,
+                            fontSize: 13,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ),
+          const SizedBox(width: 10),
+
+          // Right End "Filter" Button
+          GestureDetector(
+            onTap: onFilterTap,
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              decoration: BoxDecoration(
+                color: isDark ? AppColors.surface : Colors.white,
+                borderRadius: AppRadius.borderRadiusSm,
+                border: Border.all(color: borderColor),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.tune_outlined, size: 16, color: textSecondary),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Filter',
+                    style: TextStyle(
+                      color: textSecondary,
                       fontSize: 13,
-                    ),
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: foren.textDisabled,
-                      size: 20,
-                    ),
-                    filled: true,
-                    fillColor: foren.surfaceRaised1,
-                    contentPadding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: 10,
-                    ),
-                    border: const OutlineInputBorder(
-                      borderRadius: AppRadius.borderRadiusMd,
-                      borderSide: BorderSide.none,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                ),
+                ],
               ),
-              const SizedBox(width: AppSpacing.sm),
-              InkWell(
-                onTap: onProgressTap,
-                borderRadius: AppRadius.borderRadiusMd,
-                child: Container(
-                  padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    color: foren.surfaceRaised1,
-                    borderRadius: AppRadius.borderRadiusMd,
-                    border: Border.all(
-                      color: foren.borderSubtle.withValues(alpha: 0.3),
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.insights_outlined,
-                    color: primaryColor,
-                    size: 22,
-                  ),
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        // Filter Chips Horizontal Scroll List
-        SizedBox(
-          height: 38,
-          child: ListView.separated(
-            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-            scrollDirection: Axis.horizontal,
-            itemCount: categories.length,
-            separatorBuilder: (_, _) => const SizedBox(width: 8),
-            itemBuilder: (context, index) {
-              final cat = categories[index];
-              final isSelected = cat == selectedCategory;
-              return ChoiceChip(
-                label: Text(cat),
-                selected: isSelected,
-                onSelected: (_) => onCategorySelected(cat),
-                selectedColor: academyColor,
-                backgroundColor: foren.surfaceRaised1,
-                labelStyle: TextStyle(
-                  color: isSelected
-                      ? theme.scaffoldBackgroundColor
-                      : foren.textSecondary,
-                  fontSize: 12,
-                  fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: AppRadius.borderRadiusSm,
-                  side: BorderSide(
-                    color: isSelected
-                        ? academyColor
-                        : foren.borderSubtle.withValues(alpha: 0.3),
-                  ),
-                ),
-                showCheckmark: false,
-              );
-            },
-          ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 }

@@ -41,14 +41,17 @@ class ModuleCard extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 3),
+                        horizontal: 8,
+                        vertical: 3,
+                      ),
                       decoration: BoxDecoration(
                         color: difficultyColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(6),
                       ),
                       child: Text(
-                        AcademyUtils.difficultyLabel(course.difficulty)
-                            .toUpperCase(),
+                        AcademyUtils.difficultyLabel(
+                          course.difficulty,
+                        ).toUpperCase(),
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: difficultyColor,
                           fontWeight: FontWeight.w700,
@@ -61,8 +64,9 @@ class ModuleCard extends StatelessWidget {
                     Text(
                       AcademyUtils.formatDuration(course.estimatedMinutes),
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.45),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.45,
+                        ),
                       ),
                     ),
                   ],
@@ -81,8 +85,7 @@ class ModuleCard extends StatelessWidget {
                 Text(
                   course.description,
                   style: theme.textTheme.bodySmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.55),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
                   ),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -93,8 +96,7 @@ class ModuleCard extends StatelessWidget {
                   child: LinearProgressIndicator(
                     value: course.progress,
                     minHeight: 4,
-                    backgroundColor:
-                        theme.colorScheme.surfaceContainerLowest,
+                    backgroundColor: theme.colorScheme.surfaceContainerLowest,
                     valueColor: AlwaysStoppedAnimation<Color>(
                       theme.colorScheme.primary,
                     ),
@@ -106,8 +108,9 @@ class ModuleCard extends StatelessWidget {
                     Text(
                       '${course.completedModules}/${course.totalModules} modules',
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                         fontSize: 10,
                       ),
                     ),

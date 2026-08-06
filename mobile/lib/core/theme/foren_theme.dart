@@ -8,7 +8,6 @@
 /// independent feature identities.
 library;
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'app_tokens.dart';
 import 'app_typography.dart';
@@ -198,7 +197,7 @@ class ForenTheme {
   static ThemeData get light {
     final colorScheme = ColorScheme.light(
       brightness: Brightness.light,
-      primary: ForenFeatureColors.missionControl.t700,
+      primary: ForenFeatureColors.missionControl.t500,
       onPrimary: Colors.white,
       secondary: ForenFeatureColors.investigation.t700,
       onSecondary: Colors.white,
@@ -253,13 +252,13 @@ class ForenTheme {
       cardTheme: CardThemeData(
         color: colorScheme.surface,
         elevation: ForenElevation.level1,
-        shape: RoundedRectangleBorder(borderRadius: ForenRadius.cardBr),
+        shape: ForenRadius.cardShape,
         margin: EdgeInsets.zero,
       ),
 
       dialogTheme: DialogThemeData(
         backgroundColor: extension.surfaceRaised3,
-        shape: RoundedRectangleBorder(borderRadius: ForenRadius.dialogBr),
+        shape: ForenRadius.dialogShape,
         elevation: ForenElevation.level3,
       ),
 
@@ -272,7 +271,9 @@ class ForenTheme {
             horizontal: ForenSpace.lg,
             vertical: ForenSpace.md,
           ),
-          shape: RoundedRectangleBorder(borderRadius: ForenRadius.buttonBr),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(ForenRadius.button)),
+          ),
           textStyle: textTheme.labelLarge,
         ),
       ),
@@ -288,7 +289,9 @@ class ForenTheme {
             horizontal: ForenSpace.lg,
             vertical: ForenSpace.md,
           ),
-          shape: RoundedRectangleBorder(borderRadius: ForenRadius.buttonBr),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(ForenRadius.button)),
+          ),
           textStyle: textTheme.labelLarge,
         ),
       ),
@@ -300,7 +303,9 @@ class ForenTheme {
             horizontal: ForenSpace.md,
             vertical: ForenSpace.sm,
           ),
-          shape: RoundedRectangleBorder(borderRadius: ForenRadius.buttonBr),
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.all(Radius.circular(ForenRadius.button)),
+          ),
           textStyle: textTheme.labelLarge,
         ),
       ),
@@ -313,34 +318,36 @@ class ForenTheme {
           vertical: ForenSpace.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: ForenRadius.buttonBr,
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: extension.borderDefault,
             width: ForenBorderWidth.defaultWidth,
           ),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: ForenRadius.buttonBr,
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: extension.borderDefault,
             width: ForenBorderWidth.defaultWidth,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: ForenRadius.buttonBr,
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: colorScheme.primary,
             width: ForenBorderWidth.focus,
           ),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: ForenRadius.buttonBr,
+          borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(
             color: colorScheme.error,
             width: ForenBorderWidth.error,
           ),
         ),
-        hintStyle: textTheme.bodyMedium?.copyWith(color: extension.textDisabled),
+        hintStyle: textTheme.bodyMedium?.copyWith(
+          color: extension.textDisabled,
+        ),
       ),
 
       chipTheme: ChipThemeData(
@@ -350,7 +357,7 @@ class ForenTheme {
           horizontal: ForenSpace.sm,
           vertical: ForenSpace.xs,
         ),
-        shape: RoundedRectangleBorder(borderRadius: ForenRadius.pillBr),
+        shape: const StadiumBorder(),
         side: BorderSide.none,
       ),
 
@@ -369,9 +376,36 @@ class ForenTheme {
 
       pageTransitionsTheme: const PageTransitionsTheme(
         builders: {
-          TargetPlatform.android: ZoomPageTransitionsBuilder(),
-          TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
+          TargetPlatform.android: _ForenSoftFadeThroughBuilder(),
+          TargetPlatform.iOS: _ForenSoftFadeThroughBuilder(),
+          TargetPlatform.macOS: _ForenSoftFadeThroughBuilder(),
         },
+      ),
+    );
+  }
+}
+
+class _ForenSoftFadeThroughBuilder extends PageTransitionsBuilder {
+  const _ForenSoftFadeThroughBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    // Soft scale-up and fade, replicating SharedAxis/FadeThrough organic feel.
+    final CurveTween easeInTween = CurveTween(curve: Curves.easeIn);
+
+    return FadeTransition(
+      opacity: animation.drive(easeInTween),
+      child: ScaleTransition(
+        scale: Tween<double>(begin: 0.96, end: 1.0).animate(
+          CurvedAnimation(parent: animation, curve: Curves.easeOutCirc),
+        ),
+        child: child,
       ),
     );
   }

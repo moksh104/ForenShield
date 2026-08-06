@@ -146,13 +146,7 @@ class _StatItem extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 2),
-        Text(
-          label,
-          style: TextStyle(
-            color: foren.textDisabled,
-            fontSize: 11,
-          ),
-        ),
+        Text(label, style: TextStyle(color: foren.textDisabled, fontSize: 11)),
       ],
     );
   }
@@ -185,11 +179,7 @@ class _CertificateTile extends StatelessWidget {
               color: warningColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              Icons.card_membership,
-              color: warningColor,
-              size: 20,
-            ),
+            child: Icon(Icons.card_membership, color: warningColor, size: 20),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -206,10 +196,7 @@ class _CertificateTile extends StatelessWidget {
                 ),
                 Text(
                   issuedDate,
-                  style: TextStyle(
-                    color: foren.textDisabled,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: foren.textDisabled, fontSize: 11),
                 ),
               ],
             ),

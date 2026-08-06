@@ -29,9 +29,8 @@ class InvestigationState {
     this.errorMessage,
   });
 
-  factory InvestigationState.initial() => const InvestigationState(
-        status: InvestigationStatus.initial,
-      );
+  factory InvestigationState.initial() =>
+      const InvestigationState(status: InvestigationStatus.initial);
 
   InvestigationState copyWith({
     InvestigationStatus? status,
@@ -59,12 +58,13 @@ class InvestigationState {
 
 final investigationRemoteDataSourceProvider =
     Provider<InvestigationRemoteDataSource>((ref) {
-  final apiClient = ref.watch(apiClientProvider);
-  return InvestigationRemoteDataSource(apiClient);
-});
+      final apiClient = ref.watch(apiClientProvider);
+      return InvestigationRemoteDataSource(apiClient);
+    });
 
-final investigationRepositoryProvider =
-    Provider<InvestigationRepository>((ref) {
+final investigationRepositoryProvider = Provider<InvestigationRepository>((
+  ref,
+) {
   final dataSource = ref.watch(investigationRemoteDataSourceProvider);
   return InvestigationRepositoryImpl(dataSource);
 });
@@ -90,7 +90,7 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
   final LoadCasesUseCase _loadCasesUseCase;
 
   InvestigationNotifier(this._loadCasesUseCase)
-      : super(InvestigationState.initial()) {
+    : super(InvestigationState.initial()) {
     loadCases();
   }
 
@@ -103,11 +103,14 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
       sortBy: state.sortBy,
     );
 
+    if (!mounted) return;
+
     result.when(
       success: (cases) {
         state = state.copyWith(
-          status:
-              cases.isEmpty ? InvestigationStatus.empty : InvestigationStatus.success,
+          status: cases.isEmpty
+              ? InvestigationStatus.empty
+              : InvestigationStatus.success,
           cases: cases,
         );
       },
@@ -129,11 +132,14 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
       sortBy: state.sortBy,
     );
 
+    if (!mounted) return;
+
     result.when(
       success: (cases) {
         state = state.copyWith(
-          status:
-              cases.isEmpty ? InvestigationStatus.empty : InvestigationStatus.success,
+          status: cases.isEmpty
+              ? InvestigationStatus.empty
+              : InvestigationStatus.success,
           cases: cases,
         );
       },
@@ -163,7 +169,10 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
 }
 
 final investigationProvider =
-    StateNotifierProvider.autoDispose<InvestigationNotifier, InvestigationState>((ref) {
-  final useCase = ref.watch(loadCasesUseCaseProvider);
-  return InvestigationNotifier(useCase);
-});
+    StateNotifierProvider.autoDispose<
+      InvestigationNotifier,
+      InvestigationState
+    >((ref) {
+      final useCase = ref.watch(loadCasesUseCaseProvider);
+      return InvestigationNotifier(useCase);
+    });

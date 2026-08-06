@@ -26,9 +26,8 @@ class SectionHeader extends StatelessWidget {
         children: [
           Text(
             title.toUpperCase(),
-            style: TextStyle(
+            style: theme.textTheme.labelSmall?.copyWith(
               color: foren.textDisabled,
-              fontSize: 11,
               fontWeight: FontWeight.w700,
               letterSpacing: 1.2,
             ),
@@ -38,13 +37,11 @@ class SectionHeader extends StatelessWidget {
               onTap: onActionTap,
               borderRadius: BorderRadius.circular(6),
               child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
                 child: Text(
                   actionLabel!,
-                  style: TextStyle(
+                  style: theme.textTheme.labelMedium?.copyWith(
                     color: theme.colorScheme.primary,
-                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

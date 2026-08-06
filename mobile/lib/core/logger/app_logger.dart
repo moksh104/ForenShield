@@ -21,7 +21,9 @@ class AppLogger {
   /// Replaces JWT tokens with '[REDACTED_TOKEN]'.
   static String redact(String message) {
     // Regex for basic JWT format (header.payload.signature)
-    final jwtRegex = RegExp(r'eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+');
+    final jwtRegex = RegExp(
+      r'eyJ[A-Za-z0-9_-]+\.eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+',
+    );
     return message.replaceAll(jwtRegex, '[REDACTED_TOKEN]');
   }
 

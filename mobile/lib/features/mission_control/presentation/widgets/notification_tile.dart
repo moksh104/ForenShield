@@ -8,10 +8,7 @@ import '../../domain/entities/mission_control_entity.dart';
 class NotificationTileSection extends StatelessWidget {
   final List<DashboardNotification> notifications;
 
-  const NotificationTileSection({
-    super.key,
-    required this.notifications,
-  });
+  const NotificationTileSection({super.key, required this.notifications});
 
   @override
   Widget build(BuildContext context) {
@@ -28,9 +25,7 @@ class NotificationTileSection extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surface,
           borderRadius: AppRadius.borderRadiusLg,
-          border: Border.all(
-            color: foren.borderSubtle.withValues(alpha: 0.4),
-          ),
+          border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.4)),
         ),
         child: ListView.separated(
           shrinkWrap: true,
@@ -74,11 +69,7 @@ class _NotificationRow extends StatelessWidget {
               color: typeColor.withValues(alpha: 0.12),
               shape: BoxShape.circle,
             ),
-            child: Icon(
-              _getTypeIcon(item.type),
-              color: typeColor,
-              size: 16,
-            ),
+            child: Icon(_getTypeIcon(item.type), color: typeColor, size: 16),
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
@@ -104,20 +95,14 @@ class _NotificationRow extends StatelessWidget {
                     ),
                     Text(
                       item.timestamp,
-                      style: TextStyle(
-                        color: foren.textDisabled,
-                        fontSize: 10,
-                      ),
+                      style: TextStyle(color: foren.textDisabled, fontSize: 10),
                     ),
                   ],
                 ),
                 const SizedBox(height: 2),
                 Text(
                   item.message,
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: foren.textSecondary, fontSize: 11),
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
                 ),

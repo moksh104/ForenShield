@@ -33,11 +33,7 @@ void main() {
     };
     addTearDown(() => FlutterError.onError = originalOnError);
 
-    await tester.pumpWidget(
-      const ProviderScope(
-        child: ForenShieldApp(),
-      ),
-    );
+    await tester.pumpWidget(const ProviderScope(child: ForenShieldApp()));
 
     // Verify the splash screen widget is rendered as the initial route.
     expect(find.byType(SplashScreen), findsOneWidget);

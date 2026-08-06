@@ -58,9 +58,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
     if (_isLoading) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        body: Center(
-          child: CircularProgressIndicator(color: academyColor),
-        ),
+        body: Center(child: CircularProgressIndicator(color: academyColor)),
       );
     }
 
@@ -70,7 +68,10 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
         backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(backgroundColor: theme.scaffoldBackgroundColor),
         body: Center(
-          child: Text('Course not found.', style: TextStyle(color: foren.textDisabled)),
+          child: Text(
+            'Course not found.',
+            style: TextStyle(color: foren.textDisabled),
+          ),
         ),
       );
     }
@@ -93,7 +94,10 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                       background: Container(
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.bgBase, theme.colorScheme.surface],
+                            colors: [
+                              AppColors.bgBase,
+                              theme.colorScheme.surface,
+                            ],
                             begin: Alignment.topCenter,
                             end: Alignment.bottomCenter,
                           ),
@@ -163,8 +167,11 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                               padding: const EdgeInsets.only(bottom: 4),
                               child: Row(
                                 children: [
-                                  Icon(Icons.check_circle_outline,
-                                      size: 14, color: foren.success.t500),
+                                  Icon(
+                                    Icons.check_circle_outline,
+                                    size: 14,
+                                    color: foren.success.t500,
+                                  ),
                                   const SizedBox(width: 6),
                                   Expanded(
                                     child: Text(
@@ -195,7 +202,9 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                             (m) => _ModuleExpansionTile(
                               module: m,
                               onLessonTap: (lesId) {
-                                context.push('${RouteConstants.lessonPlayer}/$lesId');
+                                context.push(
+                                  '${RouteConstants.lessonPlayer}/$lesId',
+                                );
                               },
                             ),
                           ),
@@ -212,20 +221,21 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
                 color: theme.colorScheme.surface,
-                border: Border(
-                  top: BorderSide(color: foren.borderSubtle),
-                ),
+                border: Border(top: BorderSide(color: foren.borderSubtle)),
               ),
               child: SizedBox(
                 width: double.infinity,
                 height: 48,
                 child: ElevatedButton(
                   onPressed: () {
-                    final firstLessonId = course.modules.isNotEmpty &&
+                    final firstLessonId =
+                        course.modules.isNotEmpty &&
                             course.modules.first.lessons.isNotEmpty
                         ? course.modules.first.lessons.first.id
                         : 'les_101';
-                    context.push('${RouteConstants.lessonPlayer}/$firstLessonId');
+                    context.push(
+                      '${RouteConstants.lessonPlayer}/$firstLessonId',
+                    );
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: academyColor,
@@ -257,10 +267,7 @@ class _ModuleExpansionTile extends StatelessWidget {
   final ModuleEntity module;
   final ValueChanged<String> onLessonTap;
 
-  const _ModuleExpansionTile({
-    required this.module,
-    required this.onLessonTap,
-  });
+  const _ModuleExpansionTile({required this.module, required this.onLessonTap});
 
   @override
   Widget build(BuildContext context) {

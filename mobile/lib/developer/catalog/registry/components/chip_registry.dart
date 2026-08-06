@@ -20,11 +20,32 @@ final List<ComponentDefinition> chipComponents = [
   isSelected: true,
 )''',
     properties: [
-      const ComponentProperty(name: 'label', type: PropertyType.string, defaultValue: 'ForenShield'),
-      const ComponentProperty(name: 'type', type: PropertyType.selection, defaultValue: AppChipType.filled, options: AppChipType.values),
-      const ComponentProperty(name: 'isSelected', type: PropertyType.boolean, defaultValue: false),
-      const ComponentProperty(name: 'isRemovable', type: PropertyType.boolean, defaultValue: false),
-      const ComponentProperty(name: 'isEnabled', type: PropertyType.boolean, defaultValue: true),
+      const ComponentProperty(
+        name: 'label',
+        type: PropertyType.string,
+        defaultValue: 'ForenShield',
+      ),
+      const ComponentProperty(
+        name: 'type',
+        type: PropertyType.selection,
+        defaultValue: AppChipType.filled,
+        options: AppChipType.values,
+      ),
+      const ComponentProperty(
+        name: 'isSelected',
+        type: PropertyType.boolean,
+        defaultValue: false,
+      ),
+      const ComponentProperty(
+        name: 'isRemovable',
+        type: PropertyType.boolean,
+        defaultValue: false,
+      ),
+      const ComponentProperty(
+        name: 'isEnabled',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
     ],
     builder: (context, props) {
       return AppChip(
@@ -43,27 +64,43 @@ final List<ComponentDefinition> chipComponents = [
     category: 'Chips',
     description: 'Semantic chip mapping to exact system states.',
     purpose: 'To standardize the visual representation of status fields.',
-    whenToUse: 'On lists or cards indicating the lifecycle state of a case or module.',
+    whenToUse:
+        'On lists or cards indicating the lifecycle state of a case or module.',
     codeExample: '''StatusChip(state: StatusChipState.active)''',
     properties: [
-      const ComponentProperty(name: 'state', type: PropertyType.selection, defaultValue: StatusChipState.active, options: StatusChipState.values),
+      const ComponentProperty(
+        name: 'state',
+        type: PropertyType.selection,
+        defaultValue: StatusChipState.active,
+        options: StatusChipState.values,
+      ),
     ],
     builder: (context, props) {
-      return StatusChip(state: props['state'] as StatusChipState? ?? StatusChipState.active);
+      return StatusChip(
+        state: props['state'] as StatusChipState? ?? StatusChipState.active,
+      );
     },
   ),
   ComponentDefinition(
     name: 'DifficultyChip',
     category: 'Chips',
     description: 'Visual indicator of difficulty levels.',
-    purpose: 'To help users assess the challenge level of a module at a glance.',
+    purpose:
+        'To help users assess the challenge level of a module at a glance.',
     whenToUse: 'In curriculum listings or module headers.',
     codeExample: '''DifficultyChip(level: DifficultyLevel.advanced)''',
     properties: [
-      const ComponentProperty(name: 'level', type: PropertyType.selection, defaultValue: DifficultyLevel.beginner, options: DifficultyLevel.values),
+      const ComponentProperty(
+        name: 'level',
+        type: PropertyType.selection,
+        defaultValue: DifficultyLevel.beginner,
+        options: DifficultyLevel.values,
+      ),
     ],
     builder: (context, props) {
-      return DifficultyChip(level: props['level'] as DifficultyLevel? ?? DifficultyLevel.beginner);
+      return DifficultyChip(
+        level: props['level'] as DifficultyLevel? ?? DifficultyLevel.beginner,
+      );
     },
   ),
   ComponentDefinition(
@@ -74,7 +111,11 @@ final List<ComponentDefinition> chipComponents = [
     whenToUse: 'When rendering a list of tags provided by the backend.',
     codeExample: '''CategoryChip(label: 'Malware', color: AppColors.error)''',
     properties: [
-      const ComponentProperty(name: 'label', type: PropertyType.string, defaultValue: 'Cryptography'),
+      const ComponentProperty(
+        name: 'label',
+        type: PropertyType.string,
+        defaultValue: 'Cryptography',
+      ),
     ],
     builder: (context, props) {
       return CategoryChip(
@@ -92,8 +133,16 @@ final List<ComponentDefinition> chipComponents = [
     whenToUse: 'In app bars or reward summaries.',
     codeExample: '''XPChip(xp: 1500)''',
     properties: [
-      const ComponentProperty(name: 'xp', type: PropertyType.number, defaultValue: 1250.0),
-      const ComponentProperty(name: 'animate', type: PropertyType.boolean, defaultValue: true),
+      const ComponentProperty(
+        name: 'xp',
+        type: PropertyType.number,
+        defaultValue: 1250.0,
+      ),
+      const ComponentProperty(
+        name: 'animate',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
     ],
     builder: (context, props) {
       return XPChip(

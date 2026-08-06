@@ -21,7 +21,8 @@ class MockMissionControlRepository implements MissionControlRepository {
         nextLevelXp: 5000,
         overallThreatLevel: 'ELEVATED',
         securityScore: 88,
-        todayRiskMessage: 'Phishing campaign targeting internal financial endpoints detected.',
+        todayRiskMessage:
+            'Phishing campaign targeting internal financial endpoints detected.',
         currentMissionTitle: 'Analyze Suspicious Memory Dump',
         missionEstimatedMinutes: 15,
         missionDifficulty: 'Intermediate',

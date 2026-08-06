@@ -33,7 +33,9 @@ class AcademyPage extends StatelessWidget {
     return LayoutBuilder(
       builder: (context, constraints) {
         final illustrationHeight =
-            OnboardingLayoutConfig.computeIllustrationHeight(constraints.maxHeight);
+            OnboardingLayoutConfig.computeIllustrationHeight(
+              constraints.maxHeight,
+            );
 
         return Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -152,17 +154,17 @@ class AcademyPage extends StatelessWidget {
             child: reduceMotion
                 ? _BulletLine(item: _bulletItems[i])
                 : _BulletLine(item: _bulletItems[i])
-                    .animate(delay: delays[i])
-                    .fadeIn(
-                      duration: OnboardingAnimationConfig.textLineDuration,
-                      curve: AppMotion.decelerate,
-                    )
-                    .slideX(
-                      begin: -0.08,
-                      end: 0,
-                      duration: OnboardingAnimationConfig.textLineDuration,
-                      curve: AppMotion.decelerate,
-                    ),
+                      .animate(delay: delays[i])
+                      .fadeIn(
+                        duration: OnboardingAnimationConfig.textLineDuration,
+                        curve: AppMotion.decelerate,
+                      )
+                      .slideX(
+                        begin: -0.08,
+                        end: 0,
+                        duration: OnboardingAnimationConfig.textLineDuration,
+                        curve: AppMotion.decelerate,
+                      ),
           ),
       ],
     );
@@ -211,7 +213,9 @@ class _BulletLine extends StatelessWidget {
         const SizedBox(width: AppSpacing.xs),
         Text(
           label,
-          style: AppTypography.bodyMedium.copyWith(color: AppColors.textSecondary),
+          style: AppTypography.bodyMedium.copyWith(
+            color: AppColors.textSecondary,
+          ),
         ),
       ],
     );

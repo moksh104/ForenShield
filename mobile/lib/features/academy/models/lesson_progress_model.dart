@@ -38,8 +38,7 @@ class LessonProgressModel {
       moduleId: json['module_id'] as String,
       courseId: json['course_id'] as String,
       isCompleted: json['is_completed'] as bool? ?? false,
-      contentProgress:
-          (json['content_progress'] as num?)?.toDouble() ?? 0.0,
+      contentProgress: (json['content_progress'] as num?)?.toDouble() ?? 0.0,
       lastAccessedAt: json['last_accessed_at'] != null
           ? DateTime.tryParse(json['last_accessed_at'] as String)
           : null,

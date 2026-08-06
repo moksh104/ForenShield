@@ -1,0 +1,13 @@
+{
+  "name": "forenshield/php-api",
+  "description": "PHP REST API for ForenShield mobile authentication.",
+  "require": {
+    "firebase/php-jwt": "^6.10",
+    "cloudinary/cloudinary_php": "^2.10"
+  },
+  "autoload": {
+    "psr-4": {
+      "ForenShield\\Api\\": "src/"
+    }
+  }
+}

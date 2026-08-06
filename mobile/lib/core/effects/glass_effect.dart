@@ -1,12 +1,11 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import '../theme/app_colors.dart';
 import '../theme/app_radius.dart';
 
-/// Premium glassmorphism effect container widget.
-/// Combines BackdropFilter for gaussian blur, translucency gradient,
-/// and subtle border highlights for dark/light themes.
-class GlassEffect extends StatefulWidget {
+/// Clean enterprise surface card container.
+/// Refactored from heavy glassmorphic blur to a crisp, high-clarity container
+/// with soft borders and neutral elevation.
+class GlassEffect extends StatelessWidget {
   final Widget child;
   final double blurX;
   final double blurY;
@@ -21,10 +20,10 @@ class GlassEffect extends StatefulWidget {
   const GlassEffect({
     super.key,
     required this.child,
-    this.blurX = 12.0,
-    this.blurY = 12.0,
+    this.blurX = 0.0,
+    this.blurY = 0.0,
     this.color,
-    this.opacity = 0.12,
+    this.opacity = 1.0,
     this.borderRadius,
     this.border,
     this.padding,
@@ -33,83 +32,31 @@ class GlassEffect extends StatefulWidget {
   });
 
   @override
-  State<GlassEffect> createState() => _GlassEffectState();
-}
-
-class _GlassEffectState extends State<GlassEffect>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-    _controller = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 2000),
-    );
-
-    if (widget.animateGlow) {
-      _controller.repeat(reverse: true);
-    }
-  }
-
-  @override
-  void didUpdateWidget(GlassEffect oldWidget) {
-    super.didUpdateWidget(oldWidget);
-    if (widget.animateGlow != oldWidget.animateGlow) {
-      if (widget.animateGlow) {
-        _controller.repeat(reverse: true);
-      } else {
-        _controller.stop();
-      }
-    }
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final effectiveRadius = widget.borderRadius ?? AppRadius.cardRadius;
+    final effectiveRadius = borderRadius ?? AppRadius.cardRadius;
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = widget.color ??
-        (isDark ? AppColors.surface : AppColors.lightSurface);
-    final borderColor = widget.border ??
+    final baseColor =
+        color ?? (isDark ? AppColors.surface : AppColors.lightSurface);
+    final borderColor =
+        border ??
         Border.all(
-          color: isDark
-              ? Colors.white.withValues(alpha: 0.12)
-              : AppColors.borderSubtle,
+          color: isDark ? AppColors.borderSubtle : AppColors.lightBorderDefault,
           width: 1.0,
         );
 
+    final finalColor = opacity == 1.0
+        ? baseColor
+        : baseColor.withValues(alpha: (baseColor.a * opacity).clamp(0.0, 1.0));
+
     return Container(
-      margin: widget.margin,
-      child: ClipRRect(
+      margin: margin,
+      padding: padding,
+      decoration: BoxDecoration(
+        color: finalColor,
         borderRadius: effectiveRadius,
-        child: BackdropFilter(
-          filter: ImageFilter.blur(
-            sigmaX: widget.blurX,
-            sigmaY: widget.blurY,
-          ),
-          child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Container(
-                padding: widget.padding,
-                decoration: BoxDecoration(
-                  color: baseColor.withValues(alpha: widget.opacity),
-                  borderRadius: effectiveRadius,
-                  border: borderColor,
-                ),
-                child: widget.child,
-              );
-            },
-          ),
-        ),
+        border: borderColor,
       ),
+      child: child,
     );
   }
 }

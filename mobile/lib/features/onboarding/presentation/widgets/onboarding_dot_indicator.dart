@@ -24,7 +24,10 @@ class OnboardingDotIndicator extends StatelessWidget {
       label: 'Step ${currentPage + 1} of $totalPages',
       child: Row(
         mainAxisSize: MainAxisSize.min,
-        children: List.generate(totalPages, (index) => _buildDot(context, index)),
+        children: List.generate(
+          totalPages,
+          (index) => _buildDot(context, index),
+        ),
       ),
     );
   }
@@ -41,19 +44,17 @@ class OnboardingDotIndicator extends StatelessWidget {
       width: isActive ? 24.0 : 8.0,
       height: 8.0,
       decoration: BoxDecoration(
-        color: isActive
-            ? primaryColor
-            : foren.borderSubtle,
+        color: isActive ? primaryColor : foren.borderSubtle,
         borderRadius: AppRadius.borderPill,
-        boxShadow: isActive
-            ? [
-                BoxShadow(
-                  color: primaryColor.withValues(alpha: 0.4),
-                  blurRadius: 6,
-                  spreadRadius: 1,
-                ),
-              ]
-            : null,
+        boxShadow: [
+          BoxShadow(
+            color: isActive
+                ? primaryColor.withValues(alpha: 0.4)
+                : Colors.transparent,
+            blurRadius: isActive ? 6 : 0,
+            spreadRadius: isActive ? 1 : 0,
+          ),
+        ],
       ),
     );
 

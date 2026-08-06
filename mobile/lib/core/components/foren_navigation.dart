@@ -15,14 +15,34 @@ export '../navigation/app_drawer.dart';
 export '../navigation/app_sidebar.dart';
 export '../widgets/layouts/app_scaffold.dart';
 
-/// The five locked destinations, in fixed order.
+/// The five locked destinations, in fixed order matching the design spec.
 const List<({ForenFeature feature, IconData icon, String label})>
-    forenNavDestinations = [
-  (feature: ForenFeature.missionControl, icon: Icons.shield_outlined, label: 'Mission Control'),
-  (feature: ForenFeature.academy, icon: Icons.school_outlined, label: 'Academy'),
-  (feature: ForenFeature.investigation, icon: Icons.search_outlined, label: 'Investigation'),
-  (feature: ForenFeature.simulation, icon: Icons.terminal_outlined, label: 'Simulation'),
-  (feature: ForenFeature.profile, icon: Icons.person_outline, label: 'Profile'),
+forenNavDestinations = [
+  (
+    feature: ForenFeature.missionControl,
+    icon: Icons.home_outlined,
+    label: 'Home',
+  ),
+  (
+    feature: ForenFeature.academy,
+    icon: Icons.menu_book_outlined,
+    label: 'Learn',
+  ),
+  (
+    feature: ForenFeature.simulation,
+    icon: Icons.science_outlined,
+    label: 'Lab',
+  ),
+  (
+    feature: ForenFeature.investigation,
+    icon: Icons.search_rounded,
+    label: 'Investigate',
+  ),
+  (
+    feature: ForenFeature.profile,
+    icon: Icons.person_outline_rounded,
+    label: 'Profile',
+  ),
 ];
 
 /// Top App Bar. Per Rule 3 (mission / threat / progress always visible),
@@ -53,7 +73,9 @@ class ForenTopAppBar extends StatelessWidget implements PreferredSizeWidget {
     final foren = theme.extension<ForenColors>()!;
     final isDark = theme.brightness == Brightness.dark;
     final accent = feature != null
-        ? (isDark ? foren.forFeature(feature!).t300 : foren.forFeature(feature!).t700)
+        ? (isDark
+              ? foren.forFeature(feature!).t300
+              : foren.forFeature(feature!).t700)
         : null;
 
     return AppBar(
@@ -71,7 +93,9 @@ class ForenTopAppBar extends StatelessWidget implements PreferredSizeWidget {
           if (subtitle != null)
             Text(
               subtitle!,
-              style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: foren.textSecondary,
+              ),
             ),
         ],
       ),
@@ -86,7 +110,11 @@ class ForenBottomNav extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTap;
 
-  const ForenBottomNav({super.key, required this.currentIndex, required this.onTap});
+  const ForenBottomNav({
+    super.key,
+    required this.currentIndex,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -105,7 +133,9 @@ class ForenBottomNav extends StatelessWidget {
             icon: Icon(d.icon, color: foren.textSecondary),
             selectedIcon: Icon(
               d.icon,
-              color: isDark ? foren.forFeature(d.feature).t300 : foren.forFeature(d.feature).t700,
+              color: isDark
+                  ? foren.forFeature(d.feature).t300
+                  : foren.forFeature(d.feature).t700,
             ),
             label: d.label,
           ),
@@ -140,14 +170,18 @@ class ForenSideNav extends StatelessWidget {
       onDestinationSelected: onTap,
       extended: extended,
       backgroundColor: theme.scaffoldBackgroundColor,
-      labelType: extended ? NavigationRailLabelType.none : NavigationRailLabelType.all,
+      labelType: extended
+          ? NavigationRailLabelType.none
+          : NavigationRailLabelType.all,
       destinations: [
         for (final d in forenNavDestinations)
           NavigationRailDestination(
             icon: Icon(d.icon, color: foren.textSecondary),
             selectedIcon: Icon(
               d.icon,
-              color: isDark ? foren.forFeature(d.feature).t300 : foren.forFeature(d.feature).t700,
+              color: isDark
+                  ? foren.forFeature(d.feature).t300
+                  : foren.forFeature(d.feature).t700,
             ),
             label: Text(d.label),
           ),

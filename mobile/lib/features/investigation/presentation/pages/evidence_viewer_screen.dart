@@ -4,12 +4,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/effects/particle_background.dart';
-import '../../../../core/effects/scanner_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../domain/entities/evidence_entity.dart';
 import '../providers/investigation_provider.dart';
 
@@ -88,25 +86,17 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: ScannerEffect(
-                  color: primaryColor,
-                  child: const Center(
-                    child: Icon(Icons.document_scanner, size: 48, color: AppColors.logoGold),
-                  ),
-                ),
+              const SizedBox(
+                width: 36,
+                height: 36,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'PARSING EVIDENCE ARTIFACT...',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
-                  letterSpacing: 1.0,
+                'Loading evidence…',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren.textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -153,7 +143,6 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: Column(
                 children: [
@@ -165,48 +154,58 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                         children: [
                           // Type & Timestamp Header Badge Row
                           GlassEffect(
-                            blurX: 12.0,
-                            blurY: 12.0,
-                            opacity: 0.12,
-                            border: Border.all(
-                              color: primaryColor.withValues(alpha: 0.35),
-                              width: 1.0,
-                            ),
-                            borderRadius: AppRadius.borderRadiusLg,
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                    decoration: BoxDecoration(
-                                      color: primaryColor.withValues(alpha: 0.15),
-                                      borderRadius: AppRadius.borderRadiusXs,
-                                      border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
-                                    ),
-                                    child: Text(
-                                      'TYPE: ${ev.type.toUpperCase()}',
-                                      style: TextStyle(
-                                        color: primaryColor,
-                                        fontSize: 10,
-                                        fontWeight: FontWeight.w800,
-                                        fontFamily: 'monospace',
+                                blurX: 12.0,
+                                blurY: 12.0,
+                                opacity: 0.12,
+                                border: Border.all(
+                                  color: primaryColor.withValues(alpha: 0.35),
+                                  width: 1.0,
+                                ),
+                                borderRadius: AppRadius.borderRadiusLg,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  child: Row(
+                                    children: [
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: primaryColor.withValues(
+                                            alpha: 0.15,
+                                          ),
+                                          borderRadius:
+                                              AppRadius.borderRadiusXs,
+                                          border: Border.all(
+                                            color: primaryColor.withValues(
+                                              alpha: 0.3,
+                                            ),
+                                          ),
+                                        ),
+                                        child: Text(
+                                          'TYPE: ${ev.type.toUpperCase()}',
+                                          style: TextStyle(
+                                            color: primaryColor,
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.w800,
+                                            fontFamily: 'monospace',
+                                          ),
+                                        ),
                                       ),
-                                    ),
+                                      const Spacer(),
+                                      Text(
+                                        ev.timestamp,
+                                        style: TextStyle(
+                                          color: foren.textSecondary,
+                                          fontSize: 11,
+                                          fontFamily: 'monospace',
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                  const Spacer(),
-                                  Text(
-                                    ev.timestamp,
-                                    style: TextStyle(
-                                      color: foren.textSecondary,
-                                      fontSize: 11,
-                                      fontFamily: 'monospace',
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
+                                ),
+                              )
                               .animate()
                               .fadeIn(duration: 400.ms)
                               .slideY(begin: -0.1, end: 0),
@@ -224,9 +223,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                 fontFamily: 'monospace',
                                 letterSpacing: 0.8,
                               ),
-                            )
-                                .animate(delay: 100.ms)
-                                .fadeIn(duration: 400.ms),
+                            ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
 
                             const SizedBox(height: AppSpacing.xs),
 
@@ -249,12 +246,15 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                     maxScale: 4.0,
                                     child: Center(
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Icon(
                                             Icons.image_search,
                                             size: 72,
-                                            color: primaryColor.withValues(alpha: 0.6),
+                                            color: primaryColor.withValues(
+                                              alpha: 0.6,
+                                            ),
                                           ),
                                           const SizedBox(height: 8),
                                           Text(
@@ -272,9 +272,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                   ),
                                 ),
                               ),
-                            )
-                                .animate(delay: 150.ms)
-                                .fadeIn(duration: 400.ms),
+                            ).animate(delay: 150.ms).fadeIn(duration: 400.ms),
 
                             const SizedBox(height: AppSpacing.md),
                           ],
@@ -289,9 +287,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                               fontFamily: 'monospace',
                               letterSpacing: 0.8,
                             ),
-                          )
-                              .animate(delay: 200.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
 
                           const SizedBox(height: AppSpacing.xs),
 
@@ -316,9 +312,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                 ),
                               ),
                             ),
-                          )
-                              .animate(delay: 250.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
 
                           const SizedBox(height: AppSpacing.lg),
 
@@ -333,9 +327,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                 fontFamily: 'monospace',
                                 letterSpacing: 0.8,
                               ),
-                            )
-                                .animate(delay: 350.ms)
-                                .fadeIn(duration: 400.ms),
+                            ).animate(delay: 350.ms).fadeIn(duration: 400.ms),
 
                             const SizedBox(height: AppSpacing.xs),
 
@@ -344,7 +336,9 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                               blurY: 14.0,
                               opacity: 0.12,
                               border: Border.all(
-                                color: foren.borderSubtle.withValues(alpha: 0.4),
+                                color: foren.borderSubtle.withValues(
+                                  alpha: 0.4,
+                                ),
                                 width: 1.0,
                               ),
                               borderRadius: AppRadius.borderRadiusMd,
@@ -380,9 +374,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                   );
                                 }).toList(),
                               ),
-                            )
-                                .animate(delay: 400.ms)
-                                .fadeIn(duration: 400.ms),
+                            ).animate(delay: 400.ms).fadeIn(duration: 400.ms),
                           ],
                         ],
                       ),
@@ -409,9 +401,14 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                               borderRadius: AppRadius.borderRadiusMd,
                             ),
                           ),
-                          icon: const Icon(Icons.check_circle_outline, size: 18),
+                          icon: const Icon(
+                            Icons.check_circle_outline,
+                            size: 18,
+                          ),
                           label: Text(
-                            ev.isReviewed ? 'ARTIFACT REVIEWED ✓' : 'MARK ARTIFACT AS REVIEWED',
+                            ev.isReviewed
+                                ? 'ARTIFACT REVIEWED ✓'
+                                : 'MARK ARTIFACT AS REVIEWED',
                             style: const TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w800,

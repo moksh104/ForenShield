@@ -64,7 +64,8 @@ class CardsSection extends StatelessWidget {
               children: [
                 ForenAlertCard(
                   severity: ForenThreatLevel.critical,
-                  message: 'C2 beacon detected on workstation WS-024 — exfiltration risk.',
+                  message:
+                      'C2 beacon detected on workstation WS-024 — exfiltration risk.',
                   timeAgo: '2 m ago',
                   onTap: () {},
                 ),
@@ -158,28 +159,30 @@ class CardsSection extends StatelessWidget {
           ),
           CatalogSubsection(
             label: 'Achievement Card — locked & unlocked',
-            child: CatalogPropRow(children: [
-              SizedBox(
-                width: 150,
-                child: ForenAchievementCard(
-                  title: 'Packet Detective',
-                  icon: Icons.radar,
-                  unlocked: true,
-                  rewardXp: 500,
-                  onTap: () {},
+            child: CatalogPropRow(
+              children: [
+                SizedBox(
+                  width: 150,
+                  child: ForenAchievementCard(
+                    title: 'Packet Detective',
+                    icon: Icons.radar,
+                    unlocked: true,
+                    rewardXp: 500,
+                    onTap: () {},
+                  ),
                 ),
-              ),
-              SizedBox(
-                width: 150,
-                child: ForenAchievementCard(
-                  title: 'Memory Master',
-                  icon: Icons.memory,
-                  unlocked: false,
-                  rewardXp: 750,
-                  onTap: () {},
+                SizedBox(
+                  width: 150,
+                  child: ForenAchievementCard(
+                    title: 'Memory Master',
+                    icon: Icons.memory,
+                    unlocked: false,
+                    rewardXp: 750,
+                    onTap: () {},
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
           ),
         ],
       ),

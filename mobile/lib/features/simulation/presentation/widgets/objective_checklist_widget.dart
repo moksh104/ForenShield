@@ -23,9 +23,6 @@ class ObjectiveChecklistWidget extends StatelessWidget {
     final primaryColor = theme.colorScheme.primary;
 
     return GlassEffect(
-      blurX: 14.0,
-      blurY: 14.0,
-      opacity: 0.12,
       border: Border.all(
         color: primaryColor.withValues(alpha: 0.35),
         width: 1.0,
@@ -38,16 +35,17 @@ class ObjectiveChecklistWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.assignment_turned_in_outlined, size: 20, color: primaryColor),
+                Icon(
+                  Icons.assignment_turned_in_outlined,
+                  size: 20,
+                  color: primaryColor,
+                ),
                 const SizedBox(width: 8),
                 Text(
-                  'MISSION OBJECTIVES',
-                  style: TextStyle(
+                  'Objectives',
+                  style: theme.textTheme.titleSmall?.copyWith(
                     color: theme.colorScheme.onSurface,
-                    fontSize: 14,
                     fontWeight: FontWeight.w800,
-                    fontFamily: 'monospace',
-                    letterSpacing: 0.8,
                   ),
                 ),
               ],
@@ -124,13 +122,10 @@ class ObjectiveChecklistWidget extends StatelessWidget {
 
             // Command Assist Section
             Text(
-              'QUICK COMMAND HELPER',
-              style: TextStyle(
+              'Quick command helper',
+              style: theme.textTheme.labelSmall?.copyWith(
                 color: foren.textSecondary,
-                fontSize: 10,
-                fontWeight: FontWeight.w800,
-                fontFamily: 'monospace',
-                letterSpacing: 0.8,
+                fontWeight: FontWeight.w700,
               ),
             ),
             const SizedBox(height: AppSpacing.xs),
@@ -138,17 +133,24 @@ class ObjectiveChecklistWidget extends StatelessWidget {
               spacing: 8,
               runSpacing: 8,
               children: [
-                _CommandChip(label: 'help', onTap: () => onQuickCommandTap('help')),
                 _CommandChip(
-                    label: 'netstat -an',
-                    onTap: () => onQuickCommandTap('netstat -an')),
+                  label: 'help',
+                  onTap: () => onQuickCommandTap('help'),
+                ),
                 _CommandChip(
-                    label: 'pkill -f ransomware',
-                    onTap: () => onQuickCommandTap('pkill -f ransomware_agent')),
+                  label: 'netstat -an',
+                  onTap: () => onQuickCommandTap('netstat -an'),
+                ),
                 _CommandChip(
-                    label: 'iptables block 4444',
-                    onTap: () => onQuickCommandTap(
-                        'iptables -A INPUT -p tcp --dport 4444 -j DROP')),
+                  label: 'pkill -f ransomware',
+                  onTap: () => onQuickCommandTap('pkill -f ransomware_agent'),
+                ),
+                _CommandChip(
+                  label: 'iptables block 4444',
+                  onTap: () => onQuickCommandTap(
+                    'iptables -A INPUT -p tcp --dport 4444 -j DROP',
+                  ),
+                ),
               ],
             ),
           ],
@@ -177,9 +179,7 @@ class _CommandChip extends StatelessWidget {
         decoration: BoxDecoration(
           color: primaryColor.withValues(alpha: 0.15),
           borderRadius: AppRadius.borderRadiusSm,
-          border: Border.all(
-            color: primaryColor.withValues(alpha: 0.35),
-          ),
+          border: Border.all(color: primaryColor.withValues(alpha: 0.35)),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,

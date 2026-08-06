@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
@@ -21,7 +20,7 @@ class QuickActionItem {
   });
 }
 
-/// Quick Actions Grid widget supporting 7 primary navigation actions with glassmorphism & hover effects.
+/// Quick Actions Grid widget supporting primary navigation actions with clean, flat tiles.
 class QuickActionGrid extends StatelessWidget {
   final List<QuickActionItem>? customActions;
 
@@ -114,7 +113,6 @@ class _ActionTile extends StatefulWidget {
 
 class _ActionTileState extends State<_ActionTile> {
   bool _isPressed = false;
-  bool _isHovered = false;
 
   @override
   Widget build(BuildContext context) {
@@ -122,69 +120,48 @@ class _ActionTileState extends State<_ActionTile> {
     final foren = theme.extension<ForenColors>()!;
     final itemColor = widget.item.colorGetter(foren, theme);
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: InkWell(
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) => setState(() => _isPressed = false),
-        onTapCancel: () => setState(() => _isPressed = false),
-        onTap: () {
-          context.push(widget.item.routePath);
-        },
-        borderRadius: AppRadius.borderRadiusMd,
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 160),
-          transform: Matrix4.translationValues(0, _isHovered ? -3 : 0, 0),
-          child: GlassEffect(
-            blurX: 12.0,
-            blurY: 12.0,
-            opacity: _isPressed
-                ? 0.25
-                : (_isHovered ? 0.18 : 0.10),
-            borderRadius: AppRadius.borderRadiusMd,
-            border: Border.all(
-              color: _isPressed || _isHovered
-                  ? itemColor.withValues(alpha: 0.7)
-                  : foren.borderSubtle.withValues(alpha: 0.35),
-              width: _isHovered ? 1.5 : 1.0,
+    return InkWell(
+      onTapDown: (_) => setState(() => _isPressed = true),
+      onTapUp: (_) => setState(() => _isPressed = false),
+      onTapCancel: () => setState(() => _isPressed = false),
+      onTap: () {
+        context.push(widget.item.routePath);
+      },
+      borderRadius: AppRadius.borderRadiusMd,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 160),
+        curve: Curves.easeOutCirc,
+        decoration: BoxDecoration(
+          color: _isPressed
+              ? itemColor.withValues(alpha: 0.16)
+              : theme.colorScheme.surface,
+          borderRadius: AppRadius.borderRadiusMd,
+          border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.35)),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 160),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: itemColor.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(widget.item.icon, color: itemColor, size: 20),
             ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                AnimatedContainer(
-                  duration: const Duration(milliseconds: 160),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: itemColor.withValues(alpha: _isHovered ? 0.22 : 0.12),
-                    shape: BoxShape.circle,
-                    boxShadow: _isHovered
-                        ? [
-                            BoxShadow(
-                              color: itemColor.withValues(alpha: 0.3),
-                              blurRadius: 10,
-                              spreadRadius: 1,
-                            ),
-                          ]
-                        : null,
-                  ),
-                  child: Icon(widget.item.icon, color: itemColor, size: 20),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  widget.item.label,
-                  style: TextStyle(
-                    color: _isHovered ? itemColor : theme.colorScheme.onSurface,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
+            const SizedBox(height: 6),
+            Text(
+              widget.item.label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: theme.colorScheme.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
-          ),
+          ],
         ),
       ),
     );

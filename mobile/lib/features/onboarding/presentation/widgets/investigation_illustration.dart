@@ -15,7 +15,8 @@ class InvestigationIllustration extends StatefulWidget {
   const InvestigationIllustration({super.key, this.animate = true});
 
   @override
-  State<InvestigationIllustration> createState() => _InvestigationIllustrationState();
+  State<InvestigationIllustration> createState() =>
+      _InvestigationIllustrationState();
 }
 
 class _InvestigationIllustrationState extends State<InvestigationIllustration>
@@ -29,24 +30,52 @@ class _InvestigationIllustrationState extends State<InvestigationIllustration>
   late final Animation<double> _timelineProgress;
 
   static const _evidence = [
-    (Alignment(-0.72, -0.46), Icons.email_rounded, 'Email', AppColors.secondary),
-    (Alignment(0.74, -0.38), Icons.chat_rounded, 'Chat Logs', AppColors.primary),
-    (Alignment(-0.66, 0.52), Icons.language_rounded, 'Browser', AppColors.error),
-    (Alignment(0.68, 0.56), Icons.payments_rounded, 'Transactions', AppColors.success),
+    (
+      Alignment(-0.72, -0.46),
+      Icons.email_rounded,
+      'Email',
+      AppColors.secondary,
+    ),
+    (
+      Alignment(0.74, -0.38),
+      Icons.chat_rounded,
+      'Chat Logs',
+      AppColors.primary,
+    ),
+    (
+      Alignment(-0.66, 0.52),
+      Icons.language_rounded,
+      'Browser',
+      AppColors.error,
+    ),
+    (
+      Alignment(0.68, 0.56),
+      Icons.payments_rounded,
+      'Transactions',
+      AppColors.success,
+    ),
   ];
 
   // Collapses the repeated Tween + CurveTween + Interval pattern.
   Animation<double> _interval(double from, double to, Curve curve) =>
-      _entry.drive(Tween<double>(begin: 0.0, end: 1.0).chain(
-        CurveTween(curve: Interval(from, to, curve: curve)),
-      ));
+      _entry.drive(
+        Tween<double>(
+          begin: 0.0,
+          end: 1.0,
+        ).chain(CurveTween(curve: Interval(from, to, curve: curve))),
+      );
 
   @override
   void initState() {
     super.initState();
-    _entry = AnimationController(vsync: this, duration: OnboardingAnimationConfig.entryDuration);
-    _ripple = AnimationController(vsync: this, duration: OnboardingAnimationConfig.radarDuration)
-      ..repeat();
+    _entry = AnimationController(
+      vsync: this,
+      duration: OnboardingAnimationConfig.entryDuration,
+    );
+    _ripple = AnimationController(
+      vsync: this,
+      duration: OnboardingAnimationConfig.radarDuration,
+    )..repeat();
 
     _boardOpacity = _interval(0.0, 0.38, Curves.easeOut);
     _connectionsOpacity = _interval(0.35, 0.65, Curves.easeOut);
@@ -126,7 +155,10 @@ class _InvestigationIllustrationState extends State<InvestigationIllustration>
                 decoration: BoxDecoration(
                   borderRadius: AppRadius.borderLg,
                   color: AppColors.accent.withValues(alpha: 0.11),
-                  border: Border.all(color: AppColors.accent.withValues(alpha: 0.55), width: 1.5),
+                  border: Border.all(
+                    color: AppColors.accent.withValues(alpha: 0.55),
+                    width: 1.5,
+                  ),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.accent.withValues(alpha: 0.26),
@@ -135,7 +167,11 @@ class _InvestigationIllustrationState extends State<InvestigationIllustration>
                     ),
                   ],
                 ),
-                child: const Icon(Icons.manage_search_rounded, color: AppColors.accent, size: 44),
+                child: const Icon(
+                  Icons.manage_search_rounded,
+                  color: AppColors.accent,
+                  size: 44,
+                ),
               ),
             ),
           ),
@@ -151,12 +187,19 @@ class _EvidenceCard extends StatelessWidget {
   final IconData icon;
   final String label;
   final Color color;
-  const _EvidenceCard({required this.icon, required this.label, required this.color});
+  const _EvidenceCard({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.sm,
+        vertical: AppSpacing.xs,
+      ),
       decoration: BoxDecoration(
         color: AppColors.surfaceElevated,
         borderRadius: AppRadius.borderPill,
@@ -184,7 +227,9 @@ class _RipplePainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     final center = Offset(size.width / 2, size.height / 2);
     final maxR = size.shortestSide * 0.42;
-    final p = Paint()..style = PaintingStyle.stroke..strokeWidth = 1.2;
+    final p = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
     for (var i = 0; i < 3; i++) {
       final phase = (progress + i / 3.0) % 1.0;
       p.color = AppColors.accent.withValues(alpha: (1.0 - phase) * 0.22);
@@ -224,8 +269,14 @@ class _BoardBackgroundPainter extends CustomPainter {
         ..strokeWidth = 0.8
         ..style = PaintingStyle.stroke;
       for (final a in _alignments) {
-        canvas.drawLine(center,
-            Offset(center.dx + a.x * size.width / 2, center.dy + a.y * size.height / 2), lp);
+        canvas.drawLine(
+          center,
+          Offset(
+            center.dx + a.x * size.width / 2,
+            center.dy + a.y * size.height / 2,
+          ),
+          lp,
+        );
       }
     }
 
@@ -234,26 +285,42 @@ class _BoardBackgroundPainter extends CustomPainter {
       final sx = size.width * 0.12;
       final ex = size.width * 0.88;
 
-      canvas.drawLine(Offset(sx, y), Offset(ex, y),
-          Paint()..color = AppColors.outline..strokeWidth = 1.5..style = PaintingStyle.stroke);
+      canvas.drawLine(
+        Offset(sx, y),
+        Offset(ex, y),
+        Paint()
+          ..color = AppColors.outline
+          ..strokeWidth = 1.5
+          ..style = PaintingStyle.stroke,
+      );
 
       canvas.drawLine(
         Offset(sx, y),
         Offset(sx + (ex - sx) * timelineProgress, y),
-        Paint()..color = AppColors.accent.withValues(alpha: 0.8)..strokeWidth = 2.5..style = PaintingStyle.stroke,
+        Paint()
+          ..color = AppColors.accent.withValues(alpha: 0.8)
+          ..strokeWidth = 2.5
+          ..style = PaintingStyle.stroke,
       );
 
       for (var i = 0; i <= 4; i++) {
         final x = sx + (ex - sx) * (i / 4);
-        canvas.drawLine(Offset(x, y - 4), Offset(x, y + 4),
-            Paint()
-              ..color = (i / 4 <= timelineProgress) ? AppColors.accent : AppColors.outline
-              ..strokeWidth = 1.5..style = PaintingStyle.stroke);
+        canvas.drawLine(
+          Offset(x, y - 4),
+          Offset(x, y + 4),
+          Paint()
+            ..color = (i / 4 <= timelineProgress)
+                ? AppColors.accent
+                : AppColors.outline
+            ..strokeWidth = 1.5
+            ..style = PaintingStyle.stroke,
+        );
       }
     }
   }
 
   @override
   bool shouldRepaint(_BoardBackgroundPainter old) =>
-      old.connectionsOpacity != connectionsOpacity || old.timelineProgress != timelineProgress;
+      old.connectionsOpacity != connectionsOpacity ||
+      old.timelineProgress != timelineProgress;
 }

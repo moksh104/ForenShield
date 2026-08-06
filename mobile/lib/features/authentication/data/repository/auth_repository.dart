@@ -19,8 +19,19 @@ abstract class AuthRepository {
     required String displayName,
   });
 
+  /// Requests a password reset OTP code.
+  Future<Result<bool>> forgotPassword({
+    required String email,
+  });
+
+  /// Verifies a 6-digit OTP code.
+  Future<Result<AuthResponseModel>> verifyOtp({
+    required String email,
+    required String otpCode,
+  });
+
   /// Invalidates the current user session.
-  Future<Result<void>> logout();
+  Future<Result<void>> logout({String? refreshToken});
 
   /// Retrieves the currently authenticated user's profile.
   Future<Result<UserModel>> getCurrentUser();
@@ -38,10 +49,9 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String password,
   }) async {
-    return _execute(() => _remoteDataSource.login(
-      email: email,
-      password: password,
-    ));
+    return _execute(
+      () => _remoteDataSource.login(email: email, password: password),
+    );
   }
 
   @override
@@ -50,17 +60,36 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required String displayName,
   }) async {
-    return _execute(() => _remoteDataSource.register(
-      email: email,
-      password: password,
-      displayName: displayName,
-    ));
+    return _execute(
+      () => _remoteDataSource.register(
+        email: email,
+        password: password,
+        displayName: displayName,
+      ),
+    );
   }
 
   @override
-  Future<Result<void>> logout() async {
+  Future<Result<bool>> forgotPassword({required String email}) async {
+    return _execute(
+      () => _remoteDataSource.forgotPassword(email: email),
+    );
+  }
+
+  @override
+  Future<Result<AuthResponseModel>> verifyOtp({
+    required String email,
+    required String otpCode,
+  }) async {
+    return _execute(
+      () => _remoteDataSource.verifyOtp(email: email, otpCode: otpCode),
+    );
+  }
+
+  @override
+  Future<Result<void>> logout({String? refreshToken}) async {
     return _execute(() async {
-      await _remoteDataSource.logout();
+      await _remoteDataSource.logout(refreshToken: refreshToken);
     });
   }
 

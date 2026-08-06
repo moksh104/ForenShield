@@ -15,7 +15,7 @@ final filteredComponentsProvider = Provider<List<ComponentDefinition>>((ref) {
     if (category != null && comp.category != category) {
       return false;
     }
-    
+
     // 2. Check search query
     if (query.isEmpty) return true;
 
@@ -23,17 +23,23 @@ final filteredComponentsProvider = Provider<List<ComponentDefinition>>((ref) {
     final matchesName = comp.name.toLowerCase().contains(query);
     final matchesCategory = comp.category.toLowerCase().contains(query);
     final matchesDesc = comp.description.toLowerCase().contains(query);
-    final matchesKeywords = comp.keywords.any((k) => k.toLowerCase().contains(query));
-    final matchesAccessibility = comp.accessibilityNotes.toLowerCase().contains(query);
-    
-    // Check property names in the playground
-    final matchesProperty = comp.properties.any((p) => p.name.toLowerCase().contains(query));
+    final matchesKeywords = comp.keywords.any(
+      (k) => k.toLowerCase().contains(query),
+    );
+    final matchesAccessibility = comp.accessibilityNotes.toLowerCase().contains(
+      query,
+    );
 
-    return matchesName || 
-           matchesCategory || 
-           matchesDesc || 
-           matchesKeywords || 
-           matchesAccessibility || 
-           matchesProperty;
+    // Check property names in the playground
+    final matchesProperty = comp.properties.any(
+      (p) => p.name.toLowerCase().contains(query),
+    );
+
+    return matchesName ||
+        matchesCategory ||
+        matchesDesc ||
+        matchesKeywords ||
+        matchesAccessibility ||
+        matchesProperty;
   }).toList();
 });

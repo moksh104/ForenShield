@@ -1,449 +1,881 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
-import '../../../../core/effects/particle_background.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/foren_theme.dart';
-import '../../../../core/widgets/chips/difficulty_chip.dart';
-import '../../../../core/widgets/chips/xp_chip.dart';
+import '../../../../core/components/foren_navigation.dart';
 import '../../../../routes/route_constants.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../data/datasources/simulation_mock_data.dart';
-import '../../domain/entities/simulation_scenario.dart';
-import '../widgets/simulation_dashboard_header.dart';
 
-/// Premium Cyber Simulation Lab & Training Operations Environment.
+/// Simulation Lab Screen matching exact white-theme design spec screenshot.
 class SimulationLabScreen extends StatefulWidget {
   const SimulationLabScreen({super.key});
-
-  /// Performance & Emergency Switch Compliance
-  static const bool enableAdvancedEffects = true;
-  static const int particleCount = 40;
 
   @override
   State<SimulationLabScreen> createState() => _SimulationLabScreenState();
 }
 
 class _SimulationLabScreenState extends State<SimulationLabScreen> {
-  ScenarioCategory? _selectedCategory;
+  String _selectedTab = 'All Simulations';
+
+  static const List<String> _tabs = [
+    'All Simulations',
+    'Phishing',
+    'Fraud',
+    'Scams',
+    'Malware',
+  ];
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    final primaryColor = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = AppColors.primary;
+    final textPrimary = isDark
+        ? AppColors.textPrimary
+        : const Color(0xFF0F172A);
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : const Color(0xFF64748B);
+    final borderColor = isDark
+        ? AppColors.borderSubtle
+        : const Color(0xFFE2E8F0);
 
-    final scenarios = SimulationMockData.scenarios.where((s) {
-      if (_selectedCategory == null) return true;
-      return s.category == _selectedCategory;
-    }).toList();
-
-    final featured = SimulationMockData.scenarios.first;
-
-    final Widget contentBody = Scaffold(
-      backgroundColor: AppColors.bgBase,
-      appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-          color: theme.colorScheme.onSurface,
-          onPressed: () {
-            if (context.canPop()) {
-              context.pop();
-              return;
-            }
-            context.go(RouteConstants.missionControl);
-          },
-        ),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(6),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.15),
-                borderRadius: AppRadius.borderRadiusSm,
-                border: Border.all(color: AppColors.primary.withValues(alpha: 0.4)),
-              ),
-              child: const Icon(Icons.terminal_outlined, color: AppColors.primary, size: 18),
-            ),
-            const SizedBox(width: 10),
-            Text(
-              'Cyber Simulation Lab',
-              style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: 0.5,
-                fontFamily: 'Geist',
-              ),
-            ),
-          ],
-        ),
+    return Scaffold(
+      backgroundColor: isDark
+          ? theme.scaffoldBackgroundColor
+          : const Color(0xFFFAFAFC),
+      bottomNavigationBar: ForenBottomNav(
+        currentIndex: 2,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              context.go(RouteConstants.missionControl);
+              break;
+            case 1:
+              context.go(RouteConstants.academy);
+              break;
+            case 2:
+              break;
+            case 3:
+              context.go(RouteConstants.investigation);
+              break;
+            case 4:
+              context.go(RouteConstants.profile);
+              break;
+          }
+        },
       ),
-      body: Stack(
-        children: [
-          const Positioned.fill(child: BackgroundGrid()),
-          SafeArea(
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.all(AppSpacing.lg),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // ── 1. Top Header Bar: Back + Logo + Search & Notif ──
+            Padding(
+              padding: const EdgeInsets.fromLTRB(
+                AppSpacing.md,
+                AppSpacing.xs,
+                AppSpacing.lg,
+                0,
+              ),
+              child: Row(
                 children: [
-                  // 1. Simulation Dashboard Telemetry Header
-                  SimulationDashboardHeader(scenarios: SimulationMockData.scenarios)
-                      .animate()
-                      .fadeIn(duration: 400.ms)
-                      .slideY(begin: -0.1, end: 0),
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+                    color: textPrimary,
+                    onPressed: () {
+                      if (context.canPop()) {
+                        context.pop();
+                      } else {
+                        context.go(RouteConstants.missionControl);
+                      }
+                    },
+                  ),
+                  const SizedBox(width: 4),
 
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 2. HERO BANNER (Featured Scenario Showcase)
-                  GlassEffect(
-                    blurX: 16.0,
-                    blurY: 16.0,
-                    opacity: 0.12,
-                    border: Border.all(
-                      color: primaryColor.withValues(alpha: 0.45),
-                      width: 1.0,
+                  // Brand Shield Logo Mark
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: isDark
+                          ? AppColors.surface
+                          : AppColors.lightSurface,
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.3),
+                        width: 1.5,
+                      ),
                     ),
-                    borderRadius: AppRadius.borderRadiusLg,
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
+                    child: Center(
+                      child: Container(
+                        width: 28,
+                        height: 28,
+                        decoration: const BoxDecoration(
+                          shape: BoxShape.circle,
+                          gradient: LinearGradient(
+                            colors: [AppColors.primary, Color(0xFF1D4ED8)],
+                            begin: Alignment.topLeft,
+                            end: Alignment.bottomRight,
+                          ),
+                        ),
+                        child: const Center(
+                          child: Stack(
+                            alignment: Alignment.center,
                             children: [
-                              DifficultyChip(
-                                level: _mapDifficulty(featured.difficulty),
+                              Icon(
+                                Icons.shield_rounded,
+                                size: 18,
+                                color: Colors.white,
                               ),
-                              const SizedBox(width: 8),
-                              XPChip(xp: featured.xpReward),
-                              const Spacer(),
-                              Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                decoration: BoxDecoration(
-                                  color: AppColors.logoGold.withValues(alpha: 0.15),
-                                  borderRadius: AppRadius.borderRadiusXs,
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    const Icon(Icons.timer_outlined, size: 11, color: AppColors.logoGold),
-                                    const SizedBox(width: 4),
-                                    Text(
-                                      '${featured.estimatedMinutes} MINS',
-                                      style: const TextStyle(
-                                        color: AppColors.logoGold,
-                                        fontSize: 9,
-                                        fontWeight: FontWeight.w800,
-                                        fontFamily: 'monospace',
-                                      ),
-                                    ),
-                                  ],
+                              Text(
+                                'F',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 8,
+                                  fontWeight: FontWeight.w900,
+                                  fontFamily: 'Outfit',
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: AppSpacing.md),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+
+                  // Brand Name + Tagline
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
                           Text(
-                            featured.title,
+                            'FOREN',
                             style: TextStyle(
-                              color: theme.colorScheme.onSurface,
-                              fontSize: 20,
+                              color: textPrimary,
+                              fontSize: 16,
                               fontWeight: FontWeight.w800,
-                              fontFamily: 'Geist',
+                              letterSpacing: 1.2,
+                              fontFamily: 'Outfit',
                             ),
                           ),
-                          const SizedBox(height: AppSpacing.xs),
                           Text(
-                            featured.description,
+                            'SHIELD',
                             style: TextStyle(
-                              color: foren.textSecondary,
-                              fontSize: 13,
-                              height: 1.4,
-                            ),
-                          ),
-                          const SizedBox(height: AppSpacing.lg),
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton.icon(
-                              onPressed: () => context.push(
-                                '${RouteConstants.simulationRun}/${featured.id}',
-                              ),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: primaryColor,
-                                foregroundColor: theme.scaffoldBackgroundColor,
-                                padding: const EdgeInsets.symmetric(vertical: 14),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: AppRadius.borderRadiusMd,
-                                ),
-                              ),
-                              icon: const Icon(Icons.play_arrow_rounded),
-                              label: const Text(
-                                'LAUNCH FEATURED SIMULATION LAB',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: 'monospace',
-                                  fontSize: 13,
-                                ),
-                              ),
+                              color: primaryColor,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w800,
+                              letterSpacing: 1.2,
+                              fontFamily: 'Outfit',
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 1),
+                      Text(
+                        'LEARN · INVESTIGATE · DEFEND',
+                        style: TextStyle(
+                          color: textSecondary,
+                          fontSize: 7.5,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 1.0,
+                        ),
+                      ),
+                    ],
+                  ),
+
+                  const Spacer(),
+
+                  // Search Button
+                  GestureDetector(
+                    onTap: () {},
+                    child: SizedBox(
+                      width: 36,
+                      height: 36,
+                      child: Icon(
+                        Icons.search_rounded,
+                        size: 22,
+                        color: textPrimary,
+                      ),
                     ),
-                  )
-                      .animate(delay: 100.ms)
-                      .fadeIn(duration: 400.ms)
-                      .slideY(begin: 0.08, end: 0),
+                  ),
+                  const SizedBox(width: 4),
 
-                  const SizedBox(height: AppSpacing.xl),
-
-                  // 3. CATEGORY FILTER BAR
-                  Text(
-                    'SIMULATION SCENARIO TRACKS',
-                    style: TextStyle(
-                      color: foren.textSecondary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'monospace',
-                      letterSpacing: 1.0,
-                    ),
-                  )
-                      .animate(delay: 200.ms)
-                      .fadeIn(duration: 400.ms),
-
-                  const SizedBox(height: AppSpacing.xs),
-
-                  SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
+                  // Notification Bell
+                  GestureDetector(
+                    onTap: () => context.push(RouteConstants.settings),
+                    child: Stack(
+                      clipBehavior: Clip.none,
                       children: [
-                        _FilterChip(
-                          label: 'All Tracks',
-                          isSelected: _selectedCategory == null,
-                          onTap: () => setState(() => _selectedCategory = null),
-                        ),
-                        _FilterChip(
-                          label: 'Phishing & Email',
-                          isSelected: _selectedCategory == ScenarioCategory.network,
-                          onTap: () => setState(
-                            () => _selectedCategory = ScenarioCategory.network,
+                        SizedBox(
+                          width: 36,
+                          height: 36,
+                          child: Icon(
+                            Icons.notifications_none_outlined,
+                            size: 22,
+                            color: textPrimary,
                           ),
                         ),
-                        _FilterChip(
-                          label: 'Web & QR Fraud',
-                          isSelected: _selectedCategory == ScenarioCategory.webSec,
-                          onTap: () => setState(
-                            () => _selectedCategory = ScenarioCategory.webSec,
-                          ),
-                        ),
-                        _FilterChip(
-                          label: 'OTP Scams & Incident',
-                          isSelected: _selectedCategory == ScenarioCategory.dfir,
-                          onTap: () => setState(
-                            () => _selectedCategory = ScenarioCategory.dfir,
+                        Positioned(
+                          top: 6,
+                          right: 6,
+                          child: Container(
+                            width: 7,
+                            height: 7,
+                            decoration: BoxDecoration(
+                              color: primaryColor,
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isDark
+                                    ? theme.scaffoldBackgroundColor
+                                    : Colors.white,
+                                width: 1.5,
+                              ),
+                            ),
                           ),
                         ),
                       ],
                     ),
-                  )
-                      .animate(delay: 250.ms)
-                      .fadeIn(duration: 400.ms),
-
-                  const SizedBox(height: AppSpacing.lg),
-
-                  // 4. SCENARIO CATALOG LIST
-                  ...scenarios.asMap().entries.map((entry) {
-                    final index = entry.key;
-                    final scenario = entry.value;
-                    final riskScore = _calculateRiskScore(scenario.difficulty);
-
-                    return Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: _ScenarioCardTile(
-                        scenario: scenario,
-                        riskScore: riskScore,
-                        onTap: () => context.push(
-                          '${RouteConstants.simulationRun}/${scenario.id}',
-                        ),
-                      )
-                          .animate(delay: Duration(milliseconds: 300 + (index * 60)))
-                          .fadeIn(duration: 400.ms)
-                          .slideY(begin: 0.08, end: 0),
-                    );
-                  }),
+                  ),
                 ],
               ),
             ),
-          ),
-        ],
+
+            const SizedBox(height: AppSpacing.md),
+
+            // ── Main Scrollable Body ──
+            Expanded(
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(
+                  parent: BouncingScrollPhysics(),
+                ),
+                padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+                children: [
+                  // ── 2. Title Section + My Results Button ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Simulation Lab',
+                                style: TextStyle(
+                                  color: textPrimary,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily: 'Outfit',
+                                  letterSpacing: -0.3,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                'Practice real-world cyber attacks in a safe and controlled environment.',
+                                style: TextStyle(
+                                  color: textSecondary,
+                                  fontSize: 13,
+                                  height: 1.3,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+
+                        const SizedBox(width: 12),
+
+                        // My Results Button
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 14,
+                              vertical: 10,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.surface : Colors.white,
+                              borderRadius: AppRadius.borderRadiusSm,
+                              border: Border.all(color: borderColor),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.bar_chart_rounded,
+                                  size: 16,
+                                  color: textPrimary,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'My Results',
+                                  style: TextStyle(
+                                    color: textPrimary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w700,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── 3. Category Filter Bar (Tabs + Filter) ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: SizedBox(
+                            height: 38,
+                            child: ListView.separated(
+                              scrollDirection: Axis.horizontal,
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: _tabs.length,
+                              separatorBuilder: (_, _) =>
+                                  const SizedBox(width: 8),
+                              itemBuilder: (context, index) {
+                                final tab = _tabs[index];
+                                final isSelected = tab == _selectedTab;
+                                return GestureDetector(
+                                  onTap: () =>
+                                      setState(() => _selectedTab = tab),
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 16,
+                                      vertical: 8,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: isSelected
+                                          ? primaryColor
+                                          : (isDark
+                                                ? AppColors.surface
+                                                : Colors.white),
+                                      borderRadius: AppRadius.borderRadiusSm,
+                                      border: Border.all(
+                                        color: isSelected
+                                            ? primaryColor
+                                            : borderColor,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        tab,
+                                        style: TextStyle(
+                                          color: isSelected
+                                              ? Colors.white
+                                              : textSecondary,
+                                          fontSize: 13,
+                                          fontWeight: isSelected
+                                              ? FontWeight.w700
+                                              : FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+
+                        // Filter Button
+                        GestureDetector(
+                          onTap: () {},
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 8,
+                            ),
+                            decoration: BoxDecoration(
+                              color: isDark ? AppColors.surface : Colors.white,
+                              borderRadius: AppRadius.borderRadiusSm,
+                              border: Border.all(color: borderColor),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.tune_outlined,
+                                  size: 16,
+                                  color: textSecondary,
+                                ),
+                                const SizedBox(width: 6),
+                                Text(
+                                  'Filter',
+                                  style: TextStyle(
+                                    color: textSecondary,
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.lg),
+
+                  // ── 4. Simulations 2x2 Grid ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Column(
+                      children: [
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimulationCard(
+                                context,
+                                title: 'Phishing Attack\nSimulation',
+                                description:
+                                    'Identify phishing emails and avoid credential theft.',
+                                level: 'Beginner',
+                                levelBg: const Color(0xFFEFF6FF),
+                                levelColor: primaryColor,
+                                iconType: _SimIconType.phishing,
+                                iconBg: const Color(0xFFEFF6FF),
+                                iconColor: primaryColor,
+                                scenarios: '8 Scenarios',
+                                duration: '15 - 20 min',
+                                onTap: () {
+                                  final s = SimulationMockData.scenarios.first;
+                                  context.push(
+                                    '${RouteConstants.simulationRun}/${s.id}',
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: _buildSimulationCard(
+                                context,
+                                title: 'QR Code Scam\nSimulation',
+                                description:
+                                    'Detect malicious QR codes and understand the risks.',
+                                level: 'Beginner',
+                                levelBg: const Color(0xFFF0FDF4),
+                                levelColor: const Color(0xFF16A34A),
+                                iconType: _SimIconType.qrCode,
+                                iconBg: const Color(0xFFF0FDF4),
+                                iconColor: const Color(0xFF16A34A),
+                                scenarios: '6 Scenarios',
+                                duration: '10 - 15 min',
+                                onTap: () {
+                                  final s = SimulationMockData.scenarios[1];
+                                  context.push(
+                                    '${RouteConstants.simulationRun}/${s.id}',
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildSimulationCard(
+                                context,
+                                title: 'OTP Fraud\nSimulation',
+                                description:
+                                    'Learn how OTP fraud happens and stay safe.',
+                                level: 'Intermediate',
+                                levelBg: const Color(0xFFFFF7ED),
+                                levelColor: const Color(0xFFEA580C),
+                                iconType: _SimIconType.otpFraud,
+                                iconBg: const Color(0xFFFFF7ED),
+                                iconColor: const Color(0xFFEA580C),
+                                scenarios: '7 Scenarios',
+                                duration: '15 - 20 min',
+                                onTap: () {
+                                  final s = SimulationMockData.scenarios.last;
+                                  context.push(
+                                    '${RouteConstants.simulationRun}/${s.id}',
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: _buildSimulationCard(
+                                context,
+                                title: 'Fake Shopping\nWebsite',
+                                description:
+                                    'Spot fake websites and protect your data.',
+                                level: 'Intermediate',
+                                levelBg: const Color(0xFFFAF5FF),
+                                levelColor: const Color(0xFF9333EA),
+                                iconType: _SimIconType.fakeStore,
+                                iconBg: const Color(0xFFFAF5FF),
+                                iconColor: const Color(0xFF9333EA),
+                                scenarios: '6 Scenarios',
+                                duration: '15 - 20 min',
+                                onTap: () {
+                                  final s = SimulationMockData.scenarios.first;
+                                  context.push(
+                                    '${RouteConstants.simulationRun}/${s.id}',
+                                  );
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // ── 5. Your Progress Section ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Your Progress',
+                          style: TextStyle(
+                            color: textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                        Text(
+                          'View All',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 16,
+                        horizontal: 8,
+                      ),
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.surface : Colors.white,
+                        borderRadius: AppRadius.borderRadiusLg,
+                        border: Border.all(color: borderColor),
+                        boxShadow: isDark
+                            ? []
+                            : [
+                                BoxShadow(
+                                  color: Colors.black.withValues(alpha: 0.02),
+                                  blurRadius: 8,
+                                  offset: const Offset(0, 2),
+                                ),
+                              ],
+                      ),
+                      child: Row(
+                        children: [
+                          _buildProgressMetric(
+                            context,
+                            icon: Icons.sports_esports_outlined,
+                            iconBg: const Color(0xFFEFF6FF),
+                            iconColor: primaryColor,
+                            value: '12',
+                            label: 'Simulations\nCompleted',
+                          ),
+                          _buildVerticalDivider(borderColor),
+                          _buildProgressMetric(
+                            context,
+                            icon: Icons.emoji_events_outlined,
+                            iconBg: const Color(0xFFF0FDF4),
+                            iconColor: const Color(0xFF16A34A),
+                            value: '85%',
+                            label: 'Average\nScore',
+                          ),
+                          _buildVerticalDivider(borderColor),
+                          _buildProgressMetric(
+                            context,
+                            icon: Icons.local_fire_department_outlined,
+                            iconBg: const Color(0xFFFFF7ED),
+                            iconColor: const Color(0xFFEA580C),
+                            value: '7',
+                            label: 'Current\nStreak',
+                          ),
+                          _buildVerticalDivider(borderColor),
+                          _buildProgressMetric(
+                            context,
+                            icon: Icons.military_tech_outlined,
+                            iconBg: const Color(0xFFFAF5FF),
+                            iconColor: const Color(0xFF9333EA),
+                            value: '3',
+                            label: 'Badges\nEarned',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(height: AppSpacing.xl),
+
+                  // ── 6. Recent Simulations Section ──
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Recent Simulations',
+                          style: TextStyle(
+                            color: textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                        Text(
+                          'View All',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: isDark ? AppColors.surface : Colors.white,
+                        borderRadius: AppRadius.borderRadiusLg,
+                        border: Border.all(color: borderColor),
+                      ),
+                      child: Column(
+                        children: [
+                          _buildRecentSimulationRow(
+                            context,
+                            title: 'Phishing Attack Simulation',
+                            subtitle: 'Completed on 24 Apr 2025',
+                            score: '90%',
+                            icon: Icons.mark_email_unread_outlined,
+                            iconBg: const Color(0xFFEFF6FF),
+                            iconColor: primaryColor,
+                          ),
+                          Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: isDark
+                                ? AppColors.borderSubtle
+                                : const Color(0xFFF1F5F9),
+                          ),
+                          _buildRecentSimulationRow(
+                            context,
+                            title: 'QR Code Scam Simulation',
+                            subtitle: 'Completed on 21 Apr 2025',
+                            score: '80%',
+                            icon: Icons.qr_code_2_rounded,
+                            iconBg: const Color(0xFFF0FDF4),
+                            iconColor: const Color(0xFF16A34A),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
-
-    if (SimulationLabScreen.enableAdvancedEffects) {
-      return ParticleBackground(
-        numberOfParticles: SimulationLabScreen.particleCount,
-        particleColor: AppColors.logoGold,
-        duration: const Duration(seconds: 18),
-        child: contentBody,
-      );
-    }
-
-    return contentBody;
   }
 
-  int _calculateRiskScore(ScenarioDifficulty difficulty) {
-    switch (difficulty) {
-      case ScenarioDifficulty.easy:
-        return 42;
-      case ScenarioDifficulty.medium:
-        return 65;
-      case ScenarioDifficulty.hard:
-        return 88;
-      case ScenarioDifficulty.critical:
-        return 96;
-    }
-  }
-
-  DifficultyLevel _mapDifficulty(ScenarioDifficulty difficulty) {
-    switch (difficulty) {
-      case ScenarioDifficulty.easy:
-        return DifficultyLevel.beginner;
-      case ScenarioDifficulty.medium:
-        return DifficultyLevel.intermediate;
-      case ScenarioDifficulty.hard:
-        return DifficultyLevel.advanced;
-      case ScenarioDifficulty.critical:
-        return DifficultyLevel.expert;
-    }
-  }
-}
-
-class _ScenarioCardTile extends StatefulWidget {
-  final SimulationScenario scenario;
-  final int riskScore;
-  final VoidCallback onTap;
-
-  const _ScenarioCardTile({
-    required this.scenario,
-    required this.riskScore,
-    required this.onTap,
-  });
-
-  @override
-  State<_ScenarioCardTile> createState() => _ScenarioCardTileState();
-}
-
-class _ScenarioCardTileState extends State<_ScenarioCardTile> {
-  bool _isHovered = false;
-
-  @override
-  Widget build(BuildContext context) {
+  // ── Simulation Grid Card Builder ──
+  Widget _buildSimulationCard(
+    BuildContext context, {
+    required String title,
+    required String description,
+    required String level,
+    required Color levelBg,
+    required Color levelColor,
+    required _SimIconType iconType,
+    required Color iconBg,
+    required Color iconColor,
+    required String scenarios,
+    required String duration,
+    required VoidCallback onTap,
+  }) {
     final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    final primaryColor = theme.colorScheme.primary;
-    final scenario = widget.scenario;
+    final isDark = theme.brightness == Brightness.dark;
+    final textPrimary = isDark ? AppColors.textPrimary : const Color(0xFF0F172A);
+    final textSecondary = isDark ? AppColors.textSecondary : const Color(0xFF64748B);
+    final effectiveIconBg = isDark ? iconColor.withValues(alpha: 0.15) : iconBg;
+    final effectiveLevelBg = isDark
+        ? levelColor.withValues(alpha: 0.15)
+        : levelBg;
 
-    final Widget cardBody = GlassEffect(
-      blurX: 12.0,
-      blurY: 12.0,
-      opacity: 0.10,
-      border: Border.all(
-        color: _isHovered ? primaryColor : foren.borderSubtle,
-        width: 1.0,
-      ),
-      borderRadius: AppRadius.borderRadiusLg,
-      child: Padding(
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surface : Colors.white,
+          borderRadius: AppRadius.borderRadiusLg,
+          border: Border.all(
+            color: isDark ? AppColors.borderSubtle : const Color(0xFFE2E8F0),
+          ),
+          boxShadow: isDark
+              ? []
+              : [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.02),
+                    blurRadius: 8,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+        ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Top Row: Icon + Chevron
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                DifficultyChip(
-                  level: _mapDifficulty(scenario.difficulty),
-                ),
-                const SizedBox(width: 8),
-                XPChip(xp: scenario.xpReward),
-                const Spacer(),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  width: 44,
+                  height: 44,
                   decoration: BoxDecoration(
-                    color: AppColors.logoGold.withValues(alpha: 0.15),
-                    borderRadius: AppRadius.borderRadiusXs,
+                    color: effectiveIconBg,
+                    borderRadius: BorderRadius.circular(12),
                   ),
-                  child: Text(
-                    'RISK SCORE: ${widget.riskScore}/100',
-                    style: const TextStyle(
-                      color: AppColors.logoGold,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'monospace',
-                    ),
-                  ),
+                  child: Center(child: _buildSimIcon(iconType, iconColor)),
+                ),
+                Icon(
+                  Icons.chevron_right_rounded,
+                  size: 20,
+                  color: textSecondary,
                 ),
               ],
             ),
-            const SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: 10),
+
+            // Title
             Text(
-              scenario.title,
+              title,
               style: TextStyle(
-                color: theme.colorScheme.onSurface,
-                fontSize: 16,
-                fontWeight: FontWeight.w800,
-                fontFamily: 'Geist',
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              scenario.description,
-              style: TextStyle(
-                color: foren.textSecondary,
-                fontSize: 12,
-                height: 1.3,
+                color: textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.w700,
+                fontFamily: 'Outfit',
+                height: 1.25,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: AppSpacing.md),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  '${scenario.objectives.length} MISSION OBJECTIVES',
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'monospace',
-                  ),
+            const SizedBox(height: 4),
+
+            // Description
+            Text(
+              description,
+              style: TextStyle(color: textSecondary, fontSize: 11, height: 1.3),
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+            ),
+            const SizedBox(height: 10),
+
+            // Level Pill
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+              decoration: BoxDecoration(
+                color: effectiveLevelBg,
+                borderRadius: BorderRadius.circular(6),
+              ),
+              child: Text(
+                level,
+                style: TextStyle(
+                  color: levelColor,
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
                 ),
-                ElevatedButton.icon(
-                  onPressed: widget.onTap,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: primaryColor,
-                    foregroundColor: theme.scaffoldBackgroundColor,
-                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: AppRadius.borderRadiusMd,
+              ),
+            ),
+            const SizedBox(height: 12),
+
+            // Footer Metadata (Scenarios | Duration)
+            Wrap(
+              alignment: WrapAlignment.spaceBetween,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              runSpacing: 4,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.description_outlined,
+                      size: 13,
+                      color: textSecondary,
                     ),
-                  ),
-                  icon: const Icon(Icons.play_arrow_rounded, size: 16),
-                  label: const Text(
-                    'START LAB',
-                    style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'monospace',
+                    const SizedBox(width: 4),
+                    Text(
+                      scenarios,
+                      style: TextStyle(
+                        color: textSecondary,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      Icons.access_time_rounded,
+                      size: 13,
+                      color: textSecondary,
+                    ),
+                    const SizedBox(width: 4),
+                    Text(
+                      duration,
+                      style: TextStyle(
+                        color: textSecondary,
+                        fontSize: 10.5,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),
@@ -451,77 +883,182 @@ class _ScenarioCardTileState extends State<_ScenarioCardTile> {
         ),
       ),
     );
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        transform: Matrix4.translationValues(0, _isHovered ? -3 : 0, 0),
-        child: SimulationLabScreen.enableAdvancedEffects
-            ? GlowEffect(
-                glowColor: _isHovered ? primaryColor : Colors.transparent,
-                blurRadius: 16,
-                spreadRadius: 1,
-                animate: _isHovered,
-                borderRadius: AppRadius.borderRadiusLg,
-                child: cardBody,
-              )
-            : cardBody,
-      ),
-    );
   }
 
-  DifficultyLevel _mapDifficulty(ScenarioDifficulty difficulty) {
-    switch (difficulty) {
-      case ScenarioDifficulty.easy:
-        return DifficultyLevel.beginner;
-      case ScenarioDifficulty.medium:
-        return DifficultyLevel.intermediate;
-      case ScenarioDifficulty.hard:
-        return DifficultyLevel.advanced;
-      case ScenarioDifficulty.critical:
-        return DifficultyLevel.expert;
+  Widget _buildSimIcon(_SimIconType type, Color iconColor) {
+    switch (type) {
+      case _SimIconType.phishing:
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.mail_outline_rounded, size: 24, color: iconColor),
+            Positioned(
+              top: 2,
+              right: 2,
+              child: Icon(Icons.phishing, size: 14, color: iconColor),
+            ),
+          ],
+        );
+      case _SimIconType.qrCode:
+        return Icon(Icons.qr_code_2_rounded, size: 26, color: iconColor);
+      case _SimIconType.otpFraud:
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.smartphone_outlined, size: 26, color: iconColor),
+            Icon(Icons.lock_outline_rounded, size: 12, color: iconColor),
+          ],
+        );
+      case _SimIconType.fakeStore:
+        return Stack(
+          alignment: Alignment.center,
+          children: [
+            Icon(Icons.shopping_cart_outlined, size: 24, color: iconColor),
+            Positioned(
+              top: 0,
+              right: 0,
+              child: Icon(
+                Icons.warning_amber_rounded,
+                size: 14,
+                color: iconColor,
+              ),
+            ),
+          ],
+        );
     }
   }
-}
 
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
+  // ── Progress Metric Item ──
+  Widget _buildProgressMetric(
+    BuildContext context, {
+    required IconData icon,
+    required Color iconBg,
+    required Color iconColor,
+    required String value,
+    required String label,
+  }) {
     final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    final primaryColor = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
+    final textPrimary = isDark
+        ? AppColors.textPrimary
+        : const Color(0xFF0F172A);
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : const Color(0xFF64748B);
+
+    return Expanded(
+      child: Column(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+            child: Center(child: Icon(icon, size: 18, color: iconColor)),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            value,
+            style: TextStyle(
+              color: textPrimary,
+              fontSize: 17,
+              fontWeight: FontWeight.w800,
+              fontFamily: 'Outfit',
+            ),
+          ),
+          const SizedBox(height: 2),
+          Text(
+            label,
+            style: TextStyle(color: textSecondary, fontSize: 10, height: 1.2),
+            textAlign: TextAlign.center,
+            maxLines: 2,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildVerticalDivider(Color color) {
+    return Container(width: 1, height: 48, color: color);
+  }
+
+  // ── Recent Simulation Item ──
+  Widget _buildRecentSimulationRow(
+    BuildContext context, {
+    required String title,
+    required String subtitle,
+    required String score,
+    required IconData icon,
+    required Color iconBg,
+    required Color iconColor,
+  }) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final textPrimary = isDark
+        ? AppColors.textPrimary
+        : const Color(0xFF0F172A);
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : const Color(0xFF64748B);
 
     return Padding(
-      padding: const EdgeInsets.only(right: 8),
-      child: ChoiceChip(
-        label: Text(label),
-        selected: isSelected,
-        onSelected: (_) => onTap(),
-        selectedColor: primaryColor.withValues(alpha: 0.2),
-        backgroundColor: AppColors.surface,
-        labelStyle: TextStyle(
-          color: isSelected ? primaryColor : foren.textSecondary,
-          fontSize: 11,
-          fontWeight: isSelected ? FontWeight.w800 : FontWeight.w500,
-          fontFamily: 'monospace',
-        ),
-        side: BorderSide(
-          color: isSelected ? primaryColor : foren.borderSubtle,
-        ),
-        showCheckmark: false,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: 12,
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36,
+            height: 36,
+            decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
+            child: Center(child: Icon(icon, size: 18, color: iconColor)),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: textPrimary,
+                    fontSize: 13,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  subtitle,
+                  style: TextStyle(color: textSecondary, fontSize: 11),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+
+          // Score Pill
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF0FDF4),
+              borderRadius: BorderRadius.circular(6),
+            ),
+            child: Text(
+              score,
+              style: const TextStyle(
+                color: Color(0xFF16A34A),
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+
+          const SizedBox(width: 6),
+          Icon(Icons.chevron_right_rounded, size: 18, color: textSecondary),
+        ],
       ),
     );
   }
 }
+
+enum _SimIconType { phishing, qrCode, otpFraud, fakeStore }

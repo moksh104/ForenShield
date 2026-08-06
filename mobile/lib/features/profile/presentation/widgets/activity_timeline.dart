@@ -1,19 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/profile_entity.dart';
 
-/// Activity Timeline & Recent Forensic Log Section.
+/// Activity timeline & recent XP log section.
 class ActivityTimeline extends StatelessWidget {
   final List<XpHistoryItemEntity> xpHistory;
 
-  const ActivityTimeline({
-    super.key,
-    required this.xpHistory,
-  });
+  const ActivityTimeline({super.key, required this.xpHistory});
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +44,8 @@ class ActivityTimeline extends StatelessWidget {
           ];
 
     return GlassEffect(
-      blurX: 14.0,
-      blurY: 14.0,
-      opacity: 0.10,
       border: Border.all(
-        color: AppColors.logoGold.withValues(alpha: 0.35),
+        color: foren.borderSubtle.withValues(alpha: 0.4),
         width: 1.0,
       ),
       borderRadius: AppRadius.borderRadiusXl,
@@ -66,27 +59,26 @@ class ActivityTimeline extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.timeline_outlined, color: AppColors.logoGold, size: 18),
+                    Icon(
+                      Icons.timeline_outlined,
+                      color: primaryColor,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      'ANALYST ACTIVITY TIMELINE',
-                      style: TextStyle(
+                      'Activity timeline',
+                      style: theme.textTheme.titleSmall?.copyWith(
                         color: theme.colorScheme.onSurface,
-                        fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'monospace',
-                        letterSpacing: 0.8,
                       ),
                     ),
                   ],
                 ),
                 Text(
-                  'RECENT LOGS',
-                  style: TextStyle(
+                  'Recent',
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: foren.textSecondary,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -113,20 +105,16 @@ class ActivityTimeline extends StatelessWidget {
                             height: 12,
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: AppColors.logoGold,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: AppColors.logoGold.withValues(alpha: 0.6),
-                                  blurRadius: 6,
-                                ),
-                              ],
+                              color: primaryColor,
                             ),
                           ),
                           if (!isLast)
                             Expanded(
                               child: Container(
                                 width: 1.5,
-                                color: foren.borderSubtle.withValues(alpha: 0.5),
+                                color: foren.borderSubtle.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                             ),
                         ],
@@ -140,10 +128,14 @@ class ActivityTimeline extends StatelessWidget {
                           child: Container(
                             padding: const EdgeInsets.all(AppSpacing.sm),
                             decoration: BoxDecoration(
-                              color: foren.surfaceRaised1.withValues(alpha: 0.5),
+                              color: foren.surfaceRaised1.withValues(
+                                alpha: 0.5,
+                              ),
                               borderRadius: AppRadius.borderRadiusMd,
                               border: Border.all(
-                                color: foren.borderSubtle.withValues(alpha: 0.3),
+                                color: foren.borderSubtle.withValues(
+                                  alpha: 0.3,
+                                ),
                               ),
                             ),
                             child: Row(
@@ -151,45 +143,50 @@ class ActivityTimeline extends StatelessWidget {
                               children: [
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         item.title,
-                                        style: TextStyle(
-                                          color: theme.colorScheme.onSurface,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                              color:
+                                                  theme.colorScheme.onSurface,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
                                         '${item.source} · ${item.timestamp}',
-                                        style: TextStyle(
-                                          color: foren.textSecondary,
-                                          fontSize: 10,
-                                          fontFamily: 'monospace',
-                                        ),
+                                        style: theme.textTheme.labelSmall
+                                            ?.copyWith(
+                                              color: foren.textSecondary,
+                                            ),
                                       ),
                                     ],
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 8,
+                                    vertical: 3,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: primaryColor.withValues(alpha: 0.15),
                                     borderRadius: AppRadius.borderRadiusSm,
                                     border: Border.all(
-                                      color: primaryColor.withValues(alpha: 0.4),
+                                      color: primaryColor.withValues(
+                                        alpha: 0.4,
+                                      ),
                                     ),
                                   ),
                                   child: Text(
                                     '+${item.xpAmount} XP',
-                                    style: TextStyle(
-                                      color: primaryColor,
-                                      fontSize: 11,
-                                      fontWeight: FontWeight.w800,
-                                      fontFamily: 'monospace',
-                                    ),
+                                    style: theme.textTheme.labelMedium
+                                        ?.copyWith(
+                                          color: primaryColor,
+                                          fontWeight: FontWeight.w700,
+                                        ),
                                   ),
                                 ),
                               ],

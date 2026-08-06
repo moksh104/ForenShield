@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import '../effects/glass_effect.dart';
 import '../effects/glow_effect.dart';
 import '../theme/app_colors.dart';
+import '../theme/app_motion.dart';
 import '../theme/app_radius.dart';
 import '../theme/app_shadows.dart';
 import '../theme/app_spacing.dart';
@@ -51,11 +52,17 @@ class ForenCard extends StatelessWidget {
     this.leadingIcon,
     this.trailingAction,
     this.onTap,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.only(
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 20,
+    ), // Asymmetrical, organic padding
     this.leftAccentBar,
-    this.mode = ForenCardMode.bordered,
+    this.mode = ForenCardMode
+        .elevated, // Default to softer elevated look instead of bordered
     this.elevation = 1,
-    this.hasBorder = true,
+    this.hasBorder = false, // Subtle borders through elevation instead
     this.borderRadius,
     this.border,
     this.color,
@@ -73,15 +80,20 @@ class ForenCard extends StatelessWidget {
     this.leadingIcon,
     this.trailingAction,
     this.onTap,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.only(
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 20,
+    ),
     this.leftAccentBar,
     this.elevation = 1,
     this.hasBorder = false,
     this.borderRadius,
     this.border,
     this.color,
-  })  : mode = ForenCardMode.elevated,
-        glowColor = null;
+  }) : mode = ForenCardMode.elevated,
+       glowColor = null;
 
   const ForenCard.bordered({
     super.key,
@@ -94,15 +106,20 @@ class ForenCard extends StatelessWidget {
     this.leadingIcon,
     this.trailingAction,
     this.onTap,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.only(
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 20,
+    ),
     this.leftAccentBar,
     this.borderRadius,
     this.border,
     this.color,
-  })  : mode = ForenCardMode.bordered,
-        elevation = 0,
-        hasBorder = true,
-        glowColor = null;
+  }) : mode = ForenCardMode.bordered,
+       elevation = 0,
+       hasBorder = true,
+       glowColor = null;
 
   const ForenCard.glass({
     super.key,
@@ -115,15 +132,20 @@ class ForenCard extends StatelessWidget {
     this.leadingIcon,
     this.trailingAction,
     this.onTap,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.only(
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 20,
+    ),
     this.leftAccentBar,
     this.borderRadius,
     this.border,
     this.color,
-  })  : mode = ForenCardMode.glass,
-        elevation = 0,
-        hasBorder = true,
-        glowColor = null;
+  }) : mode = ForenCardMode.glass,
+       elevation = 0,
+       hasBorder = true,
+       glowColor = null;
 
   const ForenCard.glow({
     super.key,
@@ -136,15 +158,20 @@ class ForenCard extends StatelessWidget {
     this.leadingIcon,
     this.trailingAction,
     this.onTap,
-    this.padding = const EdgeInsets.all(AppSpacing.md),
+    this.padding = const EdgeInsets.only(
+      left: 20,
+      right: 20,
+      top: 24,
+      bottom: 20,
+    ),
     this.leftAccentBar,
     this.glowColor,
     this.borderRadius,
     this.border,
     this.color,
-  })  : mode = ForenCardMode.glow,
-        elevation = 1,
-        hasBorder = true;
+  }) : mode = ForenCardMode.glow,
+       elevation = 1,
+       hasBorder = true;
 
   Widget _buildCardContent(BuildContext context) {
     final theme = Theme.of(context);
@@ -181,8 +208,10 @@ class ForenCard extends StatelessWidget {
                         const SizedBox(height: AppSpacing.xxs),
                         Text(
                           subtitle!,
-                          style: theme.textTheme.bodySmall
-                              ?.copyWith(color: foren?.textSecondary ?? AppColors.textSecondary),
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color:
+                                foren?.textSecondary ?? AppColors.textSecondary,
+                          ),
                         ),
                       ],
                     ],
@@ -195,7 +224,9 @@ class ForenCard extends StatelessWidget {
               ],
             ),
 
-          if ((header != null || title != null) && child == null && body != null)
+          if ((header != null || title != null) &&
+              child == null &&
+              body != null)
             const SizedBox(height: AppSpacing.md),
 
           effectiveChild,
@@ -214,17 +245,25 @@ class ForenCard extends StatelessWidget {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>();
     final isDark = theme.brightness == Brightness.dark;
-    final effectiveRadius = borderRadius ?? AppRadius.cardRadius;
-    final surfaceColor = color ??
+    final effectiveRadius =
+        borderRadius ??
+        AppRadius
+            .borderRadiusLg; // Ensure we fallback to the BorderRadius type properly since some ShapeBorder usages might conflict here.
+
+    final surfaceColor =
+        color ??
         (isDark
             ? (foren?.surfaceRaised1 ?? AppColors.surface)
             : AppColors.lightSurface);
 
     Border? effectiveBorder;
     if (hasBorder || border != null) {
-      effectiveBorder = border ??
+      effectiveBorder =
+          border ??
           Border.all(
-            color: foren?.borderSubtle ?? AppColors.borderSubtle,
+            color: isDark
+                ? (foren?.borderSubtle ?? AppColors.borderSubtle)
+                : AppColors.lightBorderDefault,
             width: 1.0,
           );
     }
@@ -244,12 +283,13 @@ class ForenCard extends StatelessWidget {
     }
 
     if (onTap != null) {
-      content = Material(
-        color: Colors.transparent,
-        borderRadius: effectiveRadius,
-        child: InkWell(
-          borderRadius: effectiveRadius,
-          onTap: onTap,
+      // Adding spring-based interaction scale
+      content = _SpringCardWrapper(
+        onTap: onTap!,
+        child: Material(
+          color: Colors.transparent,
+          shape: AppRadius.cardShape,
+          clipBehavior: Clip.antiAlias,
           child: content,
         ),
       );
@@ -271,10 +311,7 @@ class ForenCard extends StatelessWidget {
             borderRadius: effectiveRadius,
             border: effectiveBorder,
           ),
-          child: ClipRRect(
-            borderRadius: effectiveRadius,
-            child: content,
-          ),
+          child: ClipRRect(borderRadius: effectiveRadius, child: content),
         );
         return GlowEffect(
           glowColor: glowColor ?? theme.colorScheme.primary,
@@ -293,10 +330,7 @@ class ForenCard extends StatelessWidget {
             border: effectiveBorder,
             boxShadow: shadows,
           ),
-          child: ClipRRect(
-            borderRadius: effectiveRadius,
-            child: content,
-          ),
+          child: ClipRRect(borderRadius: effectiveRadius, child: content),
         );
       case ForenCardMode.bordered:
         return Container(
@@ -305,10 +339,7 @@ class ForenCard extends StatelessWidget {
             borderRadius: effectiveRadius,
             border: effectiveBorder,
           ),
-          child: ClipRRect(
-            borderRadius: effectiveRadius,
-            child: content,
-          ),
+          child: ClipRRect(borderRadius: effectiveRadius, child: content),
         );
     }
   }
@@ -336,7 +367,9 @@ class ForenMissionCard extends StatelessWidget {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
     final isDark = theme.brightness == Brightness.dark;
-    final accent = isDark ? foren.missionControl.t300 : foren.missionControl.t700;
+    final accent = isDark
+        ? foren.missionControl.t300
+        : foren.missionControl.t700;
 
     return ForenCard(
       onTap: onTap,
@@ -357,7 +390,9 @@ class ForenMissionCard extends StatelessWidget {
             description,
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodyMedium?.copyWith(color: foren.textSecondary),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: foren.textSecondary,
+            ),
           ),
           const SizedBox(height: ForenSpace.md),
           Row(
@@ -412,7 +447,10 @@ class ForenInvestigationCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(caseId, style: theme.textTheme.labelMedium?.copyWith(color: accent)),
+              Text(
+                caseId,
+                style: theme.textTheme.labelMedium?.copyWith(color: accent),
+              ),
               ForenStatusChip(status: status),
             ],
           ),
@@ -425,7 +463,12 @@ class ForenInvestigationCard extends StatelessWidget {
               const SizedBox(width: ForenSpace.sm),
               Icon(Icons.folder_outlined, size: 14, color: foren.textSecondary),
               const SizedBox(width: 4),
-              Text('$evidenceCount items', style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary)),
+              Text(
+                '$evidenceCount items',
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: foren.textSecondary,
+                ),
+              ),
             ],
           ),
         ],
@@ -463,11 +506,19 @@ class ForenCourseCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(category.toUpperCase(), style: theme.textTheme.labelSmall?.copyWith(color: accent)),
+          Text(
+            category.toUpperCase(),
+            style: theme.textTheme.labelSmall?.copyWith(color: accent),
+          ),
           const SizedBox(height: ForenSpace.xs),
           Text(title, style: theme.textTheme.titleLarge),
           const SizedBox(height: ForenSpace.xs),
-          Text('$lessonCount lessons', style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary)),
+          Text(
+            '$lessonCount lessons',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
           const SizedBox(height: ForenSpace.md),
           ForenLearningProgress(percent: progress),
         ],
@@ -517,7 +568,12 @@ class ForenSimulationCard extends StatelessWidget {
               children: [
                 Text(title, style: theme.textTheme.titleMedium),
                 const SizedBox(height: 4),
-                Text(scenarioType, style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary)),
+                Text(
+                  scenarioType,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: foren.textSecondary,
+                  ),
+                ),
               ],
             ),
           ),
@@ -565,12 +621,22 @@ class ForenAlertCard extends StatelessWidget {
               children: [
                 ForenThreatBadge(level: severity),
                 const SizedBox(height: ForenSpace.xs),
-                Text(message, style: theme.textTheme.bodyMedium, maxLines: 2, overflow: TextOverflow.ellipsis),
+                Text(
+                  message,
+                  style: theme.textTheme.bodyMedium,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ],
             ),
           ),
           const SizedBox(width: ForenSpace.sm),
-          Text(timeAgo, style: theme.textTheme.labelSmall?.copyWith(color: foren.textSecondary)),
+          Text(
+            timeAgo,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
         ],
       ),
     );
@@ -595,13 +661,13 @@ class ForenEvidenceCard extends StatelessWidget {
   });
 
   IconData get _icon => switch (type) {
-        ForenEvidenceType.email => Icons.mail_outline,
-        ForenEvidenceType.pdf => Icons.description_outlined,
-        ForenEvidenceType.pcap => Icons.public,
-        ForenEvidenceType.memoryDump => Icons.memory,
-        ForenEvidenceType.screenshot => Icons.photo_camera_outlined,
-        ForenEvidenceType.other => Icons.insert_drive_file_outlined,
-      };
+    ForenEvidenceType.email => Icons.mail_outline,
+    ForenEvidenceType.pdf => Icons.description_outlined,
+    ForenEvidenceType.pcap => Icons.public,
+    ForenEvidenceType.memoryDump => Icons.memory,
+    ForenEvidenceType.screenshot => Icons.photo_camera_outlined,
+    ForenEvidenceType.other => Icons.insert_drive_file_outlined,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -612,15 +678,27 @@ class ForenEvidenceCard extends StatelessWidget {
 
     return ForenCard(
       onTap: onTap,
-      padding: const EdgeInsets.symmetric(horizontal: ForenSpace.md, vertical: ForenSpace.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: ForenSpace.md,
+        vertical: ForenSpace.sm,
+      ),
       child: Row(
         children: [
           Icon(_icon, size: 24, color: accent),
           const SizedBox(width: ForenSpace.sm),
           Expanded(
-            child: Text(filename, style: theme.textTheme.titleSmall, overflow: TextOverflow.ellipsis),
+            child: Text(
+              filename,
+              style: theme.textTheme.titleSmall,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
-          Text(meta, style: theme.textTheme.labelSmall?.copyWith(color: foren.textSecondary)),
+          Text(
+            meta,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: foren.textSecondary,
+            ),
+          ),
         ],
       ),
     );
@@ -657,15 +735,24 @@ class ForenStatisticsCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(label, style: theme.textTheme.labelMedium?.copyWith(color: foren.textSecondary)),
-              if (icon != null) Icon(icon, size: 18, color: foren.textSecondary),
+              Text(
+                label,
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: foren.textSecondary,
+                ),
+              ),
+              if (icon != null)
+                Icon(icon, size: 18, color: foren.textSecondary),
             ],
           ),
           const SizedBox(height: ForenSpace.xs),
           Text(value, style: theme.textTheme.displaySmall),
           if (trend != null) ...[
             const SizedBox(height: 4),
-            Text(trend!, style: theme.textTheme.bodySmall?.copyWith(color: trendColor)),
+            Text(
+              trend!,
+              style: theme.textTheme.bodySmall?.copyWith(color: trendColor),
+            ),
           ],
         ],
       ),
@@ -710,13 +797,58 @@ class ForenAchievementCard extends StatelessWidget {
             child: Icon(unlocked ? icon : Icons.lock_outline, color: accent),
           ),
           const SizedBox(height: ForenSpace.sm),
-          Text(title, textAlign: TextAlign.center, style: theme.textTheme.titleSmall),
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            style: theme.textTheme.titleSmall,
+          ),
           const SizedBox(height: 4),
           if (unlocked)
             ForenXpChip(amount: rewardXp, showPlus: false)
           else
-            Text('Locked', style: theme.textTheme.labelSmall?.copyWith(color: foren.textDisabled)),
+            Text(
+              'Locked',
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: foren.textDisabled,
+              ),
+            ),
         ],
+      ),
+    );
+  }
+}
+
+/// Tactile spring press wrapper for tappable cards.
+class _SpringCardWrapper extends StatefulWidget {
+  final Widget child;
+  final VoidCallback onTap;
+
+  const _SpringCardWrapper({required this.child, required this.onTap});
+
+  @override
+  State<_SpringCardWrapper> createState() => _SpringCardWrapperState();
+}
+
+class _SpringCardWrapperState extends State<_SpringCardWrapper> {
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _isPressed = false),
+        child: AnimatedScale(
+          scale: _isPressed ? 0.98 : 1.0,
+          duration: AppMotion.fast,
+          curve: AppMotion.micro,
+          child: widget.child,
+        ),
       ),
     );
   }

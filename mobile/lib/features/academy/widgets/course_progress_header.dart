@@ -23,7 +23,9 @@ class CourseProgressHeader extends StatelessWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: theme.colorScheme.surfaceContainerHigh,
-        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(AppRadius.extraLarge)),
+        borderRadius: const BorderRadius.vertical(
+          bottom: Radius.circular(AppRadius.extraLarge),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

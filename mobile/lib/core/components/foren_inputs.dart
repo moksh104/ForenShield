@@ -97,12 +97,12 @@ class ForenTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.onTap,
-  })  : obscureText = true,
-        isPassword = true,
-        isSearch = false,
-        keyboardType = TextInputType.visiblePassword,
-        maxLines = 1,
-        minLines = 1;
+  }) : obscureText = true,
+       isPassword = true,
+       isSearch = false,
+       keyboardType = TextInputType.visiblePassword,
+       maxLines = 1,
+       minLines = 1;
 
   const ForenTextField.search({
     super.key,
@@ -129,11 +129,11 @@ class ForenTextField extends StatefulWidget {
     this.onChanged,
     this.onSubmitted,
     this.onTap,
-  })  : obscureText = false,
-        isPassword = false,
-        isSearch = true,
-        maxLines = 1,
-        minLines = 1;
+  }) : obscureText = false,
+       isPassword = false,
+       isSearch = true,
+       maxLines = 1,
+       minLines = 1;
 
   @override
   State<ForenTextField> createState() => _ForenTextFieldState();
@@ -268,7 +268,9 @@ class _ForenTextFieldState extends State<ForenTextField> {
             widget.label!,
             style: AppTypography.labelLarge.copyWith(
               color: widget.enabled
-                  ? (isDark ? AppColors.textPrimary : AppColors.lightTextPrimary)
+                  ? (isDark
+                        ? AppColors.textPrimary
+                        : AppColors.lightTextPrimary)
                   : textDisabled,
             ),
           ),

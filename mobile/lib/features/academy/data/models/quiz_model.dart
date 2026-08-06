@@ -11,9 +11,10 @@ class QuizQuestionModel extends QuizQuestionEntity {
 
   factory QuizQuestionModel.fromJson(Map<String, dynamic> json) {
     return QuizQuestionModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       questionText: json['question_text'] as String? ?? '',
-      options: (json['options'] as List<dynamic>?)
+      options:
+          (json['options'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],
@@ -43,11 +44,14 @@ class QuizModel extends QuizEntity {
 
   factory QuizModel.fromJson(Map<String, dynamic> json) {
     return QuizModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       passingScorePercent: json['passing_score_percent'] as int? ?? 80,
-      questions: (json['questions'] as List<dynamic>?)
-              ?.map((e) => QuizQuestionModel.fromJson(e as Map<String, dynamic>))
+      questions:
+          (json['questions'] as List<dynamic>?)
+              ?.map(
+                (e) => QuizQuestionModel.fromJson(e as Map<String, dynamic>),
+              )
               .toList() ??
           const [],
     );
@@ -58,8 +62,9 @@ class QuizModel extends QuizEntity {
       'id': id,
       'title': title,
       'passing_score_percent': passingScorePercent,
-      'questions':
-          questions.map((q) => (q as QuizQuestionModel).toJson()).toList(),
+      'questions': questions
+          .map((q) => (q as QuizQuestionModel).toJson())
+          .toList(),
     };
   }
 }

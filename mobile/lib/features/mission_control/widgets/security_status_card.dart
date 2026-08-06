@@ -81,8 +81,7 @@ class _SecurityStatusCardState extends State<SecurityStatusCard>
                     painter: _ArcPainter(
                       progress: widget.score / 100 * _animation.value,
                       color: scoreColor,
-                      backgroundColor:
-                          theme.colorScheme.surfaceContainerLowest,
+                      backgroundColor: theme.colorScheme.surfaceContainerLowest,
                     ),
                     child: Center(
                       child: Column(
@@ -99,8 +98,9 @@ class _SecurityStatusCardState extends State<SecurityStatusCard>
                           Text(
                             'pts',
                             style: theme.textTheme.labelSmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -138,8 +138,9 @@ class _SecurityStatusCardState extends State<SecurityStatusCard>
                     Text(
                       'Security posture',
                       style: theme.textTheme.bodySmall?.copyWith(
-                        color:
-                            theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.5,
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
@@ -175,8 +176,11 @@ class _MetricRow extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        Icon(metric.icon, size: 13,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.55)),
+        Icon(
+          metric.icon,
+          size: 13,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.55),
+        ),
         const SizedBox(width: 6),
         Text(
           metric.label,

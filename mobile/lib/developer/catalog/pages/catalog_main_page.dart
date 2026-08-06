@@ -32,11 +32,9 @@ class CatalogMainPage extends ConsumerWidget {
           return Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              if (isDesktop) 
-                const CatalogSidebar(),
-              
-              if (isDesktop)
-                const VerticalDivider(width: 1, thickness: 1),
+              if (isDesktop) const CatalogSidebar(),
+
+              if (isDesktop) const VerticalDivider(width: 1, thickness: 1),
 
               Expanded(
                 child: Column(
@@ -63,7 +61,10 @@ class _CatalogContentList extends ConsumerWidget {
 
     if (components.isEmpty) {
       return const Center(
-        child: Text('No components match your search criteria.', style: TextStyle(color: AppColors.textSecondary)),
+        child: Text(
+          'No components match your search criteria.',
+          style: TextStyle(color: AppColors.textSecondary),
+        ),
       );
     }
 
@@ -83,16 +84,20 @@ class _ComponentDetailSection extends ConsumerStatefulWidget {
   const _ComponentDetailSection({required this.component});
 
   @override
-  ConsumerState<_ComponentDetailSection> createState() => _ComponentDetailSectionState();
+  ConsumerState<_ComponentDetailSection> createState() =>
+      _ComponentDetailSectionState();
 }
 
-class _ComponentDetailSectionState extends ConsumerState<_ComponentDetailSection> {
+class _ComponentDetailSectionState
+    extends ConsumerState<_ComponentDetailSection> {
   @override
   void initState() {
     super.initState();
     // Initialize default playground state for this specific component
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      ref.read(playgroundStateProvider(widget.component.name).notifier).initialize(widget.component.properties);
+      ref
+          .read(playgroundStateProvider(widget.component.name).notifier)
+          .initialize(widget.component.properties);
     });
   }
 

@@ -5,7 +5,7 @@ import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 
-/// Cybersecurity Domain Skill Badges & Mastery Matrix Section.
+/// Cybersecurity domain skill badges & mastery matrix section.
 class SkillBadgesSection extends StatelessWidget {
   const SkillBadgesSection({super.key});
 
@@ -18,35 +18,35 @@ class SkillBadgesSection extends StatelessWidget {
     const skills = [
       _SkillItemData(
         name: 'Memory Forensics & Dump Analysis',
-        level: 'MASTER',
+        level: 'Master',
         progress: 0.88,
         color: AppColors.primary,
         icon: Icons.memory_outlined,
       ),
       _SkillItemData(
         name: 'Network Traffic & Packet Inspection',
-        level: 'EXPERT',
+        level: 'Expert',
         progress: 0.94,
-        color: AppColors.logoGold,
+        color: AppColors.primary,
         icon: Icons.lan_outlined,
       ),
       _SkillItemData(
         name: 'Malware & Binary Disassembly',
-        level: 'ADVANCED',
+        level: 'Advanced',
         progress: 0.82,
         color: AppColors.investigation,
         icon: Icons.bug_report_outlined,
       ),
       _SkillItemData(
         name: 'Incident Response & SOC Triage',
-        level: 'EXPERT',
+        level: 'Expert',
         progress: 0.90,
         color: AppColors.secondary,
         icon: Icons.shield_moon_outlined,
       ),
       _SkillItemData(
         name: 'Cryptography & Log Auditing',
-        level: 'PROFICIENT',
+        level: 'Proficient',
         progress: 0.78,
         color: AppColors.academy,
         icon: Icons.vpn_key_outlined,
@@ -54,9 +54,6 @@ class SkillBadgesSection extends StatelessWidget {
     ];
 
     return GlassEffect(
-      blurX: 14.0,
-      blurY: 14.0,
-      opacity: 0.10,
       border: Border.all(
         color: primaryColor.withValues(alpha: 0.35),
         width: 1.0,
@@ -72,22 +69,26 @@ class SkillBadgesSection extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    Icon(Icons.workspace_premium_outlined, color: primaryColor, size: 18),
+                    Icon(
+                      Icons.workspace_premium_outlined,
+                      color: primaryColor,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      'CYBERSECURITY SKILL MATRIX',
-                      style: TextStyle(
+                      'Skills',
+                      style: theme.textTheme.titleSmall?.copyWith(
                         color: theme.colorScheme.onSurface,
-                        fontSize: 13,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'monospace',
-                        letterSpacing: 0.8,
                       ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryColor.withValues(alpha: 0.12),
                     borderRadius: AppRadius.borderRadiusSm,
@@ -96,12 +97,10 @@ class SkillBadgesSection extends StatelessWidget {
                     ),
                   ),
                   child: Text(
-                    '5 DOMAINS ACTIVE',
-                    style: TextStyle(
+                    '${skills.length} domains',
+                    style: theme.textTheme.labelSmall?.copyWith(
                       color: primaryColor,
-                      fontSize: 9,
                       fontWeight: FontWeight.w700,
-                      fontFamily: 'monospace',
                     ),
                   ),
                 ),
@@ -113,7 +112,8 @@ class SkillBadgesSection extends StatelessWidget {
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
               itemCount: skills.length,
-              separatorBuilder: (ctx, i) => const SizedBox(height: AppSpacing.sm),
+              separatorBuilder: (ctx, i) =>
+                  const SizedBox(height: AppSpacing.sm),
               itemBuilder: (context, index) {
                 final skill = skills[index];
                 final percentInt = (skill.progress * 100).toInt();
@@ -130,9 +130,8 @@ class SkillBadgesSection extends StatelessWidget {
                             const SizedBox(width: 6),
                             Text(
                               skill.name,
-                              style: TextStyle(
+                              style: theme.textTheme.bodyMedium?.copyWith(
                                 color: theme.colorScheme.onSurface,
-                                fontSize: 12,
                                 fontWeight: FontWeight.w600,
                               ),
                             ),
@@ -140,11 +139,9 @@ class SkillBadgesSection extends StatelessWidget {
                         ),
                         Text(
                           '${skill.level} · $percentInt%',
-                          style: TextStyle(
+                          style: theme.textTheme.labelSmall?.copyWith(
                             color: skill.color,
-                            fontSize: 10,
                             fontWeight: FontWeight.w700,
-                            fontFamily: 'monospace',
                           ),
                         ),
                       ],
@@ -167,16 +164,10 @@ class SkillBadgesSection extends StatelessWidget {
                             gradient: LinearGradient(
                               colors: [
                                 skill.color,
-                                AppColors.logoGold,
+                                skill.color.withValues(alpha: 0.6),
                               ],
                             ),
                             borderRadius: BorderRadius.circular(3),
-                            boxShadow: [
-                              BoxShadow(
-                                color: skill.color.withValues(alpha: 0.5),
-                                blurRadius: 6,
-                              ),
-                            ],
                           ),
                         ),
                       ),

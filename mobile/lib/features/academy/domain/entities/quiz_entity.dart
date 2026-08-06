@@ -17,8 +17,13 @@ class QuizQuestionEntity extends Equatable {
   });
 
   @override
-  List<Object?> get props =>
-      [id, questionText, options, correctOptionIndex, explanation];
+  List<Object?> get props => [
+    id,
+    questionText,
+    options,
+    correctOptionIndex,
+    explanation,
+  ];
 }
 
 /// Quiz entity for knowledge checks.

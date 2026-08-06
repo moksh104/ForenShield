@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/effects/particle_background.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/progress/lesson_progress_bar.dart';
 import '../../../../routes/route_constants.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../providers/simulation_runner_notifier.dart';
 import '../widgets/objective_checklist_widget.dart';
 import '../widgets/terminal_console_widget.dart';
@@ -46,9 +44,7 @@ class ScenarioRunnerScreen extends ConsumerWidget {
     if (scenario == null) {
       return Scaffold(
         backgroundColor: AppColors.bgBase,
-        body: Center(
-          child: CircularProgressIndicator(color: primaryColor),
-        ),
+        body: Center(child: CircularProgressIndicator(color: primaryColor)),
       );
     }
 
@@ -64,11 +60,9 @@ class ScenarioRunnerScreen extends ConsumerWidget {
         ),
         title: Text(
           scenario.title,
-          style: TextStyle(
+          style: theme.textTheme.titleMedium?.copyWith(
             color: theme.colorScheme.onSurface,
-            fontSize: 16,
             fontWeight: FontWeight.w800,
-            fontFamily: 'Geist',
           ),
         ),
         actions: [
@@ -76,7 +70,10 @@ class ScenarioRunnerScreen extends ConsumerWidget {
             child: Padding(
               padding: const EdgeInsets.only(right: 12),
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: primaryColor.withValues(alpha: 0.15),
                   borderRadius: AppRadius.borderRadiusSm,
@@ -104,119 +101,115 @@ class ScenarioRunnerScreen extends ConsumerWidget {
           ),
         ],
       ),
-      body: ParticleBackground(
-        numberOfParticles: 40,
-        particleColor: AppColors.logoGold,
-        duration: const Duration(seconds: 18),
-        child: Stack(
+      body: SafeArea(
+        child: Column(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
-            SafeArea(
-              child: Column(
-                children: [
-                  // Progress Bar Header
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.lg,
-                      vertical: AppSpacing.xs,
-                    ),
-                    child: LessonProgressBar(
-                      totalSteps: state.objectives.length,
-                      completedSteps: state.completedObjectivesCount,
-                    ),
-                  ),
+            // Progress Bar Header
+            Padding(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.lg,
+                vertical: AppSpacing.xs,
+              ),
+              child: LessonProgressBar(
+                totalSteps: state.objectives.length,
+                completedSteps: state.completedObjectivesCount,
+              ),
+            ),
 
-                  // Main Interactive Console & Objective Checklist View
-                  Expanded(
-                    child: LayoutBuilder(
-                      builder: (context, constraints) {
-                        final isWide = constraints.maxWidth >= 768;
+            // Main Interactive Console & Objective Checklist View
+            Expanded(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final isWide = constraints.maxWidth >= 768;
 
-                        if (isWide) {
-                          // Desktop Split View
-                          return Padding(
-                            padding: const EdgeInsets.all(AppSpacing.lg),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex: 6,
-                                  child: TerminalConsoleWidget(
-                                    lines: state.terminalLines,
-                                    onCommandSubmitted: notifier.executeCommand,
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.lg),
-                                Expanded(
-                                  flex: 4,
-                                  child: SingleChildScrollView(
-                                    child: Column(
-                                      children: [
-                                        ObjectiveChecklistWidget(
-                                          objectives: state.objectives,
-                                          onQuickCommandTap: notifier.executeCommand,
-                                        ),
-                                        const SizedBox(height: AppSpacing.md),
-                                        SizedBox(
-                                          width: double.infinity,
-                                          child: OutlinedButton.icon(
-                                            onPressed: notifier.completeLabManually,
-                                            style: OutlinedButton.styleFrom(
-                                              foregroundColor: primaryColor,
-                                              side: BorderSide(color: primaryColor),
-                                              padding: const EdgeInsets.symmetric(vertical: 12),
-                                              shape: const RoundedRectangleBorder(
-                                                borderRadius: AppRadius.borderRadiusMd,
-                                              ),
-                                            ),
-                                            icon: const Icon(Icons.check_circle_outline, size: 18),
-                                            label: const Text(
-                                              'FORCE COMPLETE LAB',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.w800,
-                                                fontFamily: 'monospace',
-                                                fontSize: 12,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
+                  if (isWide) {
+                    // Desktop Split View
+                    return Padding(
+                      padding: const EdgeInsets.all(AppSpacing.lg),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            flex: 6,
+                            child: TerminalConsoleWidget(
+                              lines: state.terminalLines,
+                              onCommandSubmitted: notifier.executeCommand,
                             ),
-                          );
-                        }
-
-                        // Mobile Stack View
-                        return Padding(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          child: Column(
-                            children: [
-                              Expanded(
-                                flex: 6,
-                                child: TerminalConsoleWidget(
-                                  lines: state.terminalLines,
-                                  onCommandSubmitted: notifier.executeCommand,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.md),
-                              Expanded(
-                                flex: 4,
-                                child: SingleChildScrollView(
-                                  child: ObjectiveChecklistWidget(
+                          ),
+                          const SizedBox(width: AppSpacing.lg),
+                          Expanded(
+                            flex: 4,
+                            child: SingleChildScrollView(
+                              child: Column(
+                                children: [
+                                  ObjectiveChecklistWidget(
                                     objectives: state.objectives,
                                     onQuickCommandTap: notifier.executeCommand,
                                   ),
-                                ),
+                                  const SizedBox(height: AppSpacing.md),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: OutlinedButton.icon(
+                                      onPressed: notifier.completeLabManually,
+                                      style: OutlinedButton.styleFrom(
+                                        foregroundColor: primaryColor,
+                                        side: BorderSide(color: primaryColor),
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 12,
+                                        ),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius:
+                                              AppRadius.borderRadiusMd,
+                                        ),
+                                      ),
+                                      icon: const Icon(
+                                        Icons.check_circle_outline,
+                                        size: 18,
+                                      ),
+                                      label: Text(
+                                        'Complete lab',
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(
+                                              color: primaryColor,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
+                            ),
                           ),
-                        );
-                      },
+                        ],
+                      ),
+                    );
+                  }
+
+                  // Mobile Stack View
+                  return Padding(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    child: Column(
+                      children: [
+                        Expanded(
+                          flex: 6,
+                          child: TerminalConsoleWidget(
+                            lines: state.terminalLines,
+                            onCommandSubmitted: notifier.executeCommand,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        Expanded(
+                          flex: 4,
+                          child: SingleChildScrollView(
+                            child: ObjectiveChecklistWidget(
+                              objectives: state.objectives,
+                              onQuickCommandTap: notifier.executeCommand,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ),
-                ],
+                  );
+                },
               ),
             ),
           ],

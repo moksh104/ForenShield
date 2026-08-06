@@ -11,7 +11,8 @@ final List<ComponentDefinition> formComponents = [
     description: 'The highly configurable base text input component.',
     purpose: 'To collect standard text data from the user.',
     whenToUse: 'For usernames, emails, short descriptions, and general inputs.',
-    whenNotToUse: 'For passwords (use PasswordField) or very long text (use MultilineField).',
+    whenNotToUse:
+        'For passwords (use PasswordField) or very long text (use MultilineField).',
     keywords: ['input', 'text', 'form', 'field', 'textbox'],
     codeExample: '''AppTextField(
   label: 'Email Address',
@@ -19,13 +20,41 @@ final List<ComponentDefinition> formComponents = [
   prefixIcon: Icon(Icons.email),
 )''',
     properties: [
-      const ComponentProperty(name: 'label', type: PropertyType.string, defaultValue: 'Username'),
-      const ComponentProperty(name: 'hint', type: PropertyType.string, defaultValue: 'Enter your username'),
-      const ComponentProperty(name: 'helperText', type: PropertyType.string, defaultValue: 'Must be unique.'),
-      const ComponentProperty(name: 'enabled', type: PropertyType.boolean, defaultValue: true),
-      const ComponentProperty(name: 'isSuccess', type: PropertyType.boolean, defaultValue: false),
-      const ComponentProperty(name: 'isLoading', type: PropertyType.boolean, defaultValue: false),
-      const ComponentProperty(name: 'showClearButton', type: PropertyType.boolean, defaultValue: true),
+      const ComponentProperty(
+        name: 'label',
+        type: PropertyType.string,
+        defaultValue: 'Username',
+      ),
+      const ComponentProperty(
+        name: 'hint',
+        type: PropertyType.string,
+        defaultValue: 'Enter your username',
+      ),
+      const ComponentProperty(
+        name: 'helperText',
+        type: PropertyType.string,
+        defaultValue: 'Must be unique.',
+      ),
+      const ComponentProperty(
+        name: 'enabled',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
+      const ComponentProperty(
+        name: 'isSuccess',
+        type: PropertyType.boolean,
+        defaultValue: false,
+      ),
+      const ComponentProperty(
+        name: 'isLoading',
+        type: PropertyType.boolean,
+        defaultValue: false,
+      ),
+      const ComponentProperty(
+        name: 'showClearButton',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
     ],
     builder: (context, props) {
       return AppTextField(
@@ -42,18 +71,36 @@ final List<ComponentDefinition> formComponents = [
   ComponentDefinition(
     name: 'PasswordField',
     category: 'Forms',
-    description: 'A secure text input managing obscure state and strength indicators.',
+    description:
+        'A secure text input managing obscure state and strength indicators.',
     purpose: 'To securely collect and validate user passwords.',
-    whenToUse: 'During login, registration, or sensitive configuration changes.',
+    whenToUse:
+        'During login, registration, or sensitive configuration changes.',
     codeExample: '''PasswordField(
   showStrengthIndicator: true,
   strength: 0.75,
 )''',
     properties: [
-      const ComponentProperty(name: 'label', type: PropertyType.string, defaultValue: 'Password'),
-      const ComponentProperty(name: 'showStrengthIndicator', type: PropertyType.boolean, defaultValue: true),
-      const ComponentProperty(name: 'strength', type: PropertyType.number, defaultValue: 0.4),
-      const ComponentProperty(name: 'enabled', type: PropertyType.boolean, defaultValue: true),
+      const ComponentProperty(
+        name: 'label',
+        type: PropertyType.string,
+        defaultValue: 'Password',
+      ),
+      const ComponentProperty(
+        name: 'showStrengthIndicator',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
+      const ComponentProperty(
+        name: 'strength',
+        type: PropertyType.number,
+        defaultValue: 0.4,
+      ),
+      const ComponentProperty(
+        name: 'enabled',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
     ],
     builder: (context, props) {
       return PasswordField(
@@ -68,7 +115,8 @@ final List<ComponentDefinition> formComponents = [
   ComponentDefinition(
     name: 'SearchField',
     category: 'Forms',
-    description: 'A specialized text field optimized for debounced search operations.',
+    description:
+        'A specialized text field optimized for debounced search operations.',
     purpose: 'To allow rapid querying of lists and data tables.',
     whenToUse: 'In app bars or at the top of long lists.',
     codeExample: '''SearchField(
@@ -77,9 +125,21 @@ final List<ComponentDefinition> formComponents = [
   onChanged: (q) => debounceSearch(q),
 )''',
     properties: [
-      const ComponentProperty(name: 'hint', type: PropertyType.string, defaultValue: 'Search cases...'),
-      const ComponentProperty(name: 'isLoading', type: PropertyType.boolean, defaultValue: false),
-      const ComponentProperty(name: 'enabled', type: PropertyType.boolean, defaultValue: true),
+      const ComponentProperty(
+        name: 'hint',
+        type: PropertyType.string,
+        defaultValue: 'Search cases...',
+      ),
+      const ComponentProperty(
+        name: 'isLoading',
+        type: PropertyType.boolean,
+        defaultValue: false,
+      ),
+      const ComponentProperty(
+        name: 'enabled',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
     ],
     builder: (context, props) {
       return SearchField(
@@ -94,7 +154,8 @@ final List<ComponentDefinition> formComponents = [
     category: 'Forms',
     description: 'Auto-growing text field for long-form content.',
     purpose: 'To collect extensive textual data like case notes or reports.',
-    whenToUse: 'When the expected input spans multiple sentences or paragraphs.',
+    whenToUse:
+        'When the expected input spans multiple sentences or paragraphs.',
     codeExample: '''MultilineField(
   label: 'Case Notes',
   minLines: 3,
@@ -102,9 +163,21 @@ final List<ComponentDefinition> formComponents = [
   maxLength: 1000,
 )''',
     properties: [
-      const ComponentProperty(name: 'label', type: PropertyType.string, defaultValue: 'Observations'),
-      const ComponentProperty(name: 'minLines', type: PropertyType.number, defaultValue: 3.0),
-      const ComponentProperty(name: 'maxLength', type: PropertyType.number, defaultValue: 250.0),
+      const ComponentProperty(
+        name: 'label',
+        type: PropertyType.string,
+        defaultValue: 'Observations',
+      ),
+      const ComponentProperty(
+        name: 'minLines',
+        type: PropertyType.number,
+        defaultValue: 3.0,
+      ),
+      const ComponentProperty(
+        name: 'maxLength',
+        type: PropertyType.number,
+        defaultValue: 250.0,
+      ),
     ],
     builder: (context, props) {
       return MultilineField(

@@ -45,13 +45,13 @@ class OnboardingPageModel extends Equatable {
 
   @override
   List<Object?> get props => [
-        categoryLabel,
-        headline,
-        supportingLine1,
-        supportingLine2,
-        primaryCta,
-        secondaryCta,
-        showSkip,
-        accentColorValue,
-      ];
+    categoryLabel,
+    headline,
+    supportingLine1,
+    supportingLine2,
+    primaryCta,
+    secondaryCta,
+    showSkip,
+    accentColorValue,
+  ];
 }

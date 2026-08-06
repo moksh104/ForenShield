@@ -11,7 +11,7 @@ class MissionControlRemoteDataSource {
   Future<MissionControlModel> getDashboardData() async {
     try {
       final response = await _apiClient.get<Map<String, dynamic>>(
-        '/mission-control/dashboard',
+        '/mission_control.php',
       );
       if (response.data != null) {
         return MissionControlModel.fromJson(response.data!);

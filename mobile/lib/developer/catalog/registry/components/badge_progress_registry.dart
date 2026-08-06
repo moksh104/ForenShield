@@ -20,9 +20,22 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
   size: 48,
 )''',
     properties: [
-      const ComponentProperty(name: 'rank', type: PropertyType.selection, defaultValue: RankTier.bronze, options: RankTier.values),
-      const ComponentProperty(name: 'size', type: PropertyType.number, defaultValue: 48.0),
-      const ComponentProperty(name: 'showLabel', type: PropertyType.boolean, defaultValue: true),
+      const ComponentProperty(
+        name: 'rank',
+        type: PropertyType.selection,
+        defaultValue: RankTier.bronze,
+        options: RankTier.values,
+      ),
+      const ComponentProperty(
+        name: 'size',
+        type: PropertyType.number,
+        defaultValue: 48.0,
+      ),
+      const ComponentProperty(
+        name: 'showLabel',
+        type: PropertyType.boolean,
+        defaultValue: true,
+      ),
     ],
     builder: (context, props) {
       return RankBadge(
@@ -43,8 +56,16 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
   progress: 0.45,
 )''',
     properties: [
-      const ComponentProperty(name: 'title', type: PropertyType.string, defaultValue: 'Module Completion'),
-      const ComponentProperty(name: 'progress', type: PropertyType.number, defaultValue: 0.65),
+      const ComponentProperty(
+        name: 'title',
+        type: PropertyType.string,
+        defaultValue: 'Module Completion',
+      ),
+      const ComponentProperty(
+        name: 'progress',
+        type: PropertyType.number,
+        defaultValue: 0.65,
+      ),
     ],
     builder: (context, props) {
       final double progress = (props['progress'] as num?)?.toDouble() ?? 0.65;
@@ -68,8 +89,16 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
   centerWidget: Text('95%'),
 )''',
     properties: [
-      const ComponentProperty(name: 'title', type: PropertyType.string, defaultValue: 'Case Accuracy'),
-      const ComponentProperty(name: 'progress', type: PropertyType.number, defaultValue: 0.88),
+      const ComponentProperty(
+        name: 'title',
+        type: PropertyType.string,
+        defaultValue: 'Case Accuracy',
+      ),
+      const ComponentProperty(
+        name: 'progress',
+        type: PropertyType.number,
+        defaultValue: 0.88,
+      ),
     ],
     builder: (context, props) {
       final p = (props['progress'] as num?)?.toDouble() ?? 0.88;
@@ -91,8 +120,16 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
   completedSteps: 2,
 )''',
     properties: [
-      const ComponentProperty(name: 'totalSteps', type: PropertyType.number, defaultValue: 5.0),
-      const ComponentProperty(name: 'completedSteps', type: PropertyType.number, defaultValue: 2.0),
+      const ComponentProperty(
+        name: 'totalSteps',
+        type: PropertyType.number,
+        defaultValue: 5.0,
+      ),
+      const ComponentProperty(
+        name: 'completedSteps',
+        type: PropertyType.number,
+        defaultValue: 2.0,
+      ),
     ],
     builder: (context, props) {
       return LessonProgressBar(
@@ -113,7 +150,11 @@ final List<ComponentDefinition> badgeAndProgressComponents = [
   currentLevel: 4,
 )''',
     properties: [
-      const ComponentProperty(name: 'currentXP', type: PropertyType.number, defaultValue: 1500.0),
+      const ComponentProperty(
+        name: 'currentXP',
+        type: PropertyType.number,
+        defaultValue: 1500.0,
+      ),
     ],
     builder: (context, props) {
       return XPProgressBar(

@@ -33,7 +33,9 @@ class AppChip extends StatelessWidget {
           ? Icon(
               icon,
               size: 16,
-              color: isSelected ? theme.scaffoldBackgroundColor : effectiveColor,
+              color: isSelected
+                  ? theme.scaffoldBackgroundColor
+                  : effectiveColor,
             )
           : null,
       onPressed: onTap,
@@ -42,9 +44,14 @@ class AppChip extends StatelessWidget {
       labelStyle: theme.textTheme.labelMedium?.copyWith(
         color: isSelected ? theme.scaffoldBackgroundColor : effectiveColor,
       ),
-      deleteIconColor: isSelected ? theme.scaffoldBackgroundColor : effectiveColor,
+      deleteIconColor: isSelected
+          ? theme.scaffoldBackgroundColor
+          : effectiveColor,
       onDeleted: onDeleted,
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs, vertical: AppSpacing.xxs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+        vertical: AppSpacing.xxs,
+      ),
       shape: RoundedRectangleBorder(borderRadius: AppRadius.borderMd),
     );
   }

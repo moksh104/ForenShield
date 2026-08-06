@@ -1,15 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/effects/particle_background.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../providers/profile_provider.dart';
 
 /// Achievements & Badge Vault Screen.
@@ -37,11 +34,9 @@ class AchievementsScreen extends ConsumerWidget {
         ),
         title: Text(
           'Achievements & Badge Vault',
-          style: TextStyle(
+          style: theme.textTheme.titleLarge?.copyWith(
             color: theme.colorScheme.onSurface,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'Geist',
+            fontWeight: FontWeight.w800,
           ),
         ),
       ),
@@ -51,10 +46,11 @@ class AchievementsScreen extends ConsumerWidget {
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: profile == null
-                  ? Center(child: CircularProgressIndicator(color: primaryColor))
+                  ? Center(
+                      child: CircularProgressIndicator(color: primaryColor),
+                    )
                   : SingleChildScrollView(
                       padding: const EdgeInsets.all(AppSpacing.lg),
                       child: Column(
@@ -62,67 +58,57 @@ class AchievementsScreen extends ConsumerWidget {
                         children: [
                           // 1. Summary Header Card
                           GlassEffect(
-                            blurX: 14.0,
-                            blurY: 14.0,
-                            opacity: 0.12,
                             border: Border.all(
-                              color: AppColors.logoGold.withValues(alpha: 0.4),
+                              color: primaryColor.withValues(alpha: 0.4),
                               width: 1.0,
                             ),
                             borderRadius: AppRadius.borderRadiusLg,
                             child: Padding(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceAround,
                                 children: [
                                   _AchieveStat(
-                                    label: 'BADGES EARNED',
-                                    value: '${profile.badges.where((b) => b.isUnlocked).length}',
-                                    color: AppColors.logoGold,
+                                    label: 'Badges earned',
+                                    value:
+                                        '${profile.badges.where((b) => b.isUnlocked).length}',
+                                    color: primaryColor,
                                   ),
                                   _AchieveStat(
-                                    label: 'TOTAL XP',
+                                    label: 'Total XP',
                                     value: '${profile.xpPoints}',
                                     color: primaryColor,
                                   ),
                                   _AchieveStat(
-                                    label: 'LEVEL',
+                                    label: 'Level',
                                     value: 'Lvl ${profile.level}',
                                     color: foren.success.t500,
                                   ),
                                 ],
                               ),
                             ),
-                          )
-                              .animate()
-                              .fadeIn(duration: 400.ms)
-                              .slideY(begin: -0.1, end: 0),
+                          ),
 
                           const SizedBox(height: AppSpacing.lg),
 
                           // 2. Earned Badges Section Title
                           Text(
-                            'SPECIALIST BADGES & VAULT',
-                            style: TextStyle(
+                            'Specialist badges',
+                            style: theme.textTheme.labelMedium?.copyWith(
                               color: foren.textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'monospace',
-                              letterSpacing: 1.0,
+                              fontWeight: FontWeight.w700,
                             ),
-                          )
-                              .animate(delay: 100.ms)
-                              .fadeIn(duration: 400.ms),
+                          ),
 
                           const SizedBox(height: AppSpacing.xs),
 
                           if (profile.badges.isEmpty)
                             GlassEffect(
-                              blurX: 12.0,
-                              blurY: 12.0,
-                              opacity: 0.10,
                               border: Border.all(
-                                color: foren.borderSubtle.withValues(alpha: 0.4),
+                                color: foren.borderSubtle.withValues(
+                                  alpha: 0.4,
+                                ),
                                 width: 1.0,
                               ),
                               borderRadius: AppRadius.borderRadiusMd,
@@ -130,137 +116,140 @@ class AchievementsScreen extends ConsumerWidget {
                                 padding: const EdgeInsets.all(AppSpacing.lg),
                                 child: Column(
                                   children: [
-                                    Icon(Icons.emoji_events_outlined, size: 44, color: foren.textSecondary),
+                                    Icon(
+                                      Icons.emoji_events_outlined,
+                                      size: 44,
+                                      color: foren.textSecondary,
+                                    ),
                                     const SizedBox(height: AppSpacing.sm),
                                     Text(
-                                      'No Achievements Unlocked Yet',
-                                      style: TextStyle(
-                                        color: theme.colorScheme.onSurface,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w700,
-                                      ),
+                                      'No achievements unlocked yet',
+                                      style: theme.textTheme.titleSmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onSurface,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       'Complete courses, quizzes, and forensic investigation cases to earn specialist badges.',
                                       textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: foren.textSecondary,
-                                        fontSize: 11,
-                                      ),
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: foren.textSecondary,
+                                          ),
                                     ),
                                   ],
                                 ),
                               ),
                             )
                           else
-                            ...profile.badges.asMap().entries.map(
-                              (entry) {
-                                final index = entry.key;
-                                final b = entry.value;
+                            ...profile.badges.asMap().entries.map((entry) {
+                              final b = entry.value;
 
-                                return Padding(
-                                  padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                                  child: _BadgeTile(badge: b)
-                                      .animate(delay: Duration(milliseconds: 150 + (index * 80)))
-                                      .fadeIn(duration: 400.ms)
-                                      .slideX(begin: -0.05, end: 0),
-                                );
-                              },
-                            ),
+                              return Padding(
+                                padding: const EdgeInsets.only(
+                                  bottom: AppSpacing.xs,
+                                ),
+                                child: _BadgeTile(badge: b),
+                              );
+                            }),
 
                           const SizedBox(height: AppSpacing.lg),
 
                           // 3. XP Activity History Log Title
                           Text(
-                            'RECENT XP LOG & TELEMETRY',
-                            style: TextStyle(
+                            'Recent XP log',
+                            style: theme.textTheme.labelMedium?.copyWith(
                               color: foren.textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'monospace',
-                              letterSpacing: 1.0,
+                              fontWeight: FontWeight.w700,
                             ),
-                          )
-                              .animate(delay: 350.ms)
-                              .fadeIn(duration: 400.ms),
+                          ),
 
                           const SizedBox(height: AppSpacing.xs),
 
-                          ...profile.xpHistory.asMap().entries.map(
-                            (entry) {
-                              final index = entry.key;
-                              final xp = entry.value;
+                          ...profile.xpHistory.asMap().entries.map((entry) {
+                            final xp = entry.value;
 
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                                child: GlassEffect(
-                                  blurX: 10.0,
-                                  blurY: 10.0,
-                                  opacity: 0.10,
-                                  border: Border.all(
-                                    color: foren.borderSubtle.withValues(alpha: 0.4),
-                                    width: 1.0,
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.xs,
+                              ),
+                              child: GlassEffect(
+                                border: Border.all(
+                                  color: foren.borderSubtle.withValues(
+                                    alpha: 0.4,
                                   ),
-                                  borderRadius: AppRadius.borderRadiusMd,
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(AppSpacing.sm),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.bolt, color: primaryColor, size: 18),
-                                        const SizedBox(width: AppSpacing.sm),
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Text(
-                                                xp.title,
-                                                style: TextStyle(
-                                                  color: theme.colorScheme.onSurface,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.w600,
-                                                ),
-                                              ),
-                                              Text(
-                                                '${xp.source} · ${xp.timestamp}',
-                                                style: TextStyle(
-                                                  color: foren.textSecondary,
-                                                  fontSize: 10,
-                                                  fontFamily: 'monospace',
-                                                ),
-                                              ),
-                                            ],
-                                          ),
+                                  width: 1.0,
+                                ),
+                                borderRadius: AppRadius.borderRadiusMd,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.sm),
+                                  child: Row(
+                                    children: [
+                                      Icon(
+                                        Icons.bolt,
+                                        color: primaryColor,
+                                        size: 18,
+                                      ),
+                                      const SizedBox(width: AppSpacing.sm),
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              xp.title,
+                                              style: theme.textTheme.bodyMedium
+                                                  ?.copyWith(
+                                                    color: theme
+                                                        .colorScheme
+                                                        .onSurface,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                            ),
+                                            Text(
+                                              '${xp.source} · ${xp.timestamp}',
+                                              style: theme.textTheme.labelSmall
+                                                  ?.copyWith(
+                                                    color: foren.textSecondary,
+                                                  ),
+                                            ),
+                                          ],
                                         ),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                                          decoration: BoxDecoration(
-                                            color: primaryColor.withValues(alpha: 0.15),
-                                            borderRadius: AppRadius.borderRadiusSm,
-                                            border: Border.all(
-                                              color: primaryColor.withValues(alpha: 0.4),
+                                      ),
+                                      Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 8,
+                                          vertical: 3,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: primaryColor.withValues(
+                                            alpha: 0.15,
+                                          ),
+                                          borderRadius:
+                                              AppRadius.borderRadiusSm,
+                                          border: Border.all(
+                                            color: primaryColor.withValues(
+                                              alpha: 0.4,
                                             ),
                                           ),
-                                          child: Text(
-                                            '+${xp.xpAmount} XP',
-                                            style: TextStyle(
-                                              color: primaryColor,
-                                              fontSize: 11,
-                                              fontWeight: FontWeight.w800,
-                                              fontFamily: 'monospace',
-                                            ),
-                                          ),
                                         ),
-                                      ],
-                                    ),
+                                        child: Text(
+                                          '+${xp.xpAmount} XP',
+                                          style: theme.textTheme.labelMedium
+                                              ?.copyWith(
+                                                color: primaryColor,
+                                                fontWeight: FontWeight.w700,
+                                              ),
+                                        ),
+                                      ),
+                                    ],
                                   ),
-                                )
-                                    .animate(delay: Duration(milliseconds: 400 + (index * 80)))
-                                    .fadeIn(duration: 400.ms)
-                                    .slideX(begin: -0.05, end: 0),
-                              );
-                            },
-                          ),
+                                ),
+                              ),
+                            );
+                          }),
                         ],
                       ),
                     ),
@@ -292,22 +281,17 @@ class _AchieveStat extends StatelessWidget {
       children: [
         Text(
           value,
-          style: TextStyle(
+          style: theme.textTheme.titleMedium?.copyWith(
             color: color,
-            fontSize: 18,
             fontWeight: FontWeight.w800,
-            fontFamily: 'Geist',
           ),
         ),
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
+          style: theme.textTheme.labelSmall?.copyWith(
             color: foren.textSecondary,
-            fontSize: 9,
             fontWeight: FontWeight.w700,
-            fontFamily: 'monospace',
-            letterSpacing: 0.5,
           ),
         ),
       ],
@@ -335,54 +319,47 @@ class _BadgeTileState extends State<_BadgeTile> {
     final b = widget.badge;
 
     final Widget badgeTileBody = GlassEffect(
-      blurX: 10.0,
-      blurY: 10.0,
-      opacity: 0.10,
       border: Border.all(
         color: _isHovered
-            ? AppColors.logoGold
-            : (b.isUnlocked ? AppColors.logoGold.withValues(alpha: 0.4) : foren.borderSubtle.withValues(alpha: 0.3)),
+            ? primaryColor
+            : (b.isUnlocked
+                  ? primaryColor.withValues(alpha: 0.4)
+                  : foren.borderSubtle.withValues(alpha: 0.3)),
         width: 1.0,
       ),
       borderRadius: AppRadius.borderRadiusMd,
       child: ListTile(
-        leading: GlowEffect(
-          glowColor: b.isUnlocked ? AppColors.logoGold : Colors.transparent,
-          blurRadius: 10,
-          animate: b.isUnlocked,
-          borderRadius: BorderRadius.circular(20),
-          child: Container(
-            padding: const EdgeInsets.all(8),
-            decoration: BoxDecoration(
-              color: b.isUnlocked
-                  ? AppColors.logoGold.withValues(alpha: 0.20)
-                  : foren.surfaceRaised1,
-              shape: BoxShape.circle,
-              border: Border.all(
-                color: b.isUnlocked ? AppColors.logoGold : foren.borderSubtle,
-                width: 1,
-              ),
+        leading: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: b.isUnlocked
+                ? primaryColor.withValues(alpha: 0.20)
+                : foren.surfaceRaised1,
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: b.isUnlocked ? primaryColor : foren.borderSubtle,
+              width: 1,
             ),
-            child: Icon(
-              b.isUnlocked ? Icons.military_tech : Icons.lock_outline,
-              color: b.isUnlocked ? AppColors.logoGold : foren.textSecondary,
-              size: 20,
-            ),
+          ),
+          child: Icon(
+            b.isUnlocked ? Icons.military_tech : Icons.lock_outline,
+            color: b.isUnlocked ? primaryColor : foren.textSecondary,
+            size: 20,
           ),
         ),
         title: Text(
           b.title,
-          style: TextStyle(
-            color: b.isUnlocked ? theme.colorScheme.onSurface : foren.textSecondary,
-            fontSize: 13,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: b.isUnlocked
+                ? theme.colorScheme.onSurface
+                : foren.textSecondary,
             fontWeight: FontWeight.w700,
           ),
         ),
         subtitle: Text(
           b.description,
-          style: TextStyle(
+          style: theme.textTheme.bodySmall?.copyWith(
             color: foren.textSecondary,
-            fontSize: 11,
           ),
         ),
         trailing: Container(
@@ -390,17 +367,13 @@ class _BadgeTileState extends State<_BadgeTile> {
           decoration: BoxDecoration(
             color: primaryColor.withValues(alpha: 0.15),
             borderRadius: AppRadius.borderRadiusSm,
-            border: Border.all(
-              color: primaryColor.withValues(alpha: 0.3),
-            ),
+            border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
           ),
           child: Text(
             '+${b.xpReward} XP',
-            style: TextStyle(
+            style: theme.textTheme.labelMedium?.copyWith(
               color: primaryColor,
-              fontSize: 11,
               fontWeight: FontWeight.w700,
-              fontFamily: 'monospace',
             ),
           ),
         ),

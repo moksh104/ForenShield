@@ -1,8 +1,9 @@
-/// ForenShield Design System v1.0 — Foundation Tokens
+/// ForenShield Design System v2.0 — Enterprise Tokens
 ///
-/// Single source of truth for every raw value used in the theme.
-/// Do not hardcode a color, spacing, radius, or duration anywhere
-/// outside this file — reference the token instead.
+/// Single source of truth for raw values used across the application.
+/// Grounded in Mobbin specs (Linear, Notion, GitHub, Stripe):
+/// Single primary accent color (Cobalt #2563EB), generous spacing (24-32px margins),
+/// readable typography, soft continuous rounded corners (12-16px).
 library;
 
 import 'package:flutter/material.dart';
@@ -13,34 +14,34 @@ import 'package:flutter/material.dart';
 
 class ForenNeutralDark {
   ForenNeutralDark._();
-  static const bgBase = Color(0xFF0A0E14);
-  static const bgSurface = Color(0xFF0F1620);
-  static const bgSurfaceRaised1 = Color(0xFF141C28);
-  static const bgSurfaceRaised2 = Color(0xFF1B2531);
-  static const bgSurfaceRaised3 = Color(0xFF24303D);
-  static const borderSubtle = Color(0xFF232E3B);
-  static const borderDefault = Color(0xFF374557);
-  static const textPrimary = Color(0xFFE8EDF2);
-  static const textSecondary = Color(0xFFA9B4C0);
-  static const textDisabled = Color(0xFF5C6773);
+  static const bgBase = Color(0xFF0B1220); // Dark navy base
+  static const bgSurface = Color(0xFF0F172A); // Elevated slate surface
+  static const bgSurfaceRaised1 = Color(0xFF1E293B);
+  static const bgSurfaceRaised2 = Color(0xFF334155);
+  static const bgSurfaceRaised3 = Color(0xFF475569);
+  static const borderSubtle = Color(0xFF1E293B);
+  static const borderDefault = Color(0xFF334155);
+  static const textPrimary = Color(0xFFF8FAFC);
+  static const textSecondary = Color(0xFF94A3B8);
+  static const textDisabled = Color(0xFF64748B);
 }
 
 class ForenNeutralLight {
   ForenNeutralLight._();
-  static const bgBase = Color(0xFFF5F7FA);
-  static const bgSurface = Color(0xFFFFFFFF);
-  static const bgSurfaceRaised1 = Color(0xFFF0F3F7);
-  static const bgSurfaceRaised2 = Color(0xFFE7ECF1);
+  static const bgBase = Color(0xFFF8FAFC); // Clean off-white page background
+  static const bgSurface = Color(0xFFFFFFFF); // Pure white surface cards
+  static const bgSurfaceRaised1 = Color(0xFFF1F5F9);
+  static const bgSurfaceRaised2 = Color(0xFFE2E8F0);
   static const bgSurfaceRaised3 = Color(0xFFFFFFFF);
-  static const borderSubtle = Color(0xFFE1E6EC);
-  static const borderDefault = Color(0xFFC7D0DA);
-  static const textPrimary = Color(0xFF111820);
-  static const textSecondary = Color(0xFF48545F);
-  static const textDisabled = Color(0xFF9AA4AE);
+  static const borderSubtle = Color(0xFFF1F5F9);
+  static const borderDefault = Color(0xFFE2E8F0);
+  static const textPrimary = Color(0xFF0F172A);
+  static const textSecondary = Color(0xFF64748B);
+  static const textDisabled = Color(0xFF94A3B8);
 }
 
 // ============================================================
-// 2. COLOR — Feature Accent Ramps (300 / 500 / 700)
+// 2. COLOR — Feature Accent Ramps (Single Primary Cobalt Accent)
 // ============================================================
 
 @immutable
@@ -58,38 +59,38 @@ class ForenAccentRamp {
 class ForenFeatureColors {
   ForenFeatureColors._();
 
-  /// Mission Control — Cyan — Control Center
+  /// Mission Control — Cobalt Blue (#2563EB)
   static const missionControl = ForenAccentRamp(
-    t300: Color(0xFF67E8F9),
-    t500: Color(0xFF06B6D4),
-    t700: Color(0xFF0E7490),
+    t300: Color(0xFF93C5FD),
+    t500: Color(0xFF2563EB),
+    t700: Color(0xFF1D4ED8),
   );
 
-  /// Academy — Amber — Learning
+  /// Academy — Cobalt Blue (#2563EB)
   static const academy = ForenAccentRamp(
-    t300: Color(0xFFFCD34D),
-    t500: Color(0xFFF59E0B),
-    t700: Color(0xFFB45309),
+    t300: Color(0xFF93C5FD),
+    t500: Color(0xFF2563EB),
+    t700: Color(0xFF1D4ED8),
   );
 
-  /// Investigation — Purple — Evidence
+  /// Investigation — Cobalt Blue (#2563EB)
   static const investigation = ForenAccentRamp(
-    t300: Color(0xFFC4B5FD),
-    t500: Color(0xFF8B5CF6),
-    t700: Color(0xFF6D28D9),
+    t300: Color(0xFF93C5FD),
+    t500: Color(0xFF2563EB),
+    t700: Color(0xFF1D4ED8),
   );
 
-  /// Simulation — Green — Practice
+  /// Simulation — Cobalt Blue (#2563EB)
   static const simulation = ForenAccentRamp(
-    t300: Color(0xFF86EFAC),
-    t500: Color(0xFF22C55E),
-    t700: Color(0xFF15803D),
+    t300: Color(0xFF93C5FD),
+    t500: Color(0xFF2563EB),
+    t700: Color(0xFF1D4ED8),
   );
 
-  /// Profile — Blue — Personal Growth
+  /// Profile — Cobalt Blue (#2563EB)
   static const profile = ForenAccentRamp(
     t300: Color(0xFF93C5FD),
-    t500: Color(0xFF3B82F6),
+    t500: Color(0xFF2563EB),
     t700: Color(0xFF1D4ED8),
   );
 }
@@ -97,23 +98,20 @@ class ForenFeatureColors {
 // ============================================================
 // 3. COLOR — Semantic / Status
 // ============================================================
-// Deliberately distinct hues from the feature accents above.
-// RULE: semantic colors are for small contexts only (badges,
-// borders, alert bars, list icons) — never full-surface fills.
 
 class ForenSemanticColors {
   ForenSemanticColors._();
 
   static const success = ForenAccentRamp(
-    t300: Color(0xFF4ADE80),
-    t500: Color(0xFF16A34A),
-    t700: Color(0xFF166534),
+    t300: Color(0xFF6EE7B7),
+    t500: Color(0xFF10B981),
+    t700: Color(0xFF047857),
   );
 
   static const warning = ForenAccentRamp(
-    t300: Color(0xFFFDBA74),
-    t500: Color(0xFFF97316),
-    t700: Color(0xFFC2410C),
+    t300: Color(0xFDFCD34D),
+    t500: Color(0xFFF59E0B),
+    t700: Color(0xFFB45309),
   );
 
   static const critical = ForenAccentRamp(
@@ -123,16 +121,19 @@ class ForenSemanticColors {
   );
 
   static const info = ForenAccentRamp(
-    t300: Color(0xFF7DD3FC),
-    t500: Color(0xFF0EA5E9),
-    t700: Color(0xFF0369A1),
+    t300: Color(0xFF93C5FD),
+    t500: Color(0xFF3B82F6),
+    t700: Color(0xFF1D4ED8),
   );
 }
 
-/// Which accent belongs to which pillar. Use this instead of
-/// referencing ForenFeatureColors directly in screen code, so a
-/// future rename/re-theme only happens in one place.
-enum ForenFeature { missionControl, academy, investigation, simulation, profile }
+enum ForenFeature {
+  missionControl,
+  academy,
+  investigation,
+  simulation,
+  profile,
+}
 
 extension ForenFeatureColorLookup on ForenFeature {
   ForenAccentRamp get ramp {
@@ -152,31 +153,35 @@ extension ForenFeatureColorLookup on ForenFeature {
 }
 
 // ============================================================
-// 4. SPACING — 8pt grid (4 as half-step). Only these exist.
+// ============================================================
+// 4. SPACING — Phase 2 UI Specs (xs=4, sm=8, md=12, lg=16, xl=24, xxl=32)
 // ============================================================
 
 class ForenSpace {
   ForenSpace._();
   static const double xs = 4;
   static const double sm = 8;
-  static const double md = 16;
-  static const double lg = 24;
-  static const double xl = 32;
-  static const double xxl = 48;
-  static const double xxxl = 64;
+  static const double md = 12;
+  static const double lg = 16;
+  static const double xl = 24;
+  static const double xxl = 32;
+  static const double xxxl = 48;
 }
 
 // ============================================================
-// 5. RADIUS
+// 5. RADIUS — Card radius scale (12, 16, 20)
 // ============================================================
 
 class ForenRadius {
   ForenRadius._();
-  static const double button = 16;
-  static const double input = 16; // matches button, no separate value
-  static const double card = 20;
-  static const double dialog = 24;
-  static const double image = 18;
+  static const double button = 12;
+  static const double input = 12;
+  static const double cardSmall = 12;
+  static const double cardMedium = 16;
+  static const double cardLarge = 20;
+  static const double card = 16;
+  static const double dialog = 20;
+  static const double image = 14;
   static const double pill = 999;
 
   static BorderRadius get buttonBr => BorderRadius.circular(button);
@@ -184,44 +189,35 @@ class ForenRadius {
   static BorderRadius get dialogBr => BorderRadius.circular(dialog);
   static BorderRadius get imageBr => BorderRadius.circular(image);
   static BorderRadius get pillBr => BorderRadius.circular(pill);
+
+  static ShapeBorder get buttonShape =>
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(button));
+  static ShapeBorder get cardShape =>
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(card));
+  static ShapeBorder get dialogShape =>
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(dialog));
+  static ShapeBorder get pillShape =>
+      RoundedRectangleBorder(borderRadius: BorderRadius.circular(pill));
 }
 
 // ============================================================
-// 6. ELEVATION — dp levels. Dark = surface tint, Light = shadow.
+// 6. ELEVATION — Phase 2 Drop Shadows (offsetY=4, blurRadius=12, opacity=0.08)
 // ============================================================
 
 class ForenElevation {
   ForenElevation._();
-  static const double level0 = 0; // base page
-  static const double level1 = 2; // cards (default)
-  static const double level2 = 4; // dropdowns, popovers, hovered card
-  static const double level3 = 8; // dialogs, modals, sheets
+  static const double level0 = 0;
+  static const double level1 = 1;
+  static const double level2 = 2;
+  static const double level3 = 4;
 
   static List<BoxShadow> lightShadow(double level) {
     if (level <= level0) return const [];
-    if (level <= level1) {
-      return [
-        BoxShadow(
-          color: const Color(0xFF101820).withValues(alpha: 0.08),
-          blurRadius: 3,
-          offset: const Offset(0, 1),
-        ),
-      ];
-    }
-    if (level <= level2) {
-      return [
-        BoxShadow(
-          color: const Color(0xFF101820).withValues(alpha: 0.10),
-          blurRadius: 8,
-          offset: const Offset(0, 4),
-        ),
-      ];
-    }
     return [
-      BoxShadow(
-        color: const Color(0xFF101820).withValues(alpha: 0.14),
-        blurRadius: 24,
-        offset: const Offset(0, 8),
+      const BoxShadow(
+        color: Color(0x140F172A),
+        blurRadius: 12,
+        offset: Offset(0, 4),
       ),
     ];
   }
@@ -251,19 +247,20 @@ class ForenIconSize {
 }
 
 // ============================================================
-// 9. MOTION
+// 9. MOTION — Phase 2 scale (150ms, 200ms, 250ms, 300ms)
 // ============================================================
 
 class ForenMotionDuration {
   ForenMotionDuration._();
-  static const Duration micro = Duration(milliseconds: 120);
-  static const Duration standard = Duration(milliseconds: 250);
-  static const Duration emphasis = Duration(milliseconds: 600);
+  static const Duration micro = Duration(milliseconds: 150);
+  static const Duration standard = Duration(milliseconds: 200);
+  static const Duration medium = Duration(milliseconds: 250);
+  static const Duration emphasis = Duration(milliseconds: 300);
 }
 
 class ForenMotionCurve {
   ForenMotionCurve._();
-  static const Curve micro = Curves.easeOut;
+  static const Curve micro = Curves.easeOutCubic;
   static const Curve standard = Curves.easeInOutCubic;
-  static const Curve emphasis = Curves.easeOutBack; // spring-like emphasis
+  static const Curve emphasis = Curves.easeOutBack;
 }

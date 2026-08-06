@@ -15,7 +15,7 @@ class SecurityHeatMapWidget extends StatelessWidget {
     final foren = theme.extension<ForenColors>()!;
     final primaryColor = theme.colorScheme.primary;
 
-    const days = ['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'];
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
     final densityMatrix = [
       [1, 2, 4, 3, 2, 1, 0], // Morning
       [3, 4, 5, 4, 3, 2, 1], // Midday
@@ -24,9 +24,6 @@ class SecurityHeatMapWidget extends StatelessWidget {
     ];
 
     return GlassEffect(
-      blurX: 14.0,
-      blurY: 14.0,
-      opacity: 0.12,
       border: Border.all(
         color: primaryColor.withValues(alpha: 0.35),
         width: 1.0,
@@ -42,27 +39,26 @@ class SecurityHeatMapWidget extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.grid_on_outlined, color: AppColors.primary, size: 18),
+                    const Icon(
+                      Icons.grid_on_outlined,
+                      color: AppColors.primary,
+                      size: 18,
+                    ),
                     const SizedBox(width: 8),
                     Text(
-                      'INCIDENT DENSITY HEATMAP',
-                      style: TextStyle(
+                      'Incident density',
+                      style: theme.textTheme.titleSmall?.copyWith(
                         color: theme.colorScheme.onSurface,
-                        fontSize: 12,
                         fontWeight: FontWeight.w800,
-                        fontFamily: 'monospace',
-                        letterSpacing: 0.8,
                       ),
                     ),
                   ],
                 ),
                 Text(
-                  'PAST 7 DAYS',
-                  style: TextStyle(
+                  'Past 7 days',
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: foren.textSecondary,
-                    fontSize: 9,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'monospace',
+                    fontWeight: FontWeight.w600,
                   ),
                 ),
               ],
@@ -78,11 +74,9 @@ class SecurityHeatMapWidget extends StatelessWidget {
                     child: Center(
                       child: Text(
                         d,
-                        style: TextStyle(
+                        style: theme.textTheme.labelSmall?.copyWith(
                           color: foren.textSecondary,
-                          fontSize: 9,
-                          fontWeight: FontWeight.w700,
-                          fontFamily: 'monospace',
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
                     ),
@@ -103,17 +97,19 @@ class SecurityHeatMapWidget extends StatelessWidget {
                       width: 44,
                       child: Text(
                         rowName,
-                        style: TextStyle(
+                        style: theme.textTheme.labelSmall?.copyWith(
                           color: foren.textSecondary,
-                          fontSize: 9,
-                          fontFamily: 'monospace',
                         ),
                       ),
                     ),
                     const SizedBox(width: 4),
                     ...List.generate(7, (colIdx) {
                       final level = densityMatrix[rowIdx][colIdx];
-                      final cellColor = _getHeatColor(primaryColor, foren, level);
+                      final cellColor = _getHeatColor(
+                        primaryColor,
+                        foren,
+                        level,
+                      );
 
                       return Expanded(
                         child: Container(

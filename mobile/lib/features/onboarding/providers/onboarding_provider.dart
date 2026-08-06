@@ -10,19 +10,16 @@ class OnboardingState {
   final int currentPage;
   final int totalPages;
 
-  const OnboardingState({
-    required this.currentPage,
-    required this.totalPages,
-  });
+  const OnboardingState({required this.currentPage, required this.totalPages});
 
   bool get isFirstPage => currentPage == 0;
   bool get isLastPage => currentPage == totalPages - 1;
   bool get showSkip => !isLastPage;
 
   OnboardingState copyWith({int? currentPage}) => OnboardingState(
-        currentPage: currentPage ?? this.currentPage,
-        totalPages: totalPages,
-      );
+    currentPage: currentPage ?? this.currentPage,
+    totalPages: totalPages,
+  );
 }
 
 // ── Notifier ──────────────────────────────────────────────────────────────────
@@ -33,10 +30,8 @@ class OnboardingState {
 /// concerns — no persistence, no routing, no auth logic.
 class OnboardingNotifier extends Notifier<OnboardingState> {
   @override
-  OnboardingState build() => const OnboardingState(
-        currentPage: 0,
-        totalPages: kOnboardingPageCount,
-      );
+  OnboardingState build() =>
+      const OnboardingState(currentPage: 0, totalPages: kOnboardingPageCount);
 
   /// Advances to the next page. No-op if already on the last page.
   void nextPage() {
@@ -67,5 +62,5 @@ class OnboardingNotifier extends Notifier<OnboardingState> {
 
 final onboardingProvider =
     NotifierProvider<OnboardingNotifier, OnboardingState>(
-  OnboardingNotifier.new,
-);
+      OnboardingNotifier.new,
+    );

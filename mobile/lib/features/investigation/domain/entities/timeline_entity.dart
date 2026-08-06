@@ -34,12 +34,12 @@ class TimelineEventEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        timestamp,
-        category,
-        severity,
-        isExpanded,
-      ];
+    id,
+    title,
+    description,
+    timestamp,
+    category,
+    severity,
+    isExpanded,
+  ];
 }

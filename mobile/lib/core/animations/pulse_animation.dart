@@ -45,7 +45,8 @@ class PulseAnimation extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final effectiveGlowColor = glowColor ??
+    final effectiveGlowColor =
+        glowColor ??
         (isDark
             ? AppColors.primary.withValues(alpha: 0.35)
             : AppColors.primaryDark.withValues(alpha: 0.25));

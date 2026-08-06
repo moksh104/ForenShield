@@ -43,12 +43,16 @@ class AppDrawer extends StatelessWidget {
           return NavigationDrawerDestination(
             icon: Icon(
               isSelected ? (item.activeIcon ?? item.icon) : item.icon,
-              color: isSelected ? theme.colorScheme.primary : foren.textSecondary,
+              color: isSelected
+                  ? theme.colorScheme.primary
+                  : foren.textSecondary,
             ),
             label: Text(
               item.label,
               style: theme.textTheme.labelLarge?.copyWith(
-                color: isSelected ? theme.colorScheme.primary : theme.colorScheme.onSurface,
+                color: isSelected
+                    ? theme.colorScheme.primary
+                    : theme.colorScheme.onSurface,
               ),
             ),
           );

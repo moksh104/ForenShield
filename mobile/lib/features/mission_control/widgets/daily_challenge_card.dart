@@ -33,9 +33,7 @@ class DailyChallengeCard extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerHigh,
           borderRadius: AppRadius.cardRadius,
-          border: Border.all(
-            color: accentColor.withValues(alpha: 0.3),
-          ),
+          border: Border.all(color: accentColor.withValues(alpha: 0.3)),
         ),
         child: InkWell(
           onTap: isCompleted ? null : onStartTap,
@@ -77,7 +75,9 @@ class DailyChallengeCard extends StatelessWidget {
                           const Spacer(),
                           Container(
                             padding: const EdgeInsets.symmetric(
-                                horizontal: 7, vertical: 2),
+                              horizontal: 7,
+                              vertical: 2,
+                            ),
                             decoration: BoxDecoration(
                               color: accentColor.withValues(alpha: 0.15),
                               borderRadius: BorderRadius.circular(5),
@@ -109,8 +109,9 @@ class DailyChallengeCard extends StatelessWidget {
                           Text(
                             challengeType,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 8),
@@ -118,22 +119,27 @@ class DailyChallengeCard extends StatelessWidget {
                             width: 3,
                             height: 3,
                             decoration: BoxDecoration(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.3),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.3,
+                              ),
                               shape: BoxShape.circle,
                             ),
                           ),
                           const SizedBox(width: 8),
-                          Icon(Icons.timer_outlined,
-                              size: 11,
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.45)),
+                          Icon(
+                            Icons.timer_outlined,
+                            size: 11,
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.45,
+                            ),
+                          ),
                           const SizedBox(width: 3),
                           Text(
                             timeLimit,
                             style: theme.textTheme.bodySmall?.copyWith(
-                              color: theme.colorScheme.onSurface
-                                  .withValues(alpha: 0.5),
+                              color: theme.colorScheme.onSurface.withValues(
+                                alpha: 0.5,
+                              ),
                             ),
                           ),
                         ],
@@ -143,14 +149,16 @@ class DailyChallengeCard extends StatelessWidget {
                 ),
                 const SizedBox(width: AppSpacing.sm),
                 if (isCompleted)
-                  Icon(Icons.check_circle_outline,
-                      color: Colors.greenAccent.shade400, size: 22)
+                  Icon(
+                    Icons.check_circle_outline,
+                    color: Colors.greenAccent.shade400,
+                    size: 22,
+                  )
                 else
                   Icon(
                     Icons.arrow_forward_ios_rounded,
                     size: 14,
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.35),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.35),
                   ),
               ],
             ),

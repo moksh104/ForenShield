@@ -1,20 +1,15 @@
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/glow_effect.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/simulation_scenario.dart';
 
-/// Cyber Simulation Operations Center Dashboard Telemetry Header.
+/// Simulation Lab dashboard header with summary metrics.
 class SimulationDashboardHeader extends StatelessWidget {
   final List<SimulationScenario> scenarios;
 
-  const SimulationDashboardHeader({
-    super.key,
-    required this.scenarios,
-  });
+  const SimulationDashboardHeader({super.key, required this.scenarios});
 
   @override
   Widget build(BuildContext context) {
@@ -24,72 +19,67 @@ class SimulationDashboardHeader extends StatelessWidget {
 
     final totalScenarios = scenarios.length;
     final totalXp = scenarios.fold<int>(0, (sum, s) => sum + s.xpReward);
-    final hardScenarios = scenarios.where((s) => s.difficulty == ScenarioDifficulty.hard || s.difficulty == ScenarioDifficulty.critical).length;
-    final avgMinutes = totalScenarios > 0 ? (scenarios.fold<int>(0, (sum, s) => sum + s.estimatedMinutes) ~/ totalScenarios) : 15;
+    final hardScenarios = scenarios
+        .where(
+          (s) =>
+              s.difficulty == ScenarioDifficulty.hard ||
+              s.difficulty == ScenarioDifficulty.critical,
+        )
+        .length;
+    final avgMinutes = totalScenarios > 0
+        ? (scenarios.fold<int>(0, (sum, s) => sum + s.estimatedMinutes) ~/
+              totalScenarios)
+        : 15;
 
     return GlassEffect(
-      blurX: 16.0,
-      blurY: 16.0,
-      opacity: 0.12,
-      border: Border.all(
-        color: primaryColor.withValues(alpha: 0.4),
-        width: 1.0,
-      ),
       borderRadius: AppRadius.borderRadiusXl,
+      border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.4)),
       child: Padding(
         padding: const EdgeInsets.all(AppSpacing.md),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Top SOC Status Indicator Badge
+            // Top status + count row
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    GlowEffect(
-                      glowColor: foren.success.t500,
-                      blurRadius: 8,
-                      animate: true,
-                      borderRadius: BorderRadius.circular(10),
-                      child: Container(
-                        width: 8,
-                        height: 8,
-                        decoration: BoxDecoration(
-                          color: foren.success.t500,
-                          shape: BoxShape.circle,
-                        ),
+                    Container(
+                      width: 8,
+                      height: 8,
+                      decoration: BoxDecoration(
+                        color: foren.success.t500,
+                        shape: BoxShape.circle,
                       ),
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'SIMULATION ENGINE · VM READY',
-                      style: TextStyle(
-                        color: AppColors.logoGold,
-                        fontSize: 9,
-                        fontWeight: FontWeight.w800,
-                        fontFamily: 'monospace',
-                        letterSpacing: 0.8,
+                    Text(
+                      'Simulation engine ready',
+                      style: theme.textTheme.labelSmall?.copyWith(
+                        color: foren.textSecondary,
+                        fontWeight: FontWeight.w600,
                       ),
                     ),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 3,
+                  ),
                   decoration: BoxDecoration(
-                    color: primaryColor.withValues(alpha: 0.15),
+                    color: primaryColor.withValues(alpha: 0.12),
                     borderRadius: AppRadius.borderRadiusSm,
                     border: Border.all(
                       color: primaryColor.withValues(alpha: 0.3),
                     ),
                   ),
                   child: Text(
-                    '$totalScenarios TRAINING LABS',
-                    style: TextStyle(
+                    '$totalScenarios training labs',
+                    style: theme.textTheme.labelSmall?.copyWith(
                       color: primaryColor,
-                      fontSize: 9,
-                      fontWeight: FontWeight.w800,
-                      fontFamily: 'monospace',
+                      fontWeight: FontWeight.w700,
                     ),
                   ),
                 ),
@@ -98,30 +88,30 @@ class SimulationDashboardHeader extends StatelessWidget {
 
             const SizedBox(height: AppSpacing.md),
 
-            // Animated Statistics Telemetry Grid Row
+            // Summary metrics grid
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
                 _HeaderMetric(
-                  label: 'TOTAL LABS',
+                  label: 'Total labs',
                   value: totalScenarios.toDouble(),
                   suffix: '',
                   color: primaryColor,
                 ),
                 _HeaderMetric(
-                  label: 'TOTAL XP',
+                  label: 'Total XP',
                   value: totalXp.toDouble(),
                   suffix: ' XP',
-                  color: AppColors.logoGold,
+                  color: foren.warning.t500,
                 ),
                 _HeaderMetric(
-                  label: 'HARD TRACKS',
+                  label: 'Hard tracks',
                   value: hardScenarios.toDouble(),
                   suffix: '',
                   color: foren.critical.t500,
                 ),
                 _HeaderMetric(
-                  label: 'AVG DURATION',
+                  label: 'Avg duration',
                   value: avgMinutes.toDouble(),
                   suffix: 'm',
                   color: foren.success.t500,
@@ -157,16 +147,14 @@ class _HeaderMetric extends StatelessWidget {
       children: [
         TweenAnimationBuilder<double>(
           tween: Tween<double>(begin: 0, end: value),
-          duration: const Duration(milliseconds: 1200),
+          duration: const Duration(milliseconds: 900),
           curve: Curves.easeOutCubic,
           builder: (context, animatedVal, child) {
             return Text(
               '${animatedVal.toInt()}$suffix',
-              style: TextStyle(
+              style: theme.textTheme.titleMedium?.copyWith(
                 color: color,
-                fontSize: 18,
                 fontWeight: FontWeight.w800,
-                fontFamily: 'Geist',
               ),
             );
           },
@@ -174,12 +162,9 @@ class _HeaderMetric extends StatelessWidget {
         const SizedBox(height: 2),
         Text(
           label,
-          style: TextStyle(
+          style: theme.textTheme.labelSmall?.copyWith(
             color: foren.textSecondary,
-            fontSize: 8,
-            fontWeight: FontWeight.w700,
-            fontFamily: 'monospace',
-            letterSpacing: 0.4,
+            fontWeight: FontWeight.w600,
           ),
         ),
       ],

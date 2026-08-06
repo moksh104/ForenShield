@@ -4,16 +4,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/effects/particle_background.dart';
-import '../../../../core/effects/scanner_effect.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
-import '../../../splash/presentation/widgets/background_grid.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../providers/investigation_provider.dart';
 import '../widgets/threat_level_badge.dart';
+import '../../../../core/services/upload_service.dart';
 
 /// Case Details Screen displaying briefing, evidence vault, timeline preview, suspects, and verdict CTA.
 class CaseDetailScreen extends ConsumerStatefulWidget {
@@ -67,25 +66,17 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              SizedBox(
-                width: 140,
-                height: 140,
-                child: ScannerEffect(
-                  color: primaryColor,
-                  child: const Center(
-                    child: Icon(Icons.folder_special_outlined, size: 48, color: AppColors.logoGold),
-                  ),
-                ),
+              const SizedBox(
+                width: 36,
+                height: 36,
+                child: CircularProgressIndicator(strokeWidth: 2.5),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
-                'ANALYZING CASE ARTIFACTS...',
-                style: TextStyle(
-                  color: primaryColor,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
-                  letterSpacing: 1.0,
+                'Loading case details…',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren.textSecondary,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -100,7 +91,10 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
         backgroundColor: AppColors.bgBase,
         appBar: AppBar(backgroundColor: AppColors.bgBase),
         body: Center(
-          child: Text('Case not found.', style: TextStyle(color: foren.textSecondary)),
+          child: Text(
+            'Case not found.',
+            style: TextStyle(color: foren.textSecondary),
+          ),
         ),
       );
     }
@@ -132,7 +126,6 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
         duration: const Duration(seconds: 18),
         child: Stack(
           children: [
-            const Positioned.fill(child: BackgroundGrid()),
             SafeArea(
               child: Column(
                 children: [
@@ -144,56 +137,60 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                         children: [
                           // Header Card & Threat Level Badge
                           GlassEffect(
-                            blurX: 14.0,
-                            blurY: 14.0,
-                            opacity: 0.12,
-                            border: Border.all(
-                              color: primaryColor.withValues(alpha: 0.35),
-                              width: 1.0,
-                            ),
-                            borderRadius: AppRadius.borderRadiusLg,
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                blurX: 14.0,
+                                blurY: 14.0,
+                                opacity: 0.12,
+                                border: Border.all(
+                                  color: primaryColor.withValues(alpha: 0.35),
+                                  width: 1.0,
+                                ),
+                                borderRadius: AppRadius.borderRadiusLg,
+                                child: Padding(
+                                  padding: const EdgeInsets.all(AppSpacing.md),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      ThreatLevelBadge(priority: caseDetail.priority),
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
+                                        children: [
+                                          ThreatLevelBadge(
+                                            priority: caseDetail.priority,
+                                          ),
+                                          Text(
+                                            'ASSIGNED: ${caseDetail.assignedDate}',
+                                            style: TextStyle(
+                                              color: foren.textSecondary,
+                                              fontSize: 10,
+                                              fontFamily: 'monospace',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      const SizedBox(height: AppSpacing.sm),
                                       Text(
-                                        'ASSIGNED: ${caseDetail.assignedDate}',
+                                        caseDetail.title,
+                                        style: TextStyle(
+                                          color: theme.colorScheme.onSurface,
+                                          fontSize: 20,
+                                          fontWeight: FontWeight.w800,
+                                          fontFamily: 'Geist',
+                                        ),
+                                      ),
+                                      const SizedBox(height: AppSpacing.xs),
+                                      Text(
+                                        caseDetail.description,
                                         style: TextStyle(
                                           color: foren.textSecondary,
-                                          fontSize: 10,
-                                          fontFamily: 'monospace',
+                                          fontSize: 13,
+                                          height: 1.4,
                                         ),
                                       ),
                                     ],
                                   ),
-                                  const SizedBox(height: AppSpacing.sm),
-                                  Text(
-                                    caseDetail.title,
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurface,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w800,
-                                      fontFamily: 'Geist',
-                                    ),
-                                  ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Text(
-                                    caseDetail.description,
-                                    style: TextStyle(
-                                      color: foren.textSecondary,
-                                      fontSize: 13,
-                                      height: 1.4,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          )
+                                ),
+                              )
                               .animate()
                               .fadeIn(duration: 400.ms)
                               .slideY(begin: -0.1, end: 0),
@@ -210,9 +207,7 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                               fontFamily: 'monospace',
                               letterSpacing: 1.0,
                             ),
-                          )
-                              .animate(delay: 100.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
 
                           const SizedBox(height: AppSpacing.xs),
 
@@ -228,35 +223,42 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                             child: Padding(
                               padding: const EdgeInsets.all(AppSpacing.md),
                               child: Column(
-                                children: caseDetail.objectives.map(
-                                  (obj) => Padding(
-                                    padding: const EdgeInsets.only(bottom: 8),
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.check_box_outlined, size: 16, color: primaryColor),
-                                        const SizedBox(width: 8),
-                                        Expanded(
-                                          child: Text(
-                                            obj,
-                                            style: TextStyle(
-                                              color: theme.colorScheme.onSurface,
-                                              fontSize: 12,
-                                            ),
-                                          ),
+                                children: caseDetail.objectives
+                                    .map(
+                                      (obj) => Padding(
+                                        padding: const EdgeInsets.only(
+                                          bottom: 8,
                                         ),
-                                      ],
-                                    ),
-                                  ),
-                                ).toList(),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              Icons.check_box_outlined,
+                                              size: 16,
+                                              color: primaryColor,
+                                            ),
+                                            const SizedBox(width: 8),
+                                            Expanded(
+                                              child: Text(
+                                                obj,
+                                                style: TextStyle(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface,
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    )
+                                    .toList(),
                               ),
                             ),
-                          )
-                              .animate(delay: 150.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 150.ms).fadeIn(duration: 400.ms),
 
                           const SizedBox(height: AppSpacing.lg),
 
-                          // Evidence Artifacts Vault Preview
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
@@ -270,75 +272,125 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                                   letterSpacing: 1.0,
                                 ),
                               ),
+                              IconButton(
+                                onPressed: () async {
+                                  final uploadService = ref.read(uploadServiceProvider);
+                                  final file = await uploadService.pickImage();
+                                  
+                                  if (!context.mounted) return;
+                                  
+                                  if (file != null) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Uploading evidence image...')),
+                                    );
+                                    final compressed = await uploadService.compressImage(file);
+                                    final url = await uploadService.uploadImage(compressed ?? file, folder: 'forenshield/evidence');
+                                    
+                                    if (!context.mounted) return;
+                                    
+                                    if (url != null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: Text('Evidence uploaded successfully! URL: $url'),
+                                          backgroundColor: foren.success.t500,
+                                        ),
+                                      );
+                                    } else {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                        SnackBar(
+                                          content: const Text('Failed to upload evidence'),
+                                          backgroundColor: foren.critical.t500,
+                                        ),
+                                      );
+                                    }
+                                  }
+                                },
+                                icon: const Icon(Icons.add_photo_alternate_outlined),
+                                color: primaryColor,
+                                tooltip: 'Upload Evidence Image',
+                                padding: EdgeInsets.zero,
+                                constraints: const BoxConstraints(),
+                              ),
                             ],
-                          )
-                              .animate(delay: 250.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
 
                           const SizedBox(height: AppSpacing.xs),
 
-                          ...caseDetail.evidenceList.asMap().entries.map(
-                            (entry) {
-                              final index = entry.key;
-                              final ev = entry.value;
+                          ...caseDetail.evidenceList.asMap().entries.map((
+                            entry,
+                          ) {
+                            final index = entry.key;
+                            final ev = entry.value;
 
-                              return Padding(
-                                padding: const EdgeInsets.only(bottom: AppSpacing.xs),
-                                child: GlassEffect(
-                                  blurX: 10.0,
-                                  blurY: 10.0,
-                                  opacity: 0.10,
-                                  border: Border.all(
-                                    color: foren.borderSubtle,
-                                    width: 1.0,
-                                  ),
-                                  borderRadius: AppRadius.borderRadiusMd,
-                                  child: ListTile(
-                                    dense: true,
-                                    leading: Container(
-                                      padding: const EdgeInsets.all(6),
-                                      decoration: BoxDecoration(
-                                        color: primaryColor.withValues(alpha: 0.15),
-                                        borderRadius: AppRadius.borderRadiusSm,
-                                      ),
-                                      child: Icon(
-                                        _getEvidenceIcon(ev.type),
-                                        color: primaryColor,
-                                        size: 18,
-                                      ),
-                                    ),
-                                    title: Text(
-                                      ev.title,
-                                      style: TextStyle(
-                                        color: theme.colorScheme.onSurface,
-                                        fontSize: 13,
-                                        fontWeight: FontWeight.w700,
-                                      ),
-                                    ),
-                                    subtitle: Text(
-                                      'TYPE: ${ev.type.toUpperCase()} · ${ev.timestamp}',
-                                      style: TextStyle(
-                                        color: foren.textSecondary,
-                                        fontSize: 10,
-                                        fontFamily: 'monospace',
-                                      ),
-                                    ),
-                                    trailing: Icon(
-                                      Icons.chevron_right,
-                                      color: primaryColor,
-                                      size: 18,
-                                    ),
-                                    onTap: () {
-                                      context.push('${RouteConstants.evidenceViewer}/${ev.id}');
-                                    },
-                                  ),
-                                )
-                                    .animate(delay: Duration(milliseconds: 300 + (index * 60)))
-                                    .fadeIn(duration: 400.ms)
-                                    .slideX(begin: -0.05, end: 0),
-                              );
-                            },
-                          ),
+                            return Padding(
+                              padding: const EdgeInsets.only(
+                                bottom: AppSpacing.xs,
+                              ),
+                              child:
+                                  GlassEffect(
+                                        blurX: 10.0,
+                                        blurY: 10.0,
+                                        opacity: 0.10,
+                                        border: Border.all(
+                                          color: foren.borderSubtle,
+                                          width: 1.0,
+                                        ),
+                                        borderRadius: AppRadius.borderRadiusMd,
+                                        child: ListTile(
+                                          dense: true,
+                                          leading: Container(
+                                            padding: const EdgeInsets.all(6),
+                                            decoration: BoxDecoration(
+                                              color: primaryColor.withValues(
+                                                alpha: 0.15,
+                                              ),
+                                              borderRadius:
+                                                  AppRadius.borderRadiusSm,
+                                            ),
+                                            child: Icon(
+                                              _getEvidenceIcon(ev.type),
+                                              color: primaryColor,
+                                              size: 18,
+                                            ),
+                                          ),
+                                          title: Text(
+                                            ev.title,
+                                            style: TextStyle(
+                                              color:
+                                                  theme.colorScheme.onSurface,
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w700,
+                                            ),
+                                          ),
+                                          subtitle: Text(
+                                            'TYPE: ${ev.type.toUpperCase()} · ${ev.timestamp}',
+                                            style: TextStyle(
+                                              color: foren.textSecondary,
+                                              fontSize: 10,
+                                              fontFamily: 'monospace',
+                                            ),
+                                          ),
+                                          trailing: Icon(
+                                            Icons.chevron_right,
+                                            color: primaryColor,
+                                            size: 18,
+                                          ),
+                                          onTap: () {
+                                            context.push(
+                                              '${RouteConstants.evidenceViewer}/${ev.id}',
+                                            );
+                                          },
+                                        ),
+                                      )
+                                      .animate(
+                                        delay: Duration(
+                                          milliseconds: 300 + (index * 60),
+                                        ),
+                                      )
+                                      .fadeIn(duration: 400.ms)
+                                      .slideX(begin: -0.05, end: 0),
+                            );
+                          }),
 
                           const SizedBox(height: AppSpacing.lg),
 
@@ -347,12 +399,16 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                             width: double.infinity,
                             child: OutlinedButton.icon(
                               onPressed: () {
-                                context.push('${RouteConstants.caseTimeline}/${caseDetail.id}');
+                                context.push(
+                                  '${RouteConstants.caseTimeline}/${caseDetail.id}',
+                                );
                               },
                               style: OutlinedButton.styleFrom(
                                 foregroundColor: primaryColor,
                                 side: BorderSide(color: primaryColor),
-                                padding: const EdgeInsets.symmetric(vertical: 12),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
                                 shape: const RoundedRectangleBorder(
                                   borderRadius: AppRadius.borderRadiusMd,
                                 ),
@@ -367,9 +423,7 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                                 ),
                               ),
                             ),
-                          )
-                              .animate(delay: 500.ms)
-                              .fadeIn(duration: 400.ms),
+                          ).animate(delay: 500.ms).fadeIn(duration: 400.ms),
                         ],
                       ),
                     ),
@@ -388,7 +442,9 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                         height: 48,
                         child: ElevatedButton.icon(
                           onPressed: () {
-                            context.push('${RouteConstants.caseVerdict}/${caseDetail.id}');
+                            context.push(
+                              '${RouteConstants.caseVerdict}/${caseDetail.id}',
+                            );
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: invColor,

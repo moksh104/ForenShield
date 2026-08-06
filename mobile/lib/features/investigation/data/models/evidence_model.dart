@@ -14,12 +14,13 @@ class EvidenceModel extends EvidenceEntity {
 
   factory EvidenceModel.fromJson(Map<String, dynamic> json) {
     return EvidenceModel(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       type: json['type'] as String? ?? 'text',
       fileUrl: json['file_url'] as String?,
       contentText: json['content_text'] as String? ?? '',
-      metadataMap: (json['metadata'] as Map<String, dynamic>?)?.map(
+      metadataMap:
+          (json['metadata'] as Map<String, dynamic>?)?.map(
             (k, v) => MapEntry(k, v.toString()),
           ) ??
           const {},

@@ -26,13 +26,21 @@ class _ForenPill extends StatelessWidget {
   final Color fg;
   final IconData? icon;
 
-  const _ForenPill({required this.label, required this.bg, required this.fg, this.icon});
+  const _ForenPill({
+    required this.label,
+    required this.bg,
+    required this.fg,
+    this.icon,
+  });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: ForenSpace.sm, vertical: ForenSpace.xs),
+      padding: const EdgeInsets.symmetric(
+        horizontal: ForenSpace.sm,
+        vertical: ForenSpace.xs,
+      ),
       decoration: BoxDecoration(color: bg, borderRadius: ForenRadius.pillBr),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -86,7 +94,11 @@ class ForenDifficultyBadge extends StatelessWidget {
       ForenDifficulty.advanced => (foren.warning, 'ADVANCED'),
       ForenDifficulty.expert => (foren.critical, 'EXPERT'),
     };
-    return _ForenPill(label: label, bg: ramp.t500.withValues(alpha: 0.16), fg: ramp.t500);
+    return _ForenPill(
+      label: label,
+      bg: ramp.t500.withValues(alpha: 0.16),
+      fg: ramp.t500,
+    );
   }
 }
 
@@ -100,11 +112,17 @@ class ForenStatusChip extends StatelessWidget {
     final (ramp, label, icon) = switch (status) {
       ForenStatus.active => (foren.info, 'ACTIVE', Icons.radio_button_checked),
       ForenStatus.inProgress => (foren.warning, 'IN PROGRESS', Icons.autorenew),
-      ForenStatus.completed => (foren.success, 'COMPLETED', Icons.check_circle_outline),
+      ForenStatus.completed => (
+        foren.success,
+        'COMPLETED',
+        Icons.check_circle_outline,
+      ),
       ForenStatus.locked => (null, 'LOCKED', Icons.lock_outline),
     };
     final fg = ramp?.t500 ?? foren.textSecondary;
-    final bg = ramp != null ? ramp.t500.withValues(alpha: 0.16) : foren.surfaceRaised2;
+    final bg = ramp != null
+        ? ramp.t500.withValues(alpha: 0.16)
+        : foren.surfaceRaised2;
     return _ForenPill(label: label, bg: bg, fg: fg, icon: icon);
   }
 }
@@ -134,7 +152,11 @@ class ForenXpChip extends StatelessWidget {
 class ForenNotificationBadge extends StatelessWidget {
   final int count;
   final Widget child;
-  const ForenNotificationBadge({super.key, required this.count, required this.child});
+  const ForenNotificationBadge({
+    super.key,
+    required this.count,
+    required this.child,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -150,11 +172,18 @@ class ForenNotificationBadge extends StatelessWidget {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 1),
             constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
-            decoration: BoxDecoration(color: foren.critical.t500, shape: BoxShape.circle),
+            decoration: BoxDecoration(
+              color: foren.critical.t500,
+              shape: BoxShape.circle,
+            ),
             alignment: Alignment.center,
             child: Text(
               count > 99 ? '99+' : '$count',
-              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.w700),
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 10,
+                fontWeight: FontWeight.w700,
+              ),
             ),
           ),
         ),

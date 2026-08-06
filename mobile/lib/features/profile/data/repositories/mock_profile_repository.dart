@@ -5,32 +5,29 @@ import '../../domain/entities/profile_entity.dart';
 import '../../domain/repositories/profile_repository.dart';
 
 /// Offline mock implementation of [ProfileRepository].
-///
-/// Provides user profile information, XP, Level, Badges, Statistics, and
-/// handles profile update and password change requests with SharedPreferences persistence.
 class MockProfileRepository implements ProfileRepository {
   final StorageService _storage = StorageService();
 
   ProfileEntity _mockProfile = const ProfileEntity(
     id: 'user_mock_001',
-    fullName: 'Moksh Patel',
-    email: 'moksh@forenshield.io',
-    role: 'Lead Cyber Investigator',
+    fullName: 'Samlee',
+    email: 'samlee@forenshield.io',
+    role: 'Cyber Detective',
     avatarUrl: '',
-    bio: 'Lead Cyber Forensic Specialist',
+    bio: 'Cyber Detective & Forensic Investigator',
     phone: '+1 (555) 019-2834',
-    xpPoints: 4250,
-    rankTitle: 'Senior Cyber Investigator',
+    xpPoints: 3200,
+    rankTitle: 'Cyber Detective',
     memberSince: 'Jan 2025',
-    accountStatus: 'Active Security Clearer',
-    level: 14,
-    nextLevelXp: 5000,
+    accountStatus: 'Active',
+    level: 12,
+    nextLevelXp: 6000,
     stats: UserStatsEntity(
       totalLearningHours: 42.5,
-      casesSolved: 12,
-      coursesCompleted: 5,
-      currentStreakDays: 7,
-      securityScore: 88,
+      casesSolved: 25,
+      coursesCompleted: 12,
+      currentStreakDays: 15,
+      securityScore: 92,
     ),
     badges: [
       AchievementBadgeEntity(
@@ -51,15 +48,6 @@ class MockProfileRepository implements ProfileRepository {
         xpReward: 350,
         isUnlocked: true,
       ),
-      AchievementBadgeEntity(
-        id: 'bdg_3',
-        title: 'Packet Guardian',
-        description: 'Analyzed 500MB of raw network PCAP streams.',
-        iconName: 'network_check',
-        unlockedDate: 'Feb 2025',
-        xpReward: 500,
-        isUnlocked: true,
-      ),
     ],
     xpHistory: [
       XpHistoryItemEntity(
@@ -69,26 +57,12 @@ class MockProfileRepository implements ProfileRepository {
         xpAmount: 250,
         timestamp: '2 hours ago',
       ),
-      XpHistoryItemEntity(
-        id: 'xp_2',
-        title: 'Solved Case #101: Phishing Investigation',
-        source: 'Investigation',
-        xpAmount: 400,
-        timestamp: 'Yesterday',
-      ),
-      XpHistoryItemEntity(
-        id: 'xp_3',
-        title: '7-Day Learning Streak Bonus',
-        source: 'Streak',
-        xpAmount: 100,
-        timestamp: '2 days ago',
-      ),
     ],
   );
 
   @override
   Future<Result<ProfileEntity>> getProfile() async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
 
     final savedName = await _storage.read(StorageKeys.profileFullName);
     final savedEmail = await _storage.read(StorageKeys.profileEmail);
@@ -115,7 +89,7 @@ class MockProfileRepository implements ProfileRepository {
     String? phone,
     String? avatarUrl,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
 
     await _storage.write(StorageKeys.profileFullName, fullName);
     await _storage.write(StorageKeys.profileEmail, email);
@@ -145,7 +119,7 @@ class MockProfileRepository implements ProfileRepository {
     required String currentPassword,
     required String newPassword,
   }) async {
-    await Future.delayed(const Duration(milliseconds: 300));
+    await Future.delayed(const Duration(milliseconds: 200));
     return const Success(null);
   }
 }

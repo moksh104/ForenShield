@@ -30,10 +30,25 @@ class _AcademyIllustrationState extends State<AcademyIllustration>
 
   /// Lesson node data: (alignment, icon, label, color)
   static const _lessons = [
-    (Alignment(-0.72, -0.48), Icons.alternate_email_rounded, 'Phishing', AppColors.error),
+    (
+      Alignment(-0.72, -0.48),
+      Icons.alternate_email_rounded,
+      'Phishing',
+      AppColors.error,
+    ),
     (Alignment(0.74, -0.40), Icons.qr_code, 'QR Fraud', AppColors.accent),
-    (Alignment(-0.68, 0.52), Icons.lock_rounded, 'OTP Scams', AppColors.secondary),
-    (Alignment(0.68, 0.58), Icons.record_voice_over_rounded, 'Social Eng.', AppColors.primary),
+    (
+      Alignment(-0.68, 0.52),
+      Icons.lock_rounded,
+      'OTP Scams',
+      AppColors.secondary,
+    ),
+    (
+      Alignment(0.68, 0.58),
+      Icons.record_voice_over_rounded,
+      'Social Eng.',
+      AppColors.primary,
+    ),
   ];
 
   @override
@@ -175,7 +190,11 @@ class _LessonNode extends StatelessWidget {
   final String label;
   final Color color;
 
-  const _LessonNode({required this.icon, required this.label, required this.color});
+  const _LessonNode({
+    required this.icon,
+    required this.label,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {

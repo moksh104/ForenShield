@@ -27,18 +27,39 @@ class UserModel extends Equatable {
   });
 
   @override
-  List<Object?> get props => [id, email, displayName, avatarUrl, totalXp, rank, currentStreak, createdAt];
+  List<Object?> get props => [
+    id,
+    email,
+    displayName,
+    avatarUrl,
+    totalXp,
+    rank,
+    currentStreak,
+    createdAt,
+  ];
 
   factory UserModel.fromJson(Map<String, dynamic> json) {
     return UserModel(
-      id: json['id'] as String,
-      email: json['email'] as String,
-      displayName: json['displayName'] as String,
-      avatarUrl: json['avatarUrl'] as String?,
-      totalXp: json['totalXp'] as int? ?? 0,
-      rank: json['rank'] as String? ?? 'Trainee',
-      currentStreak: json['currentStreak'] as int? ?? 0,
-      createdAt: DateTime.parse(json['createdAt'] as String),
+      id: (json['id'] ?? '').toString(),
+      email: (json['email'] ?? '').toString(),
+      displayName: (json['displayName'] ?? json['full_name'] ?? json['name'] ?? '').toString(),
+      avatarUrl: json['avatarUrl']?.toString() ?? json['avatar_url']?.toString(),
+      totalXp: json['totalXp'] is int
+          ? json['totalXp']
+          : (json['xp'] is int
+              ? json['xp']
+              : int.tryParse(json['totalXp']?.toString() ?? json['xp']?.toString() ?? '0') ?? 0),
+      rank: (json['rank'] ?? 'Trainee').toString(),
+      currentStreak: json['currentStreak'] is int
+          ? json['currentStreak']
+          : (json['streak'] is int
+              ? json['streak']
+              : int.tryParse(json['currentStreak']?.toString() ?? json['streak']?.toString() ?? '0') ?? 0),
+      createdAt: json['createdAt'] != null
+          ? (DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now())
+          : (json['created_at'] != null
+              ? (DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now())
+              : DateTime.now()),
     );
   }
 

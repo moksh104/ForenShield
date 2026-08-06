@@ -25,11 +25,7 @@ class AppBreadcrumb extends StatelessWidget {
 
     final effectiveSeparator =
         separator ??
-        Icon(
-          Icons.chevron_right,
-          size: 16,
-          color: foren.textDisabled,
-        );
+        Icon(Icons.chevron_right, size: 16, color: foren.textDisabled);
 
     final List<Widget> children = [];
 

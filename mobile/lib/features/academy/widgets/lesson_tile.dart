@@ -40,8 +40,9 @@ class LessonTile extends StatelessWidget {
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: isLocked
-                            ? theme.colorScheme.onSurface
-                                .withValues(alpha: 0.35)
+                            ? theme.colorScheme.onSurface.withValues(
+                                alpha: 0.35,
+                              )
                             : theme.colorScheme.onSurface,
                       ),
                       maxLines: 1,
@@ -53,8 +54,9 @@ class LessonTile extends StatelessWidget {
                         Text(
                           AcademyUtils.contentTypeLabel(lesson.contentType),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: isLocked ? 0.25 : 0.5),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: isLocked ? 0.25 : 0.5,
+                            ),
                             fontSize: 11,
                           ),
                         ),
@@ -63,8 +65,9 @@ class LessonTile extends StatelessWidget {
                           width: 3,
                           height: 3,
                           decoration: BoxDecoration(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: 0.3),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: 0.3,
+                            ),
                             shape: BoxShape.circle,
                           ),
                         ),
@@ -72,8 +75,9 @@ class LessonTile extends StatelessWidget {
                         Text(
                           AcademyUtils.formatDuration(lesson.durationMinutes),
                           style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurface
-                                .withValues(alpha: isLocked ? 0.25 : 0.5),
+                            color: theme.colorScheme.onSurface.withValues(
+                              alpha: isLocked ? 0.25 : 0.5,
+                            ),
                             fontSize: 11,
                           ),
                         ),
@@ -124,9 +128,11 @@ class _LessonStatusIcon extends StatelessWidget {
           color: theme.colorScheme.surfaceContainerLowest,
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(Icons.lock_outline,
-            size: 16,
-            color: theme.colorScheme.onSurface.withValues(alpha: 0.25)),
+        child: Icon(
+          Icons.lock_outline,
+          size: 16,
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.25),
+        ),
       );
     }
 
@@ -138,8 +144,11 @@ class _LessonStatusIcon extends StatelessWidget {
           color: Colors.greenAccent.withValues(alpha: 0.12),
           borderRadius: BorderRadius.circular(10),
         ),
-        child: Icon(Icons.check_rounded,
-            size: 18, color: Colors.greenAccent.shade400),
+        child: Icon(
+          Icons.check_rounded,
+          size: 18,
+          color: Colors.greenAccent.shade400,
+        ),
       );
     }
 

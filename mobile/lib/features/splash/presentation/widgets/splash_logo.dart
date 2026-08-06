@@ -1,221 +1,291 @@
+import 'dart:math' as math;
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_radius.dart';
+import '../../../../core/theme/app_shadows.dart';
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../core/theme/foren_theme.dart';
-import '../pages/splash_screen.dart';
+import 'background_grid.dart';
 
-/// Animated ForenShield logo with glowing shield, gold/blue gradient, and emergency switch support.
-class SplashLogo extends StatefulWidget {
+/// ForenShield Enterprise Splash Branding & Logo Sequence.
+/// Strictly aligned with the official light & dark splash specification:
+/// 1. Logo Reveal (Shield Emblem + FORENSHIELD Title + Subtitle)
+/// 2. Elements Animate (Orbit ring with 5 nodes: Search, Document, Lock, Monitor, Fingerprint)
+/// 3. Tagline & World Map Fade In ("Uncover the truth. Protect the future.")
+class SplashLogo extends StatelessWidget {
   const SplashLogo({super.key});
-
-  @override
-  State<SplashLogo> createState() => _SplashLogoState();
-}
-
-class _SplashLogoState extends State<SplashLogo>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _floatController;
-  late Animation<double> _floatAnimation;
-
-  @override
-  void initState() {
-    super.initState();
-    _floatController = AnimationController(
-      vsync: this,
-      duration: const Duration(seconds: 4),
-    )..repeat(reverse: true);
-
-    _floatAnimation = Tween<double>(begin: -4.0, end: 4.0).animate(
-      CurvedAnimation(
-        parent: _floatController,
-        curve: Curves.easeInOutSine,
-      ),
-    );
-  }
-
-  @override
-  void dispose() {
-    _floatController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>()!;
-    final primaryColor = theme.colorScheme.primary;
-
-    final Widget logoContainer = Container(
-      width: 120,
-      height: 120,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [
-            AppColors.logoGold,
-            AppColors.logoBlue,
-            primaryColor,
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: AppColors.logoGold.withValues(alpha: 0.3),
-            blurRadius: 30,
-            spreadRadius: 5,
-          ),
-          BoxShadow(
-            color: primaryColor.withValues(alpha: 0.25),
-            blurRadius: 45,
-            spreadRadius: 10,
-          ),
-        ],
-      ),
-      child: Container(
-        margin: const EdgeInsets.all(3),
-        decoration: BoxDecoration(
-          shape: BoxShape.circle,
-          color: AppColors.surfaceHighlight,
-          border: Border.all(
-            color: AppColors.logoGold.withValues(alpha: 0.4),
-            width: 1.5,
-          ),
-        ),
-        child: Center(
-          child: Icon(
-            Icons.shield_outlined,
-            size: 58,
-            color: AppColors.logoGold,
-          ),
-        ),
-      ),
-    );
+    final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = AppColors.primary; // #2563EB Cobalt Blue
+    final textPrimary = isDark
+        ? AppColors.textPrimary
+        : AppColors.lightTextPrimary;
+    final textSecondary = isDark
+        ? AppColors.textSecondary
+        : AppColors.lightTextSecondary;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Security Command Center Telemetry Tag
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-          decoration: BoxDecoration(
-            color: AppColors.logoGold.withValues(alpha: 0.12),
-            borderRadius: AppRadius.borderRadiusSm,
-            border: Border.all(
-              color: AppColors.logoGold.withValues(alpha: 0.35),
-            ),
-          ),
-          child: Row(
-            mainAxisSize: MainAxisSize.min,
+        // ------------------------------------------------------------
+        // 1. Orbital Ring & Central 3D Shield Emblem (Steps 1 & 2)
+        // ------------------------------------------------------------
+        SizedBox(
+          width: 240,
+          height: 240,
+          child: Stack(
+            alignment: Alignment.center,
             children: [
-              Container(
-                width: 6,
-                height: 6,
-                decoration: const BoxDecoration(
-                  color: AppColors.logoGold,
-                  shape: BoxShape.circle,
-                ),
-              ),
-              const SizedBox(width: 6),
-              const Text(
-                'CYBER OPS CENTER · SECURE INITIALIZE',
-                style: TextStyle(
-                  color: AppColors.logoGold,
-                  fontSize: 9,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
-                  letterSpacing: 1.0,
-                ),
-              ),
+              // Step 2: Dotted Orbital Ring (Fades & scales in)
+              CustomPaint(
+                    size: const Size(210, 210),
+                    painter: _OrbitRingPainter(
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.12)
+                          : AppColors.lightBorderDefault,
+                    ),
+                  )
+                  .animate()
+                  .fadeIn(
+                    delay: 300.ms,
+                    duration: 400.ms,
+                    curve: Curves.easeOutCubic,
+                  )
+                  .scale(
+                    begin: const Offset(0.85, 0.85),
+                    end: const Offset(1.0, 1.0),
+                    delay: 300.ms,
+                    duration: 400.ms,
+                    curve: Curves.easeOutCubic,
+                  ),
+
+              // Step 2: 5 Orbital Nodes (Search, Document, Lock, Monitor, Fingerprint)
+              ..._buildNodes(primaryColor, isDark),
+
+              // Step 1: Central 3D Shield Emblem (Soft scale-up & fade-in)
+              const _ShieldEmblem()
+                  .animate()
+                  .fadeIn(duration: 400.ms, curve: Curves.easeOutCubic)
+                  .scale(
+                    begin: const Offset(0.85, 0.85),
+                    end: const Offset(1.0, 1.0),
+                    duration: 450.ms,
+                    curve: Curves.easeOutBack,
+                  ),
             ],
           ),
-        )
-            .animate()
-            .fadeIn(duration: 400.ms, delay: 50.ms)
-            .slideY(begin: -0.2, end: 0),
-
-        const SizedBox(height: AppSpacing.md),
-
-        // Floating Shield Icon with Glow (Controlled by enableAdvancedEffects)
-        AnimatedBuilder(
-          animation: _floatAnimation,
-          builder: (context, child) {
-            return Transform.translate(
-              offset: Offset(0, _floatAnimation.value),
-              child: SplashScreen.enableAdvancedEffects
-                  ? GlowEffect(
-                      glowColor: AppColors.logoGold,
-                      blurRadius: 36,
-                      spreadRadius: 6,
-                      animate: true,
-                      borderRadius: BorderRadius.circular(60),
-                      child: logoContainer,
-                    )
-                  : logoContainer,
-            );
-          },
-        )
-            .animate()
-            .scale(
-              begin: const Offset(0.90, 0.90),
-              end: const Offset(1.0, 1.0),
-              duration: 600.ms,
-              curve: Curves.easeOutCubic,
-            )
-            .fadeIn(duration: 500.ms),
+        ),
 
         const SizedBox(height: AppSpacing.lg),
 
-        // App Name with Dual-Tone Gradient Typography
+        // ------------------------------------------------------------
+        // 2. Brand Title: FOREN (textPrimary) + SHIELD (#2563EB)
+        // ------------------------------------------------------------
         Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Text(
-              'Foren',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w800,
-                color: theme.colorScheme.onSurface,
-                letterSpacing: 1.2,
-                fontFamily: 'Geist',
-              ),
-            ),
-            const Text(
-              'Shield',
-              style: TextStyle(
-                fontSize: 32,
-                fontWeight: FontWeight.w800,
-                color: AppColors.logoGold,
-                letterSpacing: 1.2,
-                fontFamily: 'Geist',
-              ),
-            ),
-          ],
-        )
-            .animate(delay: 200.ms)
-            .fadeIn(duration: 500.ms)
-            .slideY(begin: 0.2, end: 0, curve: Curves.easeOut),
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Text(
+                  'FOREN',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: textPrimary,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2.0,
+                  ),
+                ),
+                Text(
+                  'SHIELD',
+                  style: theme.textTheme.headlineMedium?.copyWith(
+                    color: primaryColor,
+                    fontWeight: FontWeight.w800,
+                    letterSpacing: 2.0,
+                  ),
+                ),
+              ],
+            )
+            .animate()
+            .fadeIn(delay: 150.ms, duration: 350.ms, curve: Curves.easeOutCubic)
+            .slideY(begin: 0.1, end: 0),
 
-        const SizedBox(height: AppSpacing.xs),
+        const SizedBox(height: 4),
 
-        // Tagline
+        // Subtitle: Cybersecurity · Forensics · Simulation
         Text(
-          'Learn. Investigate. Defend.',
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
-            color: foren.textSecondary,
+          'Cybersecurity  ·  Forensics  ·  Simulation',
+          style: theme.textTheme.labelSmall?.copyWith(
+            color: textSecondary,
+            fontWeight: FontWeight.w600,
             letterSpacing: 0.8,
-            fontFamily: 'Geist',
           ),
-        )
-            .animate(delay: 350.ms)
-            .fadeIn(duration: 500.ms)
-            .slideY(begin: 0.2, end: 0, curve: Curves.easeOut),
+        ).animate().fadeIn(
+          delay: 250.ms,
+          duration: 350.ms,
+          curve: Curves.easeOutCubic,
+        ),
+
+        const SizedBox(height: AppSpacing.xxl),
+
+        // ------------------------------------------------------------
+        // 3. Step 3: Tagline & World Map Matrix Fade In
+        // ------------------------------------------------------------
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Background World Map Dot Matrix
+            WorldMapWidget(
+                  color: primaryColor.withValues(alpha: isDark ? 0.07 : 0.09),
+                )
+                .animate(delay: 600.ms)
+                .fadeIn(duration: 500.ms, curve: Curves.easeOutCubic),
+
+            // Tagline Lines
+            Column(
+                  children: [
+                    Text(
+                      'Uncover the truth.',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: textPrimary,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Protect the future.',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: primaryColor,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.2,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                )
+                .animate(delay: 550.ms)
+                .fadeIn(duration: 450.ms, curve: Curves.easeOutCubic)
+                .slideY(begin: 0.08, end: 0),
+          ],
+        ),
       ],
     );
+  }
+
+  /// Builds the 5 orbital node icons per specification:
+  /// 1. Top (Search)
+  /// 2. Top-Left (Document)
+  /// 3. Bottom-Left (Lock)
+  /// 4. Bottom (Monitor)
+  /// 5. Right (Fingerprint)
+  List<Widget> _buildNodes(Color primaryColor, bool isDark) {
+    const radius = 95.0;
+    // Angles in radians: -90° (top), -150° (top-left), 150° (bottom-left), 90° (bottom), 0° (right)
+    const angles = [
+      -math.pi / 2,
+      -math.pi * 5 / 6,
+      math.pi * 5 / 6,
+      math.pi / 2,
+      0.0,
+    ];
+
+    const nodeIcons = [
+      Icons.search,
+      Icons.description_outlined,
+      Icons.lock_outline,
+      Icons.desktop_windows_outlined,
+      Icons.fingerprint_outlined,
+    ];
+
+    return List.generate(5, (index) {
+      final nodeAngle = angles[index];
+      final dx = radius * math.cos(nodeAngle);
+      final dy = radius * math.sin(nodeAngle);
+
+      return Positioned(
+            left: 120 + dx - 15,
+            top: 120 + dy - 15,
+            child: Container(
+              width: 30,
+              height: 30,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: isDark ? AppColors.surface : AppColors.lightSurface,
+                border: Border.all(
+                  color: isDark
+                      ? AppColors.borderDefault
+                      : AppColors.lightBorderDefault,
+                  width: 1.0,
+                ),
+                boxShadow: AppShadows.low,
+              ),
+              child: Center(
+                child: Icon(nodeIcons[index], size: 15, color: primaryColor),
+              ),
+            ),
+          )
+          .animate()
+          .fadeIn(
+            delay: Duration(milliseconds: 350 + (index * 60)),
+            duration: 350.ms,
+            curve: Curves.easeOutCubic,
+          )
+          .scale(
+            begin: const Offset(0.7, 0.7),
+            end: const Offset(1.0, 1.0),
+            delay: Duration(milliseconds: 350 + (index * 60)),
+            duration: 350.ms,
+            curve: Curves.easeOutCubic,
+          );
+    });
+  }
+}
+
+/// Central 3D Shield Emblem Widget matching official spec image.
+class _ShieldEmblem extends StatelessWidget {
+  const _ShieldEmblem();
+
+  @override
+  Widget build(BuildContext context) {
+    final primaryColor = AppColors.primary;
+
+    return Image.asset(
+      'assets/logos/app_logo.png',
+      width: 96,
+      height: 96,
+      fit: BoxFit.contain,
+      errorBuilder: (context, error, stackTrace) => Container(
+        width: 96,
+        height: 96,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: primaryColor.withValues(alpha: 0.1),
+        ),
+        child: Icon(Icons.shield_rounded, size: 48, color: primaryColor),
+      ),
+    );
+  }
+}
+
+class _OrbitRingPainter extends CustomPainter {
+  final Color color;
+
+  _OrbitRingPainter({required this.color});
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final center = Offset(size.width / 2, size.height / 2);
+    final paint = Paint()
+      ..color = color
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 1.2;
+
+    canvas.drawCircle(center, 95.0, paint);
+  }
+
+  @override
+  bool shouldRepaint(covariant _OrbitRingPainter oldDelegate) {
+    return oldDelegate.color != color;
   }
 }

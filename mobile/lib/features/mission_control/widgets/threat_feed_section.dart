@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/services/upload_service.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -10,25 +12,25 @@ class ThreatFeedSection extends StatelessWidget {
   const ThreatFeedSection({super.key, this.threats = const []});
 
   static List<ThreatItem> get defaults => const [
-        ThreatItem(
-          severity: ThreatSeverity.critical,
-          title: 'LockBit 3.0 Variant Detected',
-          source: 'CISA Advisory',
-          time: '1h ago',
-        ),
-        ThreatItem(
-          severity: ThreatSeverity.high,
-          title: 'Phishing Campaign Targeting Finance Sector',
-          source: 'Threat Intel Feed',
-          time: '4h ago',
-        ),
-        ThreatItem(
-          severity: ThreatSeverity.medium,
-          title: 'CVE-2024-3049 Exploited in the Wild',
-          source: 'NVD',
-          time: '12h ago',
-        ),
-      ];
+    ThreatItem(
+      severity: ThreatSeverity.critical,
+      title: 'LockBit 3.0 Variant Detected',
+      source: 'CISA Advisory',
+      time: '1h ago',
+    ),
+    ThreatItem(
+      severity: ThreatSeverity.high,
+      title: 'Phishing Campaign Targeting Finance Sector',
+      source: 'Threat Intel Feed',
+      time: '4h ago',
+    ),
+    ThreatItem(
+      severity: ThreatSeverity.medium,
+      title: 'CVE-2024-3049 Exploited in the Wild',
+      source: 'NVD',
+      time: '12h ago',
+    ),
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -100,12 +102,12 @@ class ThreatFeedSection extends StatelessWidget {
   }
 }
 
-class _ThreatTile extends StatelessWidget {
+class _ThreatTile extends ConsumerWidget {
   final ThreatItem item;
   const _ThreatTile({required this.item});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final severityColor = item.severity.color;
     final severityLabel = item.severity.label;
@@ -136,7 +138,9 @@ class _ThreatTile extends StatelessWidget {
                   children: [
                     Container(
                       padding: const EdgeInsets.symmetric(
-                          horizontal: 6, vertical: 2),
+                        horizontal: 6,
+                        vertical: 2,
+                      ),
                       decoration: BoxDecoration(
                         color: severityColor.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(4),
@@ -155,8 +159,9 @@ class _ThreatTile extends StatelessWidget {
                     Text(
                       item.time,
                       style: theme.textTheme.labelSmall?.copyWith(
-                        color: theme.colorScheme.onSurface
-                            .withValues(alpha: 0.38),
+                        color: theme.colorScheme.onSurface.withValues(
+                          alpha: 0.38,
+                        ),
                         fontSize: 10,
                       ),
                     ),
@@ -176,13 +181,49 @@ class _ThreatTile extends StatelessWidget {
                 Text(
                   item.source,
                   style: theme.textTheme.labelSmall?.copyWith(
-                    color:
-                        theme.colorScheme.onSurface.withValues(alpha: 0.42),
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.42),
                     fontSize: 10,
                   ),
                 ),
               ],
             ),
+          ),
+          IconButton(
+            icon: const Icon(Icons.add_a_photo_outlined),
+            color: severityColor,
+            tooltip: 'Upload Threat Screenshot',
+            onPressed: () async {
+              final uploadService = ref.read(uploadServiceProvider);
+              final file = await uploadService.pickImage();
+              
+              if (!context.mounted) return;
+              
+              if (file != null) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Uploading threat screenshot...')),
+                );
+                final compressed = await uploadService.compressImage(file);
+                final url = await uploadService.uploadImage(compressed ?? file, folder: 'forenshield/threats');
+                
+                if (!context.mounted) return;
+                
+                if (url != null) {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: Text('Screenshot uploaded successfully! URL: $url'),
+                      backgroundColor: Colors.green,
+                    ),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to upload screenshot'),
+                      backgroundColor: Colors.red,
+                    ),
+                  );
+                }
+              }
+            },
           ),
         ],
       ),

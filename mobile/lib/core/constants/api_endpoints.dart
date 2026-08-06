@@ -4,68 +4,75 @@
 class ApiEndpoints {
   ApiEndpoints._();
 
-  // ── Base Routes ────────────────────────────────────────────────────────────
-  static const String _auth = '/auth';
-  static const String _academy = '/academy';
-  static const String _missionControl = '/mission-control';
-  static const String _simulation = '/simulation';
-  static const String _investigation = '/investigation';
-  static const String _upload = '/upload';
-
   // ── Authentication ─────────────────────────────────────────────────────────
 
   /// Login with email and password
-  static const String login = '$_auth/login';
+  static const String login = '/login.php';
 
   /// Register a new account
-  static const String register = '$_auth/register';
-
-  /// Exchange a refresh token for a new access token
-  static const String refresh = '$_auth/refresh';
+  static const String register = '/register.php';
 
   /// Invalidate the current session
-  static const String logout = '$_auth/logout';
+  static const String logout = '/logout.php';
+
+  /// Exchange a refresh token for a new access token
+  static const String refresh = '/refresh_token.php';
+
+  /// Send password reset request
+  static const String forgotPassword = '/forgot_password.php';
+
+  /// Verify 6-digit OTP code
+  static const String verifyOtp = '/verify_otp.php';
 
   /// Fetch the authenticated user's profile
-  static const String currentUser = '$_auth/me';
-
-  // ── Academy ────────────────────────────────────────────────────────────────
-
-  /// Fetch a list of educational lessons
-  static const String lessons = '$_academy/lessons';
-
-  /// Fetch a specific lesson by its [id]
-  static String lesson(String id) => '$lessons/$id';
-
-  // ── Mission Control ────────────────────────────────────────────────────────
-
-  /// Fetch all active missions and global state
-  static const String missions = '$_missionControl/missions';
-
-  /// Fetch a specific mission by its [id]
-  static String mission(String id) => '$missions/$id';
-
-  // ── Simulation ─────────────────────────────────────────────────────────────
-
-  /// Fetch available simulation scenarios
-  static const String simulations = '$_simulation/scenarios';
-
-  /// Fetch a specific simulation scenario by its [id]
-  static String simulation(String id) => '$simulations/$id';
-
-  // ── Investigation ──────────────────────────────────────────────────────────
-
-  /// Fetch investigation cases
-  static const String cases = '$_investigation/cases';
-
-  /// Fetch a specific investigation case by its [id]
-  static String investigationCase(String id) => '$cases/$id';
+  static const String currentUser = '/current_user.php';
 
   // ── Upload ─────────────────────────────────────────────────────────────────
 
-  /// Placeholder endpoint for future Cloudinary integration (e.g. user avatars)
-  static const String uploadAvatar = '$_upload/avatar';
+  /// Upload an image to Cloudinary
+  static const String uploadImage = '/upload_image.php';
 
-  /// Placeholder endpoint for future Cloudinary integration (e.g. case evidence)
-  static const String uploadEvidence = '$_upload/evidence';
+  /// Delete an image from Cloudinary
+  static const String deleteImage = '/delete_image.php';
+
+  // ── Profile ────────────────────────────────────────────────────────────────
+
+  static const String profile = '/profile.php';
+  static const String updateProfile = '/update_profile.php';
+
+  // ── Mission Control ────────────────────────────────────────────────────────
+
+  static const String missionControl = '/mission_control.php';
+
+  // ── Investigation ──────────────────────────────────────────────────────────
+
+  static const String investigationCases = '/investigation_cases.php';
+  static const String investigationCaseDetail = '/investigation_case_detail.php';
+  static const String investigationEvidence = '/investigation_evidence.php';
+  static const String investigationVerdict = '/investigation_verdict.php';
+
+  // ── Cyber Academy ──────────────────────────────────────────────────────────
+
+  static const String academyCourses = '/academy_courses.php';
+  static const String academyCourseDetail = '/academy_course_detail.php';
+  static const String academyLesson = '/academy_lesson.php';
+  static const String academyQuizSubmit = '/academy_quiz_submit.php';
+
+  static const String lessons = '/academy_courses.php';
+  static String lesson(String id) => '/academy_lesson.php';
+
+  // ── Reports ────────────────────────────────────────────────────────────────
+
+  static const String reports = '/reports.php';
+
+  // ── Notifications ──────────────────────────────────────────────────────────
+
+  /// Save user FCM registration token
+  static const String saveFcmToken = '/save_fcm_token.php';
+
+  /// Fetch notifications and mark as read
+  static const String notifications = '/notifications.php';
+
+  /// Dedicated endpoint for marking notifications as read
+  static const String markAsRead = '/mark_as_read.php';
 }

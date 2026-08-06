@@ -8,10 +8,7 @@ class RetryInterceptor extends Interceptor {
   final int maxRetries;
   final List<String> safeMethods = const ['GET', 'HEAD', 'OPTIONS'];
 
-  RetryInterceptor({
-    required this.dio,
-    this.maxRetries = 3,
-  });
+  RetryInterceptor({required this.dio, this.maxRetries = 3});
 
   @override
   void onError(DioException err, ErrorInterceptorHandler handler) async {
@@ -43,7 +40,8 @@ class RetryInterceptor extends Interceptor {
             responseType: requestOptions.responseType,
             contentType: requestOptions.contentType,
             validateStatus: requestOptions.validateStatus,
-            receiveDataWhenStatusError: requestOptions.receiveDataWhenStatusError,
+            receiveDataWhenStatusError:
+                requestOptions.receiveDataWhenStatusError,
             followRedirects: requestOptions.followRedirects,
             maxRedirects: requestOptions.maxRedirects,
             persistentConnection: requestOptions.persistentConnection,
@@ -89,6 +87,10 @@ class RetryInterceptor extends Interceptor {
   }
 
   bool _isServerError(int? statusCode) {
-    return statusCode != null && (statusCode == 500 || statusCode == 502 || statusCode == 503 || statusCode == 504);
+    return statusCode != null &&
+        (statusCode == 500 ||
+            statusCode == 502 ||
+            statusCode == 503 ||
+            statusCode == 504);
   }
 }

@@ -16,7 +16,11 @@ class CatalogScreen extends StatelessWidget {
   final ThemeMode themeMode;
   final VoidCallback onToggleTheme;
 
-  const CatalogScreen({super.key, required this.themeMode, required this.onToggleTheme});
+  const CatalogScreen({
+    super.key,
+    required this.themeMode,
+    required this.onToggleTheme,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -25,14 +29,23 @@ class CatalogScreen extends StatelessWidget {
         title: const Text('ForenShield Component Catalog'),
         actions: [
           IconButton(
-            tooltip: themeMode == ThemeMode.dark ? 'Switch to Light' : 'Switch to Dark',
-            icon: Icon(themeMode == ThemeMode.dark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
+            tooltip: themeMode == ThemeMode.dark
+                ? 'Switch to Light'
+                : 'Switch to Dark',
+            icon: Icon(
+              themeMode == ThemeMode.dark
+                  ? Icons.light_mode_outlined
+                  : Icons.dark_mode_outlined,
+            ),
             onPressed: onToggleTheme,
           ),
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: ForenSpace.lg, vertical: ForenSpace.lg),
+        padding: const EdgeInsets.symmetric(
+          horizontal: ForenSpace.lg,
+          vertical: ForenSpace.lg,
+        ),
         children: const [
           TypographySection(),
           ButtonsSection(),

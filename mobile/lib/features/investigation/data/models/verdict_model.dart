@@ -13,10 +13,11 @@ class VerdictModel extends VerdictEntity {
 
   factory VerdictModel.fromJson(Map<String, dynamic> json) {
     return VerdictModel(
-      id: json['id'] as String? ?? '',
-      caseId: json['case_id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
+      caseId: (json['case_id'] ?? '').toString(),
       summaryText: json['summary_text'] as String? ?? '',
-      options: (json['options'] as List<dynamic>?)
+      options:
+          (json['options'] as List<dynamic>?)
               ?.map((e) => e.toString())
               .toList() ??
           const [],

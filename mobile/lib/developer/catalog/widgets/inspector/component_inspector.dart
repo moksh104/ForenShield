@@ -32,10 +32,18 @@ class ComponentInspector extends StatelessWidget {
   Widget _buildHeader() {
     Color statusColor = AppColors.info;
     switch (component.status) {
-      case ComponentStatus.stable: statusColor = AppColors.success; break;
-      case ComponentStatus.experimental: statusColor = AppColors.warning; break;
-      case ComponentStatus.deprecated: statusColor = AppColors.error; break;
-      case ComponentStatus.internal: statusColor = AppColors.info; break;
+      case ComponentStatus.stable:
+        statusColor = AppColors.success;
+        break;
+      case ComponentStatus.experimental:
+        statusColor = AppColors.warning;
+        break;
+      case ComponentStatus.deprecated:
+        statusColor = AppColors.error;
+        break;
+      case ComponentStatus.internal:
+        statusColor = AppColors.info;
+        break;
     }
 
     return Column(
@@ -54,13 +62,21 @@ class ComponentInspector extends StatelessWidget {
               ),
               child: Text(
                 component.status.name.toUpperCase(),
-                style: AppTypography.labelSmall.copyWith(color: statusColor, fontWeight: FontWeight.bold),
+                style: AppTypography.labelSmall.copyWith(
+                  color: statusColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text(component.description, style: AppTypography.bodyLarge.copyWith(color: AppColors.textSecondary)),
+        Text(
+          component.description,
+          style: AppTypography.bodyLarge.copyWith(
+            color: AppColors.textSecondary,
+          ),
+        ),
       ],
     );
   }

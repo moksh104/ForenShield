@@ -15,7 +15,8 @@ class NetworkState extends StatelessWidget {
   const NetworkState({
     super.key,
     this.title = 'No Internet Connection',
-    this.message = 'Please check your Wi-Fi or cellular network settings and try again.',
+    this.message =
+        'Please check your Wi-Fi or cellular network settings and try again.',
     this.icon = Icons.wifi_off_rounded,
     this.reconnectLabel = 'Reconnect',
     this.onReconnect,
@@ -44,27 +45,23 @@ class NetworkState extends StatelessWidget {
                   color: AppColors.warning.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(
-                  icon,
-                  size: 48,
-                  color: AppColors.warning,
-                ),
+                child: Icon(icon, size: 48, color: AppColors.warning),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 title,
                 style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: AppColors.textPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
+                  color: AppColors.textPrimary,
+                  fontWeight: FontWeight.bold,
+                ),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
                 message,
                 style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                  color: AppColors.textSecondary,
+                ),
                 textAlign: TextAlign.center,
               ),
               if (onReconnect != null) ...[

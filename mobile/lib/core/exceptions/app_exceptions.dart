@@ -29,7 +29,8 @@ class NetworkException extends AppException {
   const NetworkException([super.message = 'No internet connection.']);
 
   @override
-  String get userMessage => 'No internet connection. Please check your network.';
+  String get userMessage =>
+      'No internet connection. Please check your network.';
 }
 
 /// Timeout exception (connect, send, or receive timeout).
@@ -88,7 +89,7 @@ class ValidationException extends AppException {
 /// Not Found exception (404).
 class NotFoundException extends AppException {
   const NotFoundException([String message = 'Resource not found.'])
-      : super(message, 404);
+    : super(message, 404);
 
   @override
   String get userMessage => 'Resource not found.';
@@ -97,10 +98,11 @@ class NotFoundException extends AppException {
 /// Conflict exception (409).
 class ConflictException extends AppException {
   const ConflictException([String message = 'A conflict occurred.'])
-      : super(message, 409);
+    : super(message, 409);
 
   @override
-  String get userMessage => message.isNotEmpty ? message : 'A conflict occurred.';
+  String get userMessage =>
+      message.isNotEmpty ? message : 'A conflict occurred.';
 }
 
 /// Server Error exception (500+).

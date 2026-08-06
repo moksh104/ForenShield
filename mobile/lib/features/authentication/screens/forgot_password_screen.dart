@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/effects/glass_effect.dart';
 import '../../../core/effects/particle_background.dart';
@@ -12,22 +13,25 @@ import '../presentation/widgets/auth_button.dart';
 import '../presentation/widgets/auth_logo.dart';
 import '../presentation/widgets/auth_otp_field.dart';
 import '../presentation/widgets/auth_text_field.dart';
+import '../providers/auth_providers.dart';
+import '../providers/auth_state_provider.dart';
 
 /// Cybersecurity Forgot Password & 2FA OTP verification screen.
-class ForgotPasswordScreen extends StatefulWidget {
+class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
 
   bool _isLoading = false;
   bool _showOtpStep = false;
   String? _enteredOtp;
+  String? _errorMessage;
 
   @override
   void dispose() {
@@ -39,29 +43,62 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
+    final repository = ref.read(authRepositoryProvider);
 
-    await Future.delayed(const Duration(milliseconds: 600));
+    final result = await repository.forgotPassword(email: _emailController.text.trim());
 
-    if (!mounted) return;
-    setState(() {
-      _isLoading = false;
-      _showOtpStep = true;
-    });
+    setState(() => _isLoading = false);
+
+    result.when(
+      success: (success) {
+        if (success) {
+          setState(() {
+            _showOtpStep = true;
+          });
+        } else {
+          setState(() {
+            _errorMessage = 'Failed to generate reset code. Please try again.';
+          });
+        }
+      },
+      failure: (exception) {
+        setState(() {
+          _errorMessage = exception.toString();
+        });
+      },
+    );
   }
 
   Future<void> _verifyOtpAndProceed() async {
-    setState(() => _isLoading = true);
-
-    // Validate OTP if entered
-    if (_enteredOtp != null && _enteredOtp!.isNotEmpty) {
-      debugPrint('OTP Token Verified: $_enteredOtp');
+    if (_enteredOtp == null || _enteredOtp!.length < 6) {
+      setState(() {
+        _errorMessage = 'Enter the 6-digit verification code.';
+      });
+      return;
     }
 
-    await Future.delayed(const Duration(milliseconds: 800));
+    setState(() => _isLoading = true);
+    final repository = ref.read(authRepositoryProvider);
 
-    if (!mounted) return;
+    final result = await repository.verifyOtp(
+      email: _emailController.text.trim(),
+      otpCode: _enteredOtp!.trim(),
+    );
+
     setState(() => _isLoading = false);
-    context.go(RouteConstants.forgotPasswordSuccess);
+
+    result.when(
+      success: (response) async {
+        await ref.read(authStateProvider.notifier).authenticateWithResponse(response);
+        if (!mounted) return;
+        context.go(RouteConstants.missionControl);
+      },
+      failure: (exception) {
+        setState(() {
+          _errorMessage = exception.toString();
+        });
+      },
+    );
   }
 
   @override
@@ -226,6 +263,20 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           ),
         ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0),
         const SizedBox(height: AppSpacing.xl),
+
+        if (_errorMessage != null) ...[
+          Padding(
+            padding: const EdgeInsets.only(bottom: AppSpacing.md),
+            child: Text(
+              _errorMessage!,
+              style: TextStyle(
+                color: theme.colorScheme.error,
+                fontSize: 13,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ],
 
         // Animated OTP input field
         AuthOtpField(

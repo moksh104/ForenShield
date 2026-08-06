@@ -26,6 +26,8 @@ class SuspectEntity extends Equatable {
 }
 
 /// Core Case Domain Entity for Investigation Lab.
+typedef CaseEntity = InvestigationEntity;
+
 class InvestigationEntity extends Equatable {
   final String id;
   final String caseCode;
@@ -89,20 +91,20 @@ class InvestigationEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        caseCode,
-        title,
-        description,
-        priority,
-        difficulty,
-        status,
-        assignedDate,
-        progress,
-        evidenceList,
-        timeline,
-        suspects,
-        notes,
-        objectives,
-        verdict,
-      ];
+    id,
+    caseCode,
+    title,
+    description,
+    priority,
+    difficulty,
+    status,
+    assignedDate,
+    progress,
+    evidenceList,
+    timeline,
+    suspects,
+    notes,
+    objectives,
+    verdict,
+  ];
 }

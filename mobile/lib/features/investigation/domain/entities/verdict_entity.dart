@@ -22,12 +22,12 @@ class VerdictEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        caseId,
-        summaryText,
-        options,
-        correctOptionIndex,
-        explanationText,
-        xpReward,
-      ];
+    id,
+    caseId,
+    summaryText,
+    options,
+    correctOptionIndex,
+    explanationText,
+    xpReward,
+  ];
 }

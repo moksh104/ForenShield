@@ -72,9 +72,6 @@ class AcademyUtils {
 
   /// Returns the total number of lessons across all modules.
   static int totalLessons(CourseModel course) {
-    return course.modules.fold(
-      0,
-      (sum, module) => sum + module.totalLessons,
-    );
+    return course.modules.fold(0, (sum, module) => sum + module.totalLessons);
   }
 }

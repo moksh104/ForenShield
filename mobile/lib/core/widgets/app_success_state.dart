@@ -83,10 +83,7 @@ class AppSuccessState extends StatelessWidget {
         builder: (context, scale, child) {
           return Transform.scale(
             scale: scale,
-            child: Opacity(
-              opacity: (scale - 0.8) / 0.2,
-              child: child,
-            ),
+            child: Opacity(opacity: (scale - 0.8) / 0.2, child: child),
           );
         },
         child: content,

@@ -53,10 +53,7 @@ class SkeletonState extends StatelessWidget {
   }
 
   /// Factory for a circular avatar skeleton placeholder
-  factory SkeletonState.avatar({
-    Key? key,
-    double size = 48.0,
-  }) {
+  factory SkeletonState.avatar({Key? key, double size = 48.0}) {
     return SkeletonState(
       key: key,
       width: size,
@@ -68,9 +65,11 @@ class SkeletonState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final defaultBaseColor = baseColor ??
+    final defaultBaseColor =
+        baseColor ??
         (isDark ? AppColors.surfaceHighlight : AppColors.borderSubtle);
-    final defaultHighlightColor = highlightColor ??
+    final defaultHighlightColor =
+        highlightColor ??
         (isDark ? AppColors.surfaceElevated : AppColors.lightSurface);
 
     return Shimmer.fromColors(

@@ -10,10 +10,12 @@ class RouteConstants {
   static const String onboarding = '/onboarding';
   static const String login = '/login';
   static const String register = '/register';
+  static const String otp = '/otp';
   static const String forgotPassword = '/forgot-password';
   static const String forgotPasswordSuccess = '/forgot-password-success';
 
   // Main Routes
+  static const String dashboard = '/dashboard';
   static const String missionControl = '/mission-control';
   static const String academy = '/academy';
   static const String courseDetail = '/academy/course';
@@ -35,4 +37,7 @@ class RouteConstants {
   static const String profileStats = '/profile/stats';
   static const String profileAccount = '/profile/account';
   static const String settings = '/settings';
+  static const String notifications = '/notifications';
+  static const String privacyPolicy = '/settings/privacy-policy';
+  static const String termsConditions = '/settings/terms-conditions';
 }

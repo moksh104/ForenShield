@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:shimmer/shimmer.dart';
-import '../../../../core/effects/glow_effect.dart';
 import '../../../../core/theme/app_gradients.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/foren_theme.dart';
 
-/// A premium animated full-width button with hover & glow effects for authentication forms.
+/// A clean full-width button for authentication forms.
 class AuthButton extends StatefulWidget {
   final String label;
   final VoidCallback? onPressed;
@@ -25,13 +23,12 @@ class AuthButton extends StatefulWidget {
 }
 
 class _AuthButtonState extends State<AuthButton> {
-  bool _isHovered = false;
+  bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
-    final primaryColor = theme.colorScheme.primary;
 
     if (widget.isOutlined) {
       return _OutlinedVariant(
@@ -43,79 +40,71 @@ class _AuthButtonState extends State<AuthButton> {
 
     final isEnabled = widget.onPressed != null && !widget.isLoading;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        transform: Matrix4.translationValues(0, _isHovered && isEnabled ? -2 : 0, 0),
-        child: GlowEffect(
-          glowColor: primaryColor,
-          blurRadius: _isHovered && isEnabled ? 16.0 : 8.0,
-          spreadRadius: _isHovered && isEnabled ? 2.0 : 0.0,
-          animate: _isHovered && isEnabled,
-          borderRadius: AppRadius.borderRadiusMd,
-          child: SizedBox(
-            width: double.infinity,
-            height: 52,
-            child: DecoratedBox(
-              decoration: BoxDecoration(
-                gradient: isEnabled ? AppGradients.brand : null,
-                color: !isEnabled ? foren.surfaceRaised1 : null,
-                borderRadius: AppRadius.borderRadiusMd,
-              ),
-              child: ElevatedButton(
-                onPressed: widget.isLoading ? null : widget.onPressed,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  disabledBackgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: AppRadius.borderRadiusMd,
-                  ),
-                  padding: EdgeInsets.zero,
+    return GestureDetector(
+      onTapDown: isEnabled ? (_) => setState(() => _isPressed = true) : null,
+      onTapUp: isEnabled
+          ? (_) {
+              setState(() => _isPressed = false);
+              widget.onPressed?.call();
+            }
+          : null,
+      onTapCancel: () => setState(() => _isPressed = false),
+      child: AnimatedScale(
+        scale: _isPressed ? 0.98 : 1.0,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOutCirc,
+        child: SizedBox(
+          width: double.infinity,
+          height: 52,
+          child: DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: isEnabled ? AppGradients.brand : null,
+              color: !isEnabled ? foren.surfaceRaised1 : null,
+              borderRadius: AppRadius.borderRadiusMd,
+            ),
+            child: ElevatedButton(
+              onPressed: widget.isLoading ? null : widget.onPressed,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                disabledBackgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: const RoundedRectangleBorder(
+                  borderRadius: AppRadius.borderRadiusMd,
                 ),
-                child: widget.isLoading
-                    ? Shimmer.fromColors(
-                        baseColor: theme.scaffoldBackgroundColor,
-                        highlightColor: primaryColor,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 18,
-                              height: 18,
-                              child: CircularProgressIndicator(
-                                color: theme.scaffoldBackgroundColor,
-                                strokeWidth: 2.5,
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            Text(
-                              'AUTHENTICATING...',
-                              style: TextStyle(
-                                color: theme.scaffoldBackgroundColor,
-                                fontSize: 13,
-                                fontWeight: FontWeight.w800,
-                                fontFamily: 'monospace',
-                                letterSpacing: 1.0,
-                              ),
-                            ),
-                          ],
-                        ),
-                      )
-                    : Text(
-                        widget.label,
-                        style: TextStyle(
-                          color: isEnabled
-                              ? theme.scaffoldBackgroundColor
-                              : foren.textDisabled,
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 0.5,
-                        ),
-                      ),
+                padding: EdgeInsets.zero,
               ),
+              child: widget.isLoading
+                  ? Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: 18,
+                          height: 18,
+                          child: CircularProgressIndicator(
+                            color: theme.scaffoldBackgroundColor,
+                            strokeWidth: 2.5,
+                          ),
+                        ),
+                        const SizedBox(width: 10),
+                        Text(
+                          'Signing in...',
+                          style: theme.textTheme.labelLarge?.copyWith(
+                            color: theme.scaffoldBackgroundColor,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    )
+                  : Text(
+                      widget.label,
+                      style: theme.textTheme.labelLarge?.copyWith(
+                        color: isEnabled
+                            ? theme.scaffoldBackgroundColor
+                            : foren.textDisabled,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.3,
+                      ),
+                    ),
             ),
           ),
         ),
@@ -140,57 +129,41 @@ class _OutlinedVariant extends StatefulWidget {
 }
 
 class _OutlinedVariantState extends State<_OutlinedVariant> {
-  bool _isHovered = false;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
     final primaryColor = theme.colorScheme.primary;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        transform: Matrix4.translationValues(0, _isHovered ? -2 : 0, 0),
-        width: double.infinity,
-        height: 52,
-        child: OutlinedButton(
-          onPressed: widget.isLoading ? null : widget.onPressed,
-          style: OutlinedButton.styleFrom(
-            backgroundColor: _isHovered
-                ? primaryColor.withValues(alpha: 0.1)
-                : Colors.transparent,
-            side: BorderSide(
-              color: _isHovered
-                  ? primaryColor
-                  : foren.borderSubtle.withValues(alpha: 0.7),
-              width: _isHovered ? 1.5 : 1.0,
-            ),
-            shape: const RoundedRectangleBorder(
-              borderRadius: AppRadius.borderRadiusMd,
-            ),
+    return SizedBox(
+      width: double.infinity,
+      height: 52,
+      child: OutlinedButton(
+        onPressed: widget.isLoading ? null : widget.onPressed,
+        style: OutlinedButton.styleFrom(
+          backgroundColor: Colors.transparent,
+          side: BorderSide(color: foren.borderSubtle.withValues(alpha: 0.7)),
+          shape: const RoundedRectangleBorder(
+            borderRadius: AppRadius.borderRadiusMd,
           ),
-          child: widget.isLoading
-              ? SizedBox(
-                  width: 22,
-                  height: 22,
-                  child: CircularProgressIndicator(
-                    color: foren.textSecondary,
-                    strokeWidth: 2.5,
-                  ),
-                )
-              : Text(
-                  widget.label,
-                  style: TextStyle(
-                    color: _isHovered ? primaryColor : foren.textSecondary,
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    letterSpacing: 0.3,
-                  ),
-                ),
         ),
+        child: widget.isLoading
+            ? SizedBox(
+                width: 22,
+                height: 22,
+                child: CircularProgressIndicator(
+                  color: foren.textSecondary,
+                  strokeWidth: 2.5,
+                ),
+              )
+            : Text(
+                widget.label,
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: primaryColor,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.3,
+                ),
+              ),
       ),
     );
   }

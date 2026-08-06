@@ -39,9 +39,17 @@ class _ForenLinearProgress extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               if (label != null)
-                Text(label!, style: theme.textTheme.labelMedium?.copyWith(color: foren.textSecondary)),
+                Text(
+                  label!,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: foren.textSecondary,
+                  ),
+                ),
               if (trailingText != null)
-                Text(trailingText!, style: theme.textTheme.labelMedium?.copyWith(color: color)),
+                Text(
+                  trailingText!,
+                  style: theme.textTheme.labelMedium?.copyWith(color: color),
+                ),
             ],
           ),
           const SizedBox(height: ForenSpace.xs),
@@ -64,7 +72,11 @@ class _ForenLinearProgress extends StatelessWidget {
 class ForenXpProgress extends StatelessWidget {
   final int currentXp;
   final int nextLevelXp;
-  const ForenXpProgress({super.key, required this.currentXp, required this.nextLevelXp});
+  const ForenXpProgress({
+    super.key,
+    required this.currentXp,
+    required this.nextLevelXp,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -83,7 +95,11 @@ class ForenXpProgress extends StatelessWidget {
 class ForenMissionProgress extends StatelessWidget {
   final int completedSteps;
   final int totalSteps;
-  const ForenMissionProgress({super.key, required this.completedSteps, required this.totalSteps});
+  const ForenMissionProgress({
+    super.key,
+    required this.completedSteps,
+    required this.totalSteps,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -133,12 +149,13 @@ class ForenCircularScore extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
-    final ringColor = color ??
+    final ringColor =
+        color ??
         (percent >= 0.75
             ? foren.success.t500
             : percent >= 0.5
-                ? foren.warning.t500
-                : foren.critical.t500);
+            ? foren.warning.t500
+            : foren.critical.t500);
 
     return SizedBox(
       width: size,
@@ -148,7 +165,11 @@ class ForenCircularScore extends StatelessWidget {
             width: size,
             height: size,
             child: CustomPaint(
-              painter: _RingPainter(percent: percent, color: ringColor, track: foren.surfaceRaised2),
+              painter: _RingPainter(
+                percent: percent,
+                color: ringColor,
+                track: foren.surfaceRaised2,
+              ),
               child: Center(
                 child: Text(
                   '${(percent * 100).round()}%',
@@ -161,7 +182,9 @@ class ForenCircularScore extends StatelessWidget {
           Text(
             label,
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+            ),
           ),
         ],
       ),
@@ -173,7 +196,11 @@ class _RingPainter extends CustomPainter {
   final double percent;
   final Color color;
   final Color track;
-  _RingPainter({required this.percent, required this.color, required this.track});
+  _RingPainter({
+    required this.percent,
+    required this.color,
+    required this.track,
+  });
 
   @override
   void paint(Canvas canvas, Size size) {

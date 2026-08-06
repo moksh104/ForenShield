@@ -5,6 +5,7 @@ import '../features/splash/presentation/pages/splash_screen.dart';
 import '../features/onboarding/screens/onboarding_screen.dart';
 import '../features/authentication/screens/login_screen.dart';
 import '../features/authentication/screens/register_screen.dart';
+import '../features/authentication/screens/otp_screen.dart';
 import '../features/authentication/screens/forgot_password_screen.dart';
 import '../features/authentication/screens/forgot_password_success_screen.dart';
 import '../features/mission_control/screens/mission_control_screen.dart';
@@ -28,6 +29,9 @@ import '../features/profile/screens/profile_screen.dart';
 import '../features/profile/presentation/pages/profile_statistics_screen.dart';
 import '../features/profile/presentation/pages/account_edit_screen.dart';
 import '../features/settings/screens/settings_screen.dart';
+import '../features/settings/presentation/pages/privacy_policy_screen.dart';
+import '../features/settings/presentation/pages/terms_conditions_screen.dart';
+import '../features/notifications/presentation/pages/notification_screen.dart';
 import '../developer/catalog/pages/catalog_main_page.dart';
 import 'route_constants.dart';
 import 'auth_guard.dart';
@@ -73,6 +77,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const RegisterScreen(),
       ),
       GoRoute(
+        name: 'otp',
+        path: RouteConstants.otp,
+        builder: (context, state) => OtpScreen(email: state.extra as String?),
+      ),
+      GoRoute(
         name: 'forgotPassword',
         path: RouteConstants.forgotPassword,
         builder: (context, state) => const ForgotPasswordScreen(),
@@ -83,7 +92,12 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ForgotPasswordSuccessScreen(),
       ),
 
-      // Protected Routes (No ShellRoute for now, just flat navigation)
+      // Protected Routes
+      GoRoute(
+        name: 'dashboard',
+        path: RouteConstants.dashboard,
+        builder: (context, state) => const MissionControlScreen(),
+      ),
       GoRoute(
         name: 'missionControl',
         path: RouteConstants.missionControl,
@@ -218,6 +232,21 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'settings',
         path: RouteConstants.settings,
         builder: (context, state) => const SettingsScreen(),
+      ),
+      GoRoute(
+        name: 'notifications',
+        path: RouteConstants.notifications,
+        builder: (context, state) => const NotificationScreen(),
+      ),
+      GoRoute(
+        name: 'privacyPolicy',
+        path: RouteConstants.privacyPolicy,
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+      GoRoute(
+        name: 'termsConditions',
+        path: RouteConstants.termsConditions,
+        builder: (context, state) => const TermsConditionsScreen(),
       ),
     ],
   );

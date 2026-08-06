@@ -17,8 +17,7 @@ class AcademyRemoteDataSource {
 
   /// Fetches all available courses from the API.
   Future<List<CourseModel>> fetchCourses() async {
-    final response =
-        await _apiClient.get<List<dynamic>>(ApiEndpoints.lessons);
+    final response = await _apiClient.get<List<dynamic>>(ApiEndpoints.lessons);
     final data = response.data;
     if (data == null) return [];
     return data
@@ -63,8 +62,9 @@ class AcademyRemoteDataSource {
 
   /// Fetches the current user's progress across all enrolled courses.
   Future<List<LessonProgressModel>> fetchUserProgress() async {
-    final response =
-        await _apiClient.get<List<dynamic>>('${ApiEndpoints.lessons}/progress');
+    final response = await _apiClient.get<List<dynamic>>(
+      '${ApiEndpoints.lessons}/progress',
+    );
     final data = response.data;
     if (data == null) return [];
     return data
@@ -74,8 +74,6 @@ class AcademyRemoteDataSource {
 
   /// Enrolls the current user in a course by [courseId].
   Future<void> enrollCourse(String courseId) async {
-    await _apiClient.post<void>(
-      '${ApiEndpoints.lessons}/$courseId/enroll',
-    );
+    await _apiClient.post<void>('${ApiEndpoints.lessons}/$courseId/enroll');
   }
 }

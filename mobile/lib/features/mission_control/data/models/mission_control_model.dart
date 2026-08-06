@@ -50,26 +50,29 @@ class MissionControlModel extends MissionControlEntity {
       securityScore: json['security_score'] as int? ?? 88,
       todayRiskMessage:
           json['today_risk_message'] as String? ?? 'Minimal Anomalies Detected',
-      currentMissionTitle: json['current_mission_title'] as String? ??
+      currentMissionTitle:
+          json['current_mission_title'] as String? ??
           'Identify Phishing Vector #204',
       missionEstimatedMinutes: json['mission_estimated_minutes'] as int? ?? 15,
       missionDifficulty: json['mission_difficulty'] as String? ?? 'Medium',
-      missionProgress:
-          (json['mission_progress'] as num?)?.toDouble() ?? 0.45,
+      missionProgress: (json['mission_progress'] as num?)?.toDouble() ?? 0.45,
       isMissionCompleted: json['is_mission_completed'] as bool? ?? false,
-      currentCourseTitle: json['current_course_title'] as String? ??
+      currentCourseTitle:
+          json['current_course_title'] as String? ??
           'Digital Forensics & Incident Response',
-      currentModuleTitle: json['current_module_title'] as String? ??
+      currentModuleTitle:
+          json['current_module_title'] as String? ??
           'Module 3 · Memory Artifact Analysis',
       courseCompletionPercentage:
           (json['course_completion_percentage'] as num?)?.toDouble() ?? 0.68,
       courseTimeRemaining:
           json['course_time_remaining'] as String? ?? '25 min left',
-      activeCaseId: json['active_case_id'] as String? ?? '#FSC-0091',
-      activeCaseTitle: json['active_case_title'] as String? ??
+      activeCaseId: (json['active_case_id'] ?? '#FSC-0091').toString(),
+      activeCaseTitle:
+          json['active_case_title'] as String? ??
           'Ransomware Intrusion: NovaCorp',
-      activeCaseType: json['active_case_type'] as String? ??
-          'Memory & Disk Forensics',
+      activeCaseType:
+          json['active_case_type'] as String? ?? 'Memory & Disk Forensics',
       evidenceCount: json['evidence_count'] as int? ?? 12,
       caseStatus: json['case_status'] as String? ?? 'IN PROGRESS',
       completedObjectives: json['completed_objectives'] as int? ?? 4,
@@ -79,19 +82,23 @@ class MissionControlModel extends MissionControlEntity {
       weeklyHoursPracticed:
           (json['weekly_hours_practiced'] as num?)?.toDouble() ?? 14.5,
       weeklyXpEarned: json['weekly_xp_earned'] as int? ?? 1250,
-      dailyXpData: (json['daily_xp_data'] as List<dynamic>?)
+      dailyXpData:
+          (json['daily_xp_data'] as List<dynamic>?)
               ?.map((e) => (e as num).toDouble())
               .toList() ??
           const [120, 240, 180, 310, 290, 420, 350],
-      achievements: (json['achievements'] as List<dynamic>?)
+      achievements:
+          (json['achievements'] as List<dynamic>?)
               ?.map((e) => AchievementItemModel.fromJson(e))
               .toList() ??
           _defaultAchievements,
-      notifications: (json['notifications'] as List<dynamic>?)
+      notifications:
+          (json['notifications'] as List<dynamic>?)
               ?.map((e) => DashboardNotificationModel.fromJson(e))
               .toList() ??
           _defaultNotifications,
-      recentActivities: (json['recent_activities'] as List<dynamic>?)
+      recentActivities:
+          (json['recent_activities'] as List<dynamic>?)
               ?.map((e) => DashboardActivityModel.fromJson(e))
               .toList() ??
           _defaultActivities,
@@ -221,7 +228,7 @@ class MissionControlModel extends MissionControlEntity {
 class AchievementItemModel {
   static AchievementItem fromJson(Map<String, dynamic> json) {
     return AchievementItem(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       description: json['description'] as String? ?? '',
       iconName: json['icon_name'] as String? ?? 'shield',
@@ -235,7 +242,7 @@ class AchievementItemModel {
 class DashboardNotificationModel {
   static DashboardNotification fromJson(Map<String, dynamic> json) {
     return DashboardNotification(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       message: json['message'] as String? ?? '',
       timestamp: json['timestamp'] as String? ?? '',
@@ -248,7 +255,7 @@ class DashboardNotificationModel {
 class DashboardActivityModel {
   static DashboardActivity fromJson(Map<String, dynamic> json) {
     return DashboardActivity(
-      id: json['id'] as String? ?? '',
+      id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       subtitle: json['subtitle'] as String? ?? '',
       timestamp: json['timestamp'] as String? ?? '',

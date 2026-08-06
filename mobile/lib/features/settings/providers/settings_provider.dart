@@ -3,24 +3,28 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/storage_keys.dart';
 import '../../../core/storage/storage_service.dart';
 
-/// App Settings State.
+/// App Settings State holding user preferences and configuration.
 class SettingsState {
   final ThemeMode themeMode;
   final bool pushNotifications;
   final bool threatAlerts;
   final bool emailAlerts;
-  final bool analyticsEnabled;
   final bool biometricLogin;
+  final int autoLogoutMinutes;
+  final bool analyticsEnabled;
+  final bool dataCollectionEnabled;
   final bool autoUpdates;
   final bool developerMode;
 
   const SettingsState({
-    this.themeMode = ThemeMode.dark,
+    this.themeMode = ThemeMode.light,
     this.pushNotifications = true,
     this.threatAlerts = true,
     this.emailAlerts = true,
-    this.analyticsEnabled = false,
     this.biometricLogin = false,
+    this.autoLogoutMinutes = 15,
+    this.analyticsEnabled = false,
+    this.dataCollectionEnabled = true,
     this.autoUpdates = true,
     this.developerMode = false,
   });
@@ -30,8 +34,10 @@ class SettingsState {
     bool? pushNotifications,
     bool? threatAlerts,
     bool? emailAlerts,
-    bool? analyticsEnabled,
     bool? biometricLogin,
+    int? autoLogoutMinutes,
+    bool? analyticsEnabled,
+    bool? dataCollectionEnabled,
     bool? autoUpdates,
     bool? developerMode,
   }) {
@@ -40,15 +46,17 @@ class SettingsState {
       pushNotifications: pushNotifications ?? this.pushNotifications,
       threatAlerts: threatAlerts ?? this.threatAlerts,
       emailAlerts: emailAlerts ?? this.emailAlerts,
-      analyticsEnabled: analyticsEnabled ?? this.analyticsEnabled,
       biometricLogin: biometricLogin ?? this.biometricLogin,
+      autoLogoutMinutes: autoLogoutMinutes ?? this.autoLogoutMinutes,
+      analyticsEnabled: analyticsEnabled ?? this.analyticsEnabled,
+      dataCollectionEnabled: dataCollectionEnabled ?? this.dataCollectionEnabled,
       autoUpdates: autoUpdates ?? this.autoUpdates,
       developerMode: developerMode ?? this.developerMode,
     );
   }
 }
 
-/// StateNotifier for Settings persistence.
+/// StateNotifier for Settings persistence and state management.
 class SettingsNotifier extends StateNotifier<SettingsState> {
   final StorageService _storage = StorageService();
 
@@ -58,15 +66,17 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
 
   Future<void> _loadSettings() async {
     final themeStr = await _storage.read(StorageKeys.themeMode);
-    ThemeMode mode = ThemeMode.dark;
-    if (themeStr == 'light') mode = ThemeMode.light;
+    ThemeMode mode = ThemeMode.light;
+    if (themeStr == 'dark') mode = ThemeMode.dark;
     if (themeStr == 'system') mode = ThemeMode.system;
 
     final push = await _storage.readBool(StorageKeys.settingsPushNotifications) ?? true;
     final threat = await _storage.readBool(StorageKeys.settingsThreatAlerts) ?? true;
     final email = await _storage.readBool(StorageKeys.settingsEmailAlerts) ?? true;
-    final analytics = await _storage.readBool(StorageKeys.settingsAnalyticsEnabled) ?? false;
     final bio = await _storage.readBool(StorageKeys.settingsBiometricLogin) ?? false;
+    final autoLogout = await _storage.readInt(StorageKeys.settingsAutoLogoutMinutes) ?? 15;
+    final analytics = await _storage.readBool(StorageKeys.settingsAnalyticsEnabled) ?? false;
+    final dataColl = await _storage.readBool(StorageKeys.settingsDataCollectionEnabled) ?? true;
     final autoUpd = await _storage.readBool(StorageKeys.settingsAutoUpdates) ?? true;
     final dev = await _storage.readBool(StorageKeys.settingsDeveloperMode) ?? false;
 
@@ -75,16 +85,18 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
       pushNotifications: push,
       threatAlerts: threat,
       emailAlerts: email,
-      analyticsEnabled: analytics,
       biometricLogin: bio,
+      autoLogoutMinutes: autoLogout,
+      analyticsEnabled: analytics,
+      dataCollectionEnabled: dataColl,
       autoUpdates: autoUpd,
       developerMode: dev,
     );
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
-    String modeStr = 'dark';
-    if (mode == ThemeMode.light) modeStr = 'light';
+    String modeStr = 'light';
+    if (mode == ThemeMode.dark) modeStr = 'dark';
     if (mode == ThemeMode.system) modeStr = 'system';
     await _storage.write(StorageKeys.themeMode, modeStr);
     state = state.copyWith(themeMode: mode);
@@ -105,14 +117,24 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     state = state.copyWith(emailAlerts: val);
   }
 
+  Future<void> toggleBiometricLogin(bool val) async {
+    await _storage.writeBool(StorageKeys.settingsBiometricLogin, val);
+    state = state.copyWith(biometricLogin: val);
+  }
+
+  Future<void> setAutoLogoutMinutes(int minutes) async {
+    await _storage.writeInt(StorageKeys.settingsAutoLogoutMinutes, minutes);
+    state = state.copyWith(autoLogoutMinutes: minutes);
+  }
+
   Future<void> toggleAnalytics(bool val) async {
     await _storage.writeBool(StorageKeys.settingsAnalyticsEnabled, val);
     state = state.copyWith(analyticsEnabled: val);
   }
 
-  Future<void> toggleBiometricLogin(bool val) async {
-    await _storage.writeBool(StorageKeys.settingsBiometricLogin, val);
-    state = state.copyWith(biometricLogin: val);
+  Future<void> toggleDataCollection(bool val) async {
+    await _storage.writeBool(StorageKeys.settingsDataCollectionEnabled, val);
+    state = state.copyWith(dataCollectionEnabled: val);
   }
 
   Future<void> toggleAutoUpdates(bool val) async {
@@ -130,8 +152,10 @@ class SettingsNotifier extends StateNotifier<SettingsState> {
     await _storage.delete(StorageKeys.settingsPushNotifications);
     await _storage.delete(StorageKeys.settingsThreatAlerts);
     await _storage.delete(StorageKeys.settingsEmailAlerts);
-    await _storage.delete(StorageKeys.settingsAnalyticsEnabled);
     await _storage.delete(StorageKeys.settingsBiometricLogin);
+    await _storage.delete(StorageKeys.settingsAutoLogoutMinutes);
+    await _storage.delete(StorageKeys.settingsAnalyticsEnabled);
+    await _storage.delete(StorageKeys.settingsDataCollectionEnabled);
     await _storage.delete(StorageKeys.settingsAutoUpdates);
     await _storage.delete(StorageKeys.settingsDeveloperMode);
 

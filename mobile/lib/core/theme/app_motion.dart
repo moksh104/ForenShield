@@ -1,41 +1,44 @@
 import 'package:flutter/material.dart';
 
-/// Centralized motion tokens for ForenShield.
-/// Acts as the single source of truth for all animation timing and easing.
+/// Centralized motion tokens for ForenShield (Phase 2 UI Optimization).
+/// Single source of truth for all animation timing and easing.
+/// Strictly configured to Phase 2 scale: 150 ms, 200 ms, 250 ms, 300 ms.
 class AppMotion {
   AppMotion._();
 
   // ------------------------------------
-  // Animation Durations
+  // Animation Durations (150ms, 200ms, 250ms, 300ms)
   // ------------------------------------
 
   /// 0ms - Instant change
   static const Duration instant = Duration.zero;
 
-  /// 150ms - Micro-interactions, hover states, ripples
+  /// 150ms - Micro-interactions, ripples, quick toggles
+  static const Duration microDuration = Duration(milliseconds: 150);
   static const Duration fast = Duration(milliseconds: 150);
 
-  /// 250ms - Standard transitions, expansions
-  static const Duration normal = Duration(milliseconds: 250);
+  /// 200ms - Standard transitions, hover states, selection shifts
+  static const Duration normal = Duration(milliseconds: 200);
 
-  /// 500ms - Emphasized celebrations, complex state changes
-  static const Duration slow = Duration(milliseconds: 500);
+  /// 250ms - Card expands, page transitions, sheets
+  static const Duration medium = Duration(milliseconds: 250);
 
-  /// 800ms - Ambient animations, heavy emphasis
-  static const Duration slower = Duration(milliseconds: 800);
+  /// 300ms - Dialog appearances, major state transitions
+  static const Duration slow = Duration(milliseconds: 300);
+  static const Duration slower = Duration(milliseconds: 300);
 
   // ------------------------------------
   // Animation Curves
   // ------------------------------------
 
   /// Fade curve - smooth opacity transition
-  static const Curve fade = Curves.easeOut;
+  static const Curve fade = Curves.easeOutCirc;
 
   /// Scale curve - spring/overshoot scale transition
   static const Curve scale = Curves.easeOutBack;
 
   /// Slide curve - natural position slide transition
-  static const Curve slide = Curves.easeInOutCubic;
+  static const Curve slide = Curves.easeInOutBack;
 
   /// Bounce curve - energetic bounce effect
   static const Curve bounce = Curves.bounceOut;
@@ -43,17 +46,20 @@ class AppMotion {
   /// Standard easing for generic movement
   static const Curve standard = Curves.easeInOut;
 
-  /// Easing for elements entering the screen (starts fast, ends slow)
-  static const Curve decelerate = Curves.easeOut;
+  /// Easing for elements entering the screen
+  static const Curve decelerate = Curves.easeOutCubic;
 
-  /// Easing for elements exiting the screen (starts slow, ends fast)
-  static const Curve accelerate = Curves.easeIn;
+  /// Easing for elements exiting the screen
+  static const Curve accelerate = Curves.easeInCubic;
 
   /// Dramatic easing for major transitions
-  static const Curve emphasized = Curves.easeInOutCubic;
+  static const Curve emphasized = Curves.easeOutCubic;
 
   /// Elastic spring easing
   static const Curve elastic = Curves.elasticOut;
+
+  /// Micro-interaction easing
+  static const Curve micro = Curves.easeOutCirc;
 
   // ------------------------------------
   // Animation Delays (Staggers)
@@ -75,12 +81,12 @@ class AppMotion {
   // Helper Extensions
   // ------------------------------------
 
-  /// Standard duration for opacity fades
+  /// Standard duration for opacity fades (150ms)
   static const Duration fadeDuration = fast;
 
-  /// Standard duration for full page transitions
-  static const Duration pageTransition = normal;
+  /// Standard duration for full page transitions (250ms)
+  static const Duration pageTransition = medium;
 
-  /// Standard duration for dialog/modal appearances
+  /// Standard duration for dialog/modal appearances (200ms)
   static const Duration dialogTransition = normal;
 }

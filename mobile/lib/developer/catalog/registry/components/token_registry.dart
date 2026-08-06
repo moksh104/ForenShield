@@ -108,7 +108,10 @@ class _ColorBox extends StatelessWidget {
         Container(
           width: 64,
           height: 64,
-          decoration: BoxDecoration(color: color, borderRadius: AppRadius.borderMd),
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: AppRadius.borderMd,
+          ),
         ),
         const SizedBox(height: AppSpacing.xs),
         Text(label, style: AppTypography.labelSmall),
@@ -128,7 +131,10 @@ class _SpacingBox extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: AppSpacing.sm),
       child: Row(
         children: [
-          SizedBox(width: 40, child: Text(label, style: AppTypography.labelSmall)),
+          SizedBox(
+            width: 40,
+            child: Text(label, style: AppTypography.labelSmall),
+          ),
           Container(
             height: 24,
             width: size,

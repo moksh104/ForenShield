@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../core/logger/app_logger.dart';
 import '../core/providers/app_preferences_provider.dart';
 import '../features/authentication/providers/auth_state_provider.dart';
 import '../models/user_model.dart';
@@ -20,23 +21,17 @@ class RouterNotifier extends ChangeNotifier {
   AsyncValue<UserModel?> get authState => _authState;
 
   RouterNotifier(this._ref) {
-    _ref.listen<AsyncValue<bool>>(
-      hasSeenOnboardingProvider,
-      (_, next) {
-        _hasSeenOnboarding = next;
-        notifyListeners();
-      },
-      fireImmediately: true,
-    );
+    _ref.listen<AsyncValue<bool>>(hasSeenOnboardingProvider, (_, next) {
+      AppLogger.d('[RouterNotifier] Onboarding state updated: $next');
+      _hasSeenOnboarding = next;
+      notifyListeners();
+    }, fireImmediately: true);
 
-    _ref.listen<AsyncValue<UserModel?>>(
-      authStateProvider,
-      (_, next) {
-        _authState = next;
-        notifyListeners();
-      },
-      fireImmediately: true,
-    );
+    _ref.listen<AsyncValue<UserModel?>>(authStateProvider, (_, next) {
+      AppLogger.d('[RouterNotifier] Auth state updated: value=${next.value?.email}, isLoading=${next.isLoading}');
+      _authState = next;
+      notifyListeners();
+    }, fireImmediately: true);
   }
 }
 

@@ -37,7 +37,8 @@ class ErrorInterceptor extends Interceptor {
 
       case DioExceptionType.unknown:
         // Commonly thrown for SocketExceptions (No internet) or parsing errors
-        if (error.error != null && error.error.toString().contains('SocketException')) {
+        if (error.error != null &&
+            error.error.toString().contains('SocketException')) {
           return const NetworkException();
         }
         if (error.error != null && error.error is FormatException) {
@@ -60,7 +61,7 @@ class ErrorInterceptor extends Interceptor {
 
     String message = 'An error occurred';
     if (data is Map<String, dynamic>) {
-      message = data['message'] as String? ?? message;
+      message = data['error'] as String? ?? data['message'] as String? ?? message;
     }
 
     switch (statusCode) {

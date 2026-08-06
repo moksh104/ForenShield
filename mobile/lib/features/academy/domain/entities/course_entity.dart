@@ -18,8 +18,7 @@ class ModuleEntity extends Equatable {
     required this.order,
   });
 
-  int get completedLessonsCount =>
-      lessons.where((l) => l.isCompleted).length;
+  int get completedLessonsCount => lessons.where((l) => l.isCompleted).length;
 
   double get progress =>
       lessons.isEmpty ? 0.0 : completedLessonsCount / lessons.length;
@@ -82,8 +81,7 @@ class CourseEntity extends Equatable {
       learningOutcomes: learningOutcomes,
       modules: modules ?? this.modules,
       isEnrolled: isEnrolled ?? this.isEnrolled,
-      completionPercentage:
-          completionPercentage ?? this.completionPercentage,
+      completionPercentage: completionPercentage ?? this.completionPercentage,
       totalXp: totalXp,
       quiz: quiz,
     );
@@ -91,20 +89,20 @@ class CourseEntity extends Equatable {
 
   @override
   List<Object?> get props => [
-        id,
-        title,
-        description,
-        category,
-        difficulty,
-        durationMinutes,
-        instructorName,
-        thumbnailUrl,
-        prerequisites,
-        learningOutcomes,
-        modules,
-        isEnrolled,
-        completionPercentage,
-        totalXp,
-        quiz,
-      ];
+    id,
+    title,
+    description,
+    category,
+    difficulty,
+    durationMinutes,
+    instructorName,
+    thumbnailUrl,
+    prerequisites,
+    learningOutcomes,
+    modules,
+    isEnrolled,
+    completionPercentage,
+    totalXp,
+    quiz,
+  ];
 }
