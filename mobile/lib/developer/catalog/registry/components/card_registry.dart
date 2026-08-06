@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../../models/component_definition.dart';
 import '../../../../core/widgets/app_card.dart';
@@ -132,7 +133,7 @@ final List<ComponentDefinition> cardComponents = [
     builder: (context, props) {
       // Wrapped in a colored container so the glass effect is visible in the playground
       return Container(
-        padding: const EdgeInsets.all(32),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         decoration: BoxDecoration(
           gradient: LinearGradient(
             colors: [

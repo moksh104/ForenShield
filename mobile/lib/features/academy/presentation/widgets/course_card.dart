@@ -172,7 +172,7 @@ class CourseCard extends StatelessWidget {
                               fontWeight: FontWeight.w500,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Icon(
                             Icons.access_time_rounded,
                             size: 13,

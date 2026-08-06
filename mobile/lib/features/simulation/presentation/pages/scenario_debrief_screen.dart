@@ -83,7 +83,7 @@ class ScenarioDebriefScreen extends ConsumerWidget {
                 ),
               ),
 
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
 
               Text(
                 scenario.title,
@@ -254,7 +254,7 @@ class _DebriefStat extends StatelessWidget {
             fontWeight: FontWeight.w800,
           ),
         ),
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
         Text(
           label,
           style: theme.textTheme.labelSmall?.copyWith(
@@ -283,7 +283,7 @@ class _ReportBullet extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(Icons.check_circle_outline, size: 16, color: foren.success.t500),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
               text,

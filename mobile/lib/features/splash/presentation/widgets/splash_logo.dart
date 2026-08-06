@@ -109,7 +109,7 @@ class SplashLogo extends StatelessWidget {
             .fadeIn(delay: 150.ms, duration: 350.ms, curve: Curves.easeOutCubic)
             .slideY(begin: 0.1, end: 0),
 
-        const SizedBox(height: 4),
+        const SizedBox(height: AppSpacing.xs),
 
         // Subtitle: Cybersecurity · Forensics · Simulation
         Text(
@@ -152,7 +152,7 @@ class SplashLogo extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Protect the future.',
                       style: theme.textTheme.titleMedium?.copyWith(

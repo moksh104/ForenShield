@@ -171,7 +171,7 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                                         color: foren.critical.t500,
                                         size: 20,
                                       ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: AppSpacing.sm),
                                       Expanded(
                                         child: Text(
                                           _errorMessage!,

@@ -167,7 +167,7 @@ class _StatBigTileState extends State<_StatBigTile> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppSpacing.md),
                   decoration: BoxDecoration(
                     color: data.color.withValues(alpha: 0.15),
                     borderRadius: AppRadius.borderRadiusMd,

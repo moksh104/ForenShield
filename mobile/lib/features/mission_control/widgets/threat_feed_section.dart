@@ -129,7 +129,7 @@ class _ThreatTile extends ConsumerWidget {
               size: 17,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -167,7 +167,7 @@ class _ThreatTile extends ConsumerWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   item.title,
                   style: theme.textTheme.bodySmall?.copyWith(

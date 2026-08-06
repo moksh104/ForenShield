@@ -74,7 +74,7 @@ class SkillBadgesSection extends StatelessWidget {
                       color: primaryColor,
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Skills',
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -146,7 +146,7 @@ class SkillBadgesSection extends StatelessWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
 
                     // Skill Bar Track
                     Container(

@@ -38,6 +38,9 @@ class ApiEndpoints {
   // ── Profile ────────────────────────────────────────────────────────────────
 
   static const String profile = '/profile.php';
+  static const String leaderboard = '/leaderboard.php';
+  static const String updateXp = '/update_xp.php';
+  static const String achievements = '/achievements.php';
   static const String updateProfile = '/update_profile.php';
 
   // ── Mission Control ────────────────────────────────────────────────────────

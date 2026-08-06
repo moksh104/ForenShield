@@ -143,7 +143,7 @@ class _ActionTileState extends State<_ActionTile> {
           children: [
             AnimatedContainer(
               duration: const Duration(milliseconds: 160),
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: itemColor.withValues(alpha: 0.12),
                 shape: BoxShape.circle,

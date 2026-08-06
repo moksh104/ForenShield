@@ -25,23 +25,17 @@ class CourseListScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = AppColors.primary;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
+    final colorScheme = theme.colorScheme;
+    final primaryColor = colorScheme.primary;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
     final foren = theme.extension<ForenColors>()!;
 
     final state = ref.watch(courseProvider);
     final notifier = ref.read(courseProvider.notifier);
 
     return Scaffold(
-      backgroundColor: isDark
-          ? theme.scaffoldBackgroundColor
-          : const Color(0xFFFAFAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       bottomNavigationBar: ForenBottomNav(
         currentIndex: 1,
         onTap: (index) {
@@ -88,7 +82,7 @@ class CourseListScreen extends ConsumerWidget {
                       }
                     },
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Brand Shield Logo Mark
                   Container(
@@ -96,9 +90,7 @@ class CourseListScreen extends ConsumerWidget {
                     height: 38,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isDark
-                          ? AppColors.surface
-                          : AppColors.lightSurface,
+                      color: colorScheme.surface,
                       border: Border.all(
                         color: primaryColor.withValues(alpha: 0.3),
                         width: 1.5,
@@ -200,11 +192,11 @@ class CourseListScreen extends ConsumerWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Notification Bell
                   GestureDetector(
-                    onTap: () => context.push(RouteConstants.settings),
+                    onTap: () => context.push(RouteConstants.notifications),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -227,9 +219,7 @@ class CourseListScreen extends ConsumerWidget {
                               color: primaryColor,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isDark
-                                    ? theme.scaffoldBackgroundColor
-                                    : Colors.white,
+                                color: colorScheme.surface,
                                 width: 1.5,
                               ),
                             ),
@@ -264,7 +254,7 @@ class CourseListScreen extends ConsumerWidget {
                             letterSpacing: -0.3,
                           ),
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Text(
                           'Learn cybersecurity with interactive lessons and quizzes.',
                           style: TextStyle(
@@ -277,7 +267,7 @@ class CourseListScreen extends ConsumerWidget {
                     ),
                   ),
 
-                  const SizedBox(width: 12),
+                  const SizedBox(width: AppSpacing.md),
 
                   // My Courses Button
                   GestureDetector(
@@ -288,12 +278,10 @@ class CourseListScreen extends ConsumerWidget {
                         vertical: 10,
                       ),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surface : Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: AppRadius.borderRadiusSm,
                         border: Border.all(
-                          color: isDark
-                              ? foren.borderSubtle
-                              : const Color(0xFFE2E8F0),
+                          color: colorScheme.outlineVariant,
                         ),
                       ),
                       child: Row(

@@ -189,7 +189,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                         color: foren.critical.t500,
                                         size: 20,
                                       ),
-                                      const SizedBox(width: 8),
+                                      const SizedBox(width: AppSpacing.sm),
                                       Expanded(
                                         child: Text(
                                           _errorMessage!,
@@ -283,7 +283,7 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 8),
+                              const SizedBox(width: AppSpacing.sm),
                               Text(
                                 pwdStrength > 0.7
                                     ? 'STRONG'

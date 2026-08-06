@@ -44,7 +44,7 @@ class SecurityHeatMapWidget extends StatelessWidget {
                       color: AppColors.primary,
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Incident density',
                       style: theme.textTheme.titleSmall?.copyWith(
@@ -68,7 +68,7 @@ class SecurityHeatMapWidget extends StatelessWidget {
             // Days Header Row
             Row(
               children: [
-                const SizedBox(width: 48),
+                const SizedBox(width: AppSpacing.xxxl),
                 ...days.map(
                   (d) => Expanded(
                     child: Center(
@@ -102,7 +102,7 @@ class SecurityHeatMapWidget extends StatelessWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     ...List.generate(7, (colIdx) {
                       final level = densityMatrix[rowIdx][colIdx];
                       final cellColor = _getHeatColor(

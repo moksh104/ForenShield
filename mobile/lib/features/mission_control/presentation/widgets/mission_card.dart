@@ -63,7 +63,7 @@ class _MissionCardState extends State<MissionCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.flag_outlined, size: 12, color: primaryColor),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       'TODAY\'S MISSION',
                       style: theme.textTheme.labelSmall?.copyWith(
@@ -106,7 +106,7 @@ class _MissionCardState extends State<MissionCard> {
           Row(
             children: [
               Icon(Icons.timer_outlined, size: 13, color: foren.textDisabled),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 '${widget.estimatedMinutes} min estimated',
                 style: theme.textTheme.bodySmall?.copyWith(

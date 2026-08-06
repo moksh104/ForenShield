@@ -340,7 +340,7 @@ class ReportDetailScreen extends ConsumerWidget {
                                       size: 8,
                                       color: accentColor,
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Expanded(
                                       child: Text(
                                         finding,
@@ -383,7 +383,7 @@ class ReportDetailScreen extends ConsumerWidget {
                                       size: 16,
                                       color: foren.success.t500,
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Expanded(
                                       child: Text(
                                         action,
@@ -425,7 +425,7 @@ class ReportDetailScreen extends ConsumerWidget {
                                       size: 16,
                                       color: foren.warning.t500,
                                     ),
-                                    const SizedBox(width: 8),
+                                    const SizedBox(width: AppSpacing.sm),
                                     Expanded(
                                       child: Text(
                                         artifact,
@@ -559,7 +559,7 @@ class _SectionCard extends StatelessWidget {
             Row(
               children: [
                 Icon(icon, color: accentColor, size: 18),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   title,
                   style: TextStyle(

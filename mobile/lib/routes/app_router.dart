@@ -32,6 +32,8 @@ import '../features/settings/screens/settings_screen.dart';
 import '../features/settings/presentation/pages/privacy_policy_screen.dart';
 import '../features/settings/presentation/pages/terms_conditions_screen.dart';
 import '../features/notifications/presentation/pages/notification_screen.dart';
+import '../features/leaderboard/presentation/pages/leaderboard_screen.dart';
+import '../features/achievements/presentation/pages/achievement_screen.dart';
 import '../developer/catalog/pages/catalog_main_page.dart';
 import 'route_constants.dart';
 import 'auth_guard.dart';
@@ -212,6 +214,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'profile',
         path: RouteConstants.profile,
         builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        name: 'leaderboard',
+        path: RouteConstants.leaderboard,
+        builder: (context, state) => const LeaderboardScreen(),
+      ),
+      GoRoute(
+        name: 'achievementsFeature',
+        path: RouteConstants.achievements,
+        builder: (context, state) => const AchievementScreen(),
       ),
       GoRoute(
         name: 'achievements',

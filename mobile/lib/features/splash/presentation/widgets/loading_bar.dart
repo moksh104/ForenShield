@@ -130,7 +130,7 @@ class _LoadingBarState extends State<LoadingBar>
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(Icons.shield_outlined, size: 15, color: primaryColor),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Enterprise-grade encryption and security',
                   style: theme.textTheme.bodySmall?.copyWith(

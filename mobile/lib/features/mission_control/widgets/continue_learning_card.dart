@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// A card showing the user's current learning progress.
@@ -62,7 +63,7 @@ class ContinueLearningCard extends StatelessWidget {
                               size: 11,
                               color: theme.colorScheme.onPrimaryContainer,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppSpacing.xs),
                             Text(
                               'ACADEMY',
                               style: theme.textTheme.labelSmall?.copyWith(
@@ -86,7 +87,7 @@ class ContinueLearningCard extends StatelessWidget {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Text(
                     lessonTitle,
                     style: theme.textTheme.titleSmall?.copyWith(

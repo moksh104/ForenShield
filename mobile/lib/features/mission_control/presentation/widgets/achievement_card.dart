@@ -71,7 +71,7 @@ class _AchievementCardState extends State<AchievementCard> {
                       color: theme.scaffoldBackgroundColor,
                     ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.sm),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -187,7 +187,7 @@ class _BadgeItemState extends State<_BadgeItem> {
         duration: const Duration(milliseconds: 160),
         curve: Curves.easeOutCirc,
         width: 160,
-        padding: const EdgeInsets.all(8),
+        padding: const EdgeInsets.all(AppSpacing.sm),
         decoration: BoxDecoration(
           color: _isPressed
               ? (widget.item.isUnlocked
@@ -220,7 +220,7 @@ class _BadgeItemState extends State<_BadgeItem> {
                 size: 18,
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

@@ -324,7 +324,7 @@ class _CodeSnippetCard extends StatelessWidget {
                 child: Row(
                   children: [
                     Icon(Icons.copy, size: 12, color: foren.textDisabled),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       'Copy',
                       style: TextStyle(color: foren.textDisabled, fontSize: 10),

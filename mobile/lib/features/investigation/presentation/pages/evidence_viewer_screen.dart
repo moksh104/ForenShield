@@ -256,7 +256,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                                               alpha: 0.6,
                                             ),
                                           ),
-                                          const SizedBox(height: 8),
+                                          const SizedBox(height: AppSpacing.sm),
                                           Text(
                                             'PINCH TO ZOOM EVIDENCE ARTIFACT',
                                             style: TextStyle(

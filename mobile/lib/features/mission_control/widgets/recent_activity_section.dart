@@ -112,7 +112,7 @@ class _ActivityTile extends StatelessWidget {
             ),
             child: Icon(item.icon, color: item.color, size: 17),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,

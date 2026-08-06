@@ -327,7 +327,7 @@ class _InvestigationTimelineScreenState
                                                   ),
                                                 ),
                                                 if (event.isExpanded) ...[
-                                                  const SizedBox(height: 8),
+                                                  const SizedBox(height: AppSpacing.sm),
                                                   Text(
                                                     event.description,
                                                     style: TextStyle(

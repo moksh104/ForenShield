@@ -243,7 +243,7 @@ class _StatTileState extends State<_StatTile> {
         child: Column(
           children: [
             Icon(widget.icon, size: 16, color: widget.color),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             TweenAnimationBuilder<double>(
               tween: Tween<double>(begin: 0, end: widget.numericValue),
               duration: const Duration(milliseconds: 1200),

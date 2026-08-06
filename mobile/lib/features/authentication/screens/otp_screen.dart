@@ -261,7 +261,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                               color: foren.critical.t500,
                               size: 20,
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             Expanded(
                               child: Text(
                                 _errorMessage!,
@@ -345,7 +345,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                                 color: _canResend ? primaryColor : foren.textDisabled,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             Text(
                               _canResend
                                   ? 'Resend code now'
@@ -431,7 +431,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Icon(Icons.shield, size: 14, color: Colors.white),
-                      SizedBox(width: 4),
+                      SizedBox(width: AppSpacing.xs),
                       Text(
                         '*****',
                         style: TextStyle(
@@ -453,7 +453,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             left: 36,
             bottom: 12,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: primaryColor,
                 shape: BoxShape.circle,
@@ -477,7 +477,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             right: 36,
             bottom: 16,
             child: Container(
-              padding: const EdgeInsets.all(8),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: primaryColor,
                 borderRadius: AppRadius.borderRadiusSm,

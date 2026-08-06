@@ -1,6 +1,7 @@
 /// ForenShield Component Library — Dialogs
 /// Mission Brief / Investigation Summary / Success Dialog / Warning Dialog
 library;
+import 'package:forenshield/core/theme/app_spacing.dart';
 
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
@@ -79,7 +80,7 @@ class ForenMissionBriefDialog extends StatelessWidget {
               color: foren.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Text(incidentSummary, style: theme.textTheme.bodyLarge),
           const SizedBox(height: ForenSpace.md),
           Text(
@@ -88,7 +89,7 @@ class ForenMissionBriefDialog extends StatelessWidget {
               color: foren.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           for (final o in objectives)
             Padding(
               padding: const EdgeInsets.only(bottom: 4),

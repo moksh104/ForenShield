@@ -28,9 +28,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
     final notifier = ref.read(missionControlProvider.notifier);
 
     return Scaffold(
-      backgroundColor: theme.brightness == Brightness.dark
-          ? theme.scaffoldBackgroundColor
-          : const Color(0xFFFAFAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: SafeArea(child: _buildBody(context, state, notifier)),
       bottomNavigationBar: ForenBottomNav(
         currentIndex: 0,
@@ -148,14 +146,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
 
   Widget _buildDashboardContent(BuildContext context, dynamic data) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
-    final primaryColor = AppColors.primary;
+    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+    final colorScheme = theme.colorScheme;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(
@@ -171,7 +163,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
           unreadNotifications: data.notifications
               .where((DashboardNotification n) => n.isUnread)
               .length,
-          onNotificationTap: () => context.push(RouteConstants.settings),
+          onNotificationTap: () => context.push(RouteConstants.notifications),
           onSearchTap: () {},
           onProfileTap: () => context.push(RouteConstants.profile),
         ),
@@ -184,14 +176,12 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.lg),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surface : Colors.white,
+              color: colorScheme.surface,
               borderRadius: AppRadius.borderRadiusLg,
               border: Border.all(
-                color: isDark
-                    ? AppColors.borderSubtle
-                    : const Color(0xFFE2E8F0),
+                color: foren.borderSubtle,
               ),
-              boxShadow: isDark
+              boxShadow: theme.brightness == Brightness.dark
                   ? []
                   : [
                       BoxShadow(
@@ -211,8 +201,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                     children: [
                       RichText(
                         text: TextSpan(
-                          style: TextStyle(
-                            color: textPrimary,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.w800,
                             fontFamily: 'Outfit',
@@ -225,25 +215,25 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                             ),
                             TextSpan(
                               text: 'digital world.',
-                              style: TextStyle(color: primaryColor),
+                              style: TextStyle(color: colorScheme.primary),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppSpacing.sm),
                       Container(
                         width: 32,
                         height: 2.5,
                         decoration: BoxDecoration(
-                          color: primaryColor,
+                          color: colorScheme.primary,
                           borderRadius: BorderRadius.circular(2),
                         ),
                       ),
                       const SizedBox(height: 10),
                       Text(
                         'Your journey to becoming a\ncyber defender starts here.',
-                        style: TextStyle(
-                          color: textSecondary,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: foren.textSecondary,
                           fontSize: 12,
                           height: 1.35,
                         ),
@@ -252,8 +242,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                       ElevatedButton(
                         onPressed: () => context.push(RouteConstants.academy),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: primaryColor,
-                          foregroundColor: Colors.white,
+                          backgroundColor: colorScheme.primary,
+                          foregroundColor: colorScheme.onPrimary,
                           elevation: 0,
                           padding: const EdgeInsets.symmetric(
                             horizontal: 16,
@@ -282,7 +272,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   ),
                 ),
 
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
 
                 // Right Vector Illustration
                 SizedBox(
@@ -290,8 +280,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   height: 130,
                   child: CustomPaint(
                     painter: _WelcomeIllustrationPainter(
-                      primaryColor: primaryColor,
-                      isDark: isDark,
+                      primaryColor: colorScheme.primary,
+                      isDark: theme.brightness == Brightness.dark,
                     ),
                   ),
                 ),
@@ -308,14 +298,12 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
           child: Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surface : Colors.white,
+              color: colorScheme.surface,
               borderRadius: AppRadius.borderRadiusLg,
               border: Border.all(
-                color: isDark
-                    ? AppColors.borderSubtle
-                    : const Color(0xFFE2E8F0),
+                color: foren.borderSubtle,
               ),
-              boxShadow: isDark
+              boxShadow: theme.brightness == Brightness.dark
                   ? []
                   : [
                       BoxShadow(
@@ -330,8 +318,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
               children: [
                 Text(
                   'Learning Progress',
-                  style: TextStyle(
-                    color: textPrimary,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    color: colorScheme.onSurface,
                     fontSize: 15,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'Outfit',
@@ -353,18 +341,16 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                             child: CircularProgressIndicator(
                               value: 0.42,
                               strokeWidth: 5.5,
-                              backgroundColor: isDark
-                                  ? AppColors.surfaceRaised1
-                                  : const Color(0xFFE2E8F0),
+                              backgroundColor: foren.surfaceRaised1,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                primaryColor,
+                                colorScheme.primary,
                               ),
                             ),
                           ),
                           Text(
                             '42%',
-                            style: TextStyle(
-                              color: textPrimary,
+                            style: theme.textTheme.titleSmall?.copyWith(
+                              color: colorScheme.onSurface,
                               fontSize: 14,
                               fontWeight: FontWeight.w800,
                               fontFamily: 'Outfit',
@@ -383,8 +369,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                         children: [
                           Text(
                             'Intermediate',
-                            style: TextStyle(
-                              color: primaryColor,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colorScheme.primary,
                               fontSize: 14,
                               fontWeight: FontWeight.w700,
                             ),
@@ -392,8 +378,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                           const SizedBox(height: 2),
                           Text(
                             'Keep going! You\'re doing great.',
-                            style: TextStyle(
-                              color: textSecondary,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: foren.textSecondary,
                               fontSize: 11,
                             ),
                           ),
@@ -403,26 +389,24 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                             child: LinearProgressIndicator(
                               value: 0.42,
                               minHeight: 4,
-                              backgroundColor: isDark
-                                  ? AppColors.surfaceRaised1
-                                  : const Color(0xFFE2E8F0),
+                              backgroundColor: foren.surfaceRaised1,
                               valueColor: AlwaysStoppedAnimation<Color>(
-                                primaryColor,
+                                colorScheme.primary,
                               ),
                             ),
                           ),
                           const SizedBox(height: 6),
                           RichText(
                             text: TextSpan(
-                              style: TextStyle(
-                                color: textSecondary,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: foren.textSecondary,
                                 fontSize: 11,
                               ),
                               children: [
                                 TextSpan(
                                   text: '24 / 57 ',
                                   style: TextStyle(
-                                    color: textPrimary,
+                                    color: colorScheme.onSurface,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
@@ -445,10 +429,10 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                           vertical: 12,
                         ),
                         decoration: BoxDecoration(
-                          color: primaryColor.withValues(alpha: 0.05),
+                          color: colorScheme.primary.withValues(alpha: 0.05),
                           borderRadius: AppRadius.borderRadiusMd,
                           border: Border.all(
-                            color: primaryColor.withValues(alpha: 0.15),
+                            color: colorScheme.primary.withValues(alpha: 0.15),
                           ),
                         ),
                         child: Column(
@@ -457,13 +441,13 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                             Icon(
                               Icons.bar_chart_rounded,
                               size: 20,
-                              color: primaryColor,
+                              color: colorScheme.primary,
                             ),
-                            const SizedBox(height: 4),
+                            const SizedBox(height: AppSpacing.xs),
                             Text(
                               'View Stats',
-                              style: TextStyle(
-                                color: primaryColor,
+                              style: theme.textTheme.labelSmall?.copyWith(
+                                color: colorScheme.primary,
                                 fontSize: 10.5,
                                 fontWeight: FontWeight.w700,
                               ),
@@ -489,8 +473,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
             children: [
               Text(
                 'Quick Access',
-                style: TextStyle(
-                  color: textPrimary,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Outfit',
@@ -500,8 +484,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                 onTap: () => context.push(RouteConstants.academy),
                 child: Text(
                   'View all',
-                  style: TextStyle(
-                    color: primaryColor,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.primary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -524,7 +508,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   onTap: () => context.push(RouteConstants.academy),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _buildQuickAccessCard(
                   context,
@@ -534,7 +518,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   onTap: () => context.push(RouteConstants.simulation),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _buildQuickAccessCard(
                   context,
@@ -544,7 +528,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   onTap: () => context.push(RouteConstants.investigation),
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: _buildQuickAccessCard(
                   context,
@@ -568,8 +552,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
             children: [
               Text(
                 'Continue Learning',
-                style: TextStyle(
-                  color: textPrimary,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  color: colorScheme.onSurface,
                   fontSize: 16,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'Outfit',
@@ -579,8 +563,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                 onTap: () => context.push(RouteConstants.academy),
                 child: Text(
                   'View all',
-                  style: TextStyle(
-                    color: primaryColor,
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: colorScheme.primary,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -597,14 +581,12 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surface : Colors.white,
+                color: colorScheme.surface,
                 borderRadius: AppRadius.borderRadiusLg,
                 border: Border.all(
-                  color: isDark
-                      ? AppColors.borderSubtle
-                      : const Color(0xFFE2E8F0),
+                  color: foren.borderSubtle,
                 ),
-                boxShadow: isDark
+                boxShadow: theme.brightness == Brightness.dark
                     ? []
                     : [
                         BoxShadow(
@@ -634,7 +616,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                         Icon(
                           Icons.fingerprint,
                           size: 32,
-                          color: primaryColor.withValues(alpha: 0.8),
+                          color: colorScheme.primary.withValues(alpha: 0.8),
                         ),
                         Positioned(
                           bottom: 8,
@@ -642,7 +624,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                           child: Icon(
                             Icons.search,
                             size: 18,
-                            color: Colors.white.withValues(alpha: 0.7),
+                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
                           ),
                         ),
                       ],
@@ -661,13 +643,13 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                             vertical: 3,
                           ),
                           decoration: BoxDecoration(
-                            color: primaryColor.withValues(alpha: 0.08),
+                            color: colorScheme.primary.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(6),
                           ),
                           child: Text(
                             'Learning Path',
-                            style: TextStyle(
-                              color: primaryColor,
+                            style: theme.textTheme.labelSmall?.copyWith(
+                              color: colorScheme.primary,
                               fontSize: 10,
                               fontWeight: FontWeight.w700,
                             ),
@@ -678,8 +660,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                           data.currentCourseTitle.isNotEmpty
                               ? data.currentCourseTitle
                               : 'Digital Forensics Fundamentals',
-                          style: TextStyle(
-                            color: textPrimary,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            color: colorScheme.onSurface,
                             fontSize: 14,
                             fontWeight: FontWeight.w700,
                             fontFamily: 'Outfit',
@@ -687,29 +669,27 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 4),
+                        const SizedBox(height: AppSpacing.xs),
                         Text(
                           'Understand the core concepts of digital forensics and evidence handling.',
-                          style: TextStyle(
-                            color: textSecondary,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: foren.textSecondary,
                             fontSize: 11,
                             height: 1.25,
                           ),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppSpacing.sm),
                         // Progress Bar
                         ClipRRect(
                           borderRadius: BorderRadius.circular(3),
                           child: LinearProgressIndicator(
                             value: 0.60,
                             minHeight: 4,
-                            backgroundColor: isDark
-                                ? AppColors.surfaceRaised1
-                                : const Color(0xFFE2E8F0),
+                            backgroundColor: foren.surfaceRaised1,
                             valueColor: AlwaysStoppedAnimation<Color>(
-                              primaryColor,
+                              colorScheme.primary,
                             ),
                           ),
                         ),
@@ -719,8 +699,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                           children: [
                             Text(
                               '60% complete',
-                              style: TextStyle(
-                                color: textSecondary,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: foren.textSecondary,
                                 fontSize: 11,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -730,17 +710,17 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                               children: [
                                 Text(
                                   'Continue',
-                                  style: TextStyle(
-                                    color: primaryColor,
+                                  style: theme.textTheme.labelMedium?.copyWith(
+                                    color: colorScheme.primary,
                                     fontSize: 12,
                                     fontWeight: FontWeight.w700,
                                   ),
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: AppSpacing.xs),
                                 Icon(
                                   Icons.arrow_forward_rounded,
                                   size: 14,
-                                  color: primaryColor,
+                                  color: colorScheme.primary,
                                 ),
                               ],
                             ),
@@ -762,8 +742,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Text(
             'Recent Activity',
-            style: TextStyle(
-              color: textPrimary,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: colorScheme.onSurface,
               fontSize: 16,
               fontWeight: FontWeight.w700,
               fontFamily: 'Outfit',
@@ -775,12 +755,10 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
           child: Container(
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surface : Colors.white,
+              color: colorScheme.surface,
               borderRadius: AppRadius.borderRadiusLg,
               border: Border.all(
-                color: isDark
-                    ? AppColors.borderSubtle
-                    : const Color(0xFFE2E8F0),
+                color: foren.borderSubtle,
               ),
             ),
             child: Column(
@@ -792,15 +770,13 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   time: '2h ago',
                   icon: Icons.science_outlined,
                   iconBg: const Color(0xFFEFF6FF),
-                  iconColor: primaryColor,
+                  iconColor: colorScheme.primary,
                   onTap: () => context.push(RouteConstants.simulation),
                 ),
                 Divider(
                   height: 1,
                   thickness: 1,
-                  color: isDark
-                      ? AppColors.borderSubtle
-                      : const Color(0xFFF1F5F9),
+                  color: foren.borderSubtle,
                 ),
                 _buildActivityRow(
                   context,
@@ -831,14 +807,8 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = AppColors.primary;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
+    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+    final colorScheme = theme.colorScheme;
 
     return GestureDetector(
       onTap: onTap,
@@ -846,12 +816,12 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
         height: 120,
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surface : Colors.white,
+          color: colorScheme.surface,
           borderRadius: AppRadius.borderRadiusLg,
           border: Border.all(
-            color: isDark ? AppColors.borderSubtle : const Color(0xFFE2E8F0),
+            color: foren.borderSubtle,
           ),
-          boxShadow: isDark
+          boxShadow: theme.brightness == Brightness.dark
               ? []
               : [
                   BoxShadow(
@@ -867,16 +837,16 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
               width: 38,
               height: 38,
               decoration: BoxDecoration(
-                color: primaryColor.withValues(alpha: 0.08),
+                color: colorScheme.primary.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
-              child: Center(child: Icon(icon, size: 20, color: primaryColor)),
+              child: Center(child: Icon(icon, size: 20, color: colorScheme.primary)),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.sm),
             Text(
               title,
-              style: TextStyle(
-                color: textPrimary,
+              style: theme.textTheme.titleSmall?.copyWith(
+                color: colorScheme.onSurface,
                 fontSize: 11,
                 fontWeight: FontWeight.w700,
                 fontFamily: 'Outfit',
@@ -888,7 +858,11 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
             const SizedBox(height: 3),
             Text(
               subtitle,
-              style: TextStyle(color: textSecondary, fontSize: 9, height: 1.2),
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: foren.textSecondary, 
+                fontSize: 9, 
+                height: 1.2
+              ),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -911,14 +885,9 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
     VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
-    final effectiveIconBg = isDark ? iconColor.withValues(alpha: 0.15) : iconBg;
+    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+    final colorScheme = theme.colorScheme;
+    final effectiveIconBg = theme.brightness == Brightness.dark ? iconColor.withValues(alpha: 0.15) : iconBg;
 
     return InkWell(
       onTap: onTap,
@@ -938,15 +907,15 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
               ),
               child: Center(child: Icon(icon, size: 18, color: iconColor)),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     title,
-                    style: TextStyle(
-                      color: textPrimary,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      color: colorScheme.onSurface,
                       fontSize: 13,
                       fontWeight: FontWeight.w600,
                     ),
@@ -954,14 +923,17 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   const SizedBox(height: 2),
                   Text(
                     subtitle,
-                    style: TextStyle(color: textSecondary, fontSize: 11),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: foren.textSecondary, 
+                      fontSize: 11
+                    ),
                   ),
                 ],
               ),
             ),
-            Text(time, style: TextStyle(color: textSecondary, fontSize: 11)),
-            const SizedBox(width: 4),
-            Icon(Icons.chevron_right_rounded, size: 16, color: textSecondary),
+            Text(time, style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary, fontSize: 11)),
+            const SizedBox(width: AppSpacing.xs),
+            Icon(Icons.chevron_right_rounded, size: 16, color: foren.textSecondary),
           ],
         ),
       ),

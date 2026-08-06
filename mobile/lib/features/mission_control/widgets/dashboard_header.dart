@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 
 /// Dashboard header displaying a greeting and user avatar.
@@ -52,7 +53,7 @@ class DashboardHeader extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           _NotificationButton(
             count: notificationCount,
             onTap: onNotificationTap,

@@ -224,7 +224,7 @@ class _ReportCardState extends State<_ReportCard> {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     widget.category,
                     style: theme.textTheme.labelMedium?.copyWith(
@@ -248,7 +248,7 @@ class _ReportCardState extends State<_ReportCard> {
                         size: 16,
                         color: foren.textSecondary,
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppSpacing.xs),
                       Text(
                         widget.generatedAt,
                         style: theme.textTheme.labelSmall?.copyWith(

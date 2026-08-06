@@ -64,7 +64,7 @@ class ActivityTimeline extends StatelessWidget {
                       color: primaryColor,
                       size: 18,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Activity timeline',
                       style: theme.textTheme.titleSmall?.copyWith(

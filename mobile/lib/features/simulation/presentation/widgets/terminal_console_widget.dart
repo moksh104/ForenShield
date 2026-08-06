@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/effects/glass_effect.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -91,7 +92,7 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
             child: Row(
               children: [
                 const Icon(Icons.terminal, size: 18, color: AppColors.primary),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 const Text(
                   'FS-HOST-09 [Interactive Shell]',
                   style: TextStyle(
@@ -128,7 +129,7 @@ class _TerminalConsoleWidgetState extends State<TerminalConsoleWidget> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: historyList.length,
               itemBuilder: (context, index) {
                 final line = historyList[index];

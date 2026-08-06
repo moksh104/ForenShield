@@ -162,7 +162,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                               animate: true,
                               borderRadius: BorderRadius.circular(40),
                               child: Container(
-                                padding: const EdgeInsets.all(16),
+                                padding: const EdgeInsets.all(AppSpacing.lg),
                                 decoration: BoxDecoration(
                                   shape: BoxShape.circle,
                                   color:

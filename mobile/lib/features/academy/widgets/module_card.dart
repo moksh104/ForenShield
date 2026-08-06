@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
@@ -81,7 +82,7 @@ class ModuleCard extends StatelessWidget {
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   course.description,
                   style: theme.textTheme.bodySmall?.copyWith(

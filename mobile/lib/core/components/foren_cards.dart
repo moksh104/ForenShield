@@ -462,7 +462,7 @@ class ForenInvestigationCard extends StatelessWidget {
               ForenDifficultyBadge(level: difficulty),
               const SizedBox(width: ForenSpace.sm),
               Icon(Icons.folder_outlined, size: 14, color: foren.textSecondary),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 '$evidenceCount items',
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -567,7 +567,7 @@ class ForenSimulationCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(title, style: theme.textTheme.titleMedium),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppSpacing.xs),
                 Text(
                   scenarioType,
                   style: theme.textTheme.bodySmall?.copyWith(
@@ -748,7 +748,7 @@ class ForenStatisticsCard extends StatelessWidget {
           const SizedBox(height: ForenSpace.xs),
           Text(value, style: theme.textTheme.displaySmall),
           if (trend != null) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
             Text(
               trend!,
               style: theme.textTheme.bodySmall?.copyWith(color: trendColor),
@@ -802,7 +802,7 @@ class ForenAchievementCard extends StatelessWidget {
             textAlign: TextAlign.center,
             style: theme.textTheme.titleSmall,
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           if (unlocked)
             ForenXpChip(amount: rewardXp, showPlus: false)
           else

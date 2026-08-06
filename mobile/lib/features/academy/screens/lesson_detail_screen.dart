@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/lesson_providers.dart';
@@ -30,7 +31,7 @@ class LessonDetailScreen extends ConsumerWidget {
         data: (result) {
           return result.when(
             success: (lesson) => SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: const EdgeInsets.all(AppSpacing.xl),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -40,7 +41,7 @@ class LessonDetailScreen extends ConsumerWidget {
                       fontWeight: FontWeight.w800,
                     ),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppSpacing.md),
                   Row(
                     children: [
                       Chip(
@@ -67,7 +68,7 @@ class LessonDetailScreen extends ConsumerWidget {
                       color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppSpacing.xl),
                   Row(
                     children: [
                       Text(

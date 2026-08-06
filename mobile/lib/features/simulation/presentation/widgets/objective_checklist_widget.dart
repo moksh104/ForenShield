@@ -40,7 +40,7 @@ class ObjectiveChecklistWidget extends StatelessWidget {
                   size: 20,
                   color: primaryColor,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
                   'Objectives',
                   style: theme.textTheme.titleSmall?.copyWith(
@@ -83,7 +83,7 @@ class ObjectiveChecklistWidget extends StatelessWidget {
                                 ? foren.success.t500
                                 : foren.textSecondary,
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Expanded(
                             child: Text(
                               obj.title,
@@ -99,7 +99,7 @@ class ObjectiveChecklistWidget extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Padding(
                         padding: const EdgeInsets.only(left: 26),
                         child: Text(
@@ -185,7 +185,7 @@ class _CommandChip extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           children: [
             Icon(Icons.terminal, size: 12, color: primaryColor),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
             Text(
               label,
               style: TextStyle(

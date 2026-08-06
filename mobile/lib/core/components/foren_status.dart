@@ -1,6 +1,7 @@
 /// ForenShield Component Library — Status Components
 /// Threat Badge / Difficulty Badge / Status Chip / XP Chip / Notification Badge
 library;
+import 'package:forenshield/core/theme/app_spacing.dart';
 
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
@@ -47,7 +48,7 @@ class _ForenPill extends StatelessWidget {
         children: [
           if (icon != null) ...[
             Icon(icon, size: 12, color: fg),
-            const SizedBox(width: 4),
+            const SizedBox(width: AppSpacing.xs),
           ],
           Text(label, style: theme.textTheme.labelMedium?.copyWith(color: fg)),
         ],

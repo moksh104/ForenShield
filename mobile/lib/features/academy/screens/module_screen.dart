@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/lesson_providers.dart';
@@ -25,14 +26,14 @@ class ModuleScreen extends ConsumerWidget {
           return result.when(
             success: (course) => SafeArea(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Row(
                       children: [
                         BackButton(color: theme.colorScheme.onSurface),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: AppSpacing.sm),
                         Expanded(
                           child: Text(
                             course.title,
@@ -43,7 +44,7 @@ class ModuleScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     Text(
                       course.description,
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -52,7 +53,7 @@ class ModuleScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     Wrap(
                       spacing: 8,
                       runSpacing: 8,
@@ -66,7 +67,7 @@ class ModuleScreen extends ConsumerWidget {
                         ),
                       ],
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppSpacing.lg),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(8),
                       child: LinearProgressIndicator(
@@ -79,7 +80,7 @@ class ModuleScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: AppSpacing.sm),
                     Text(
                       '${(course.progress * 100).toStringAsFixed(0)}% complete',
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -88,14 +89,14 @@ class ModuleScreen extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xl),
                     Text(
                       'Modules',
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.md),
                     ...course.modules.map(
                       (module) => Padding(
                         padding: const EdgeInsets.only(bottom: 12),

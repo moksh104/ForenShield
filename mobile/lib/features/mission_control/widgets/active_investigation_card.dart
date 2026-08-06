@@ -94,7 +94,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                         alpha: 0.45,
                       ),
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       timeActive,
                       style: theme.textTheme.labelSmall?.copyWith(
@@ -127,7 +127,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                         fontFamily: 'monospace',
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Container(
                       width: 3,
                       height: 3,
@@ -138,7 +138,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       caseType,
                       style: theme.textTheme.bodySmall?.copyWith(
@@ -165,7 +165,7 @@ class ActiveInvestigationCard extends StatelessWidget {
                                   fontWeight: FontWeight.w700,
                                 ),
                               ),
-                              const SizedBox(width: 4),
+                              const SizedBox(width: AppSpacing.xs),
                               Text(
                                 'objectives',
                                 style: theme.textTheme.labelSmall?.copyWith(

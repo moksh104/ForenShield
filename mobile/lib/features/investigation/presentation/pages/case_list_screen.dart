@@ -30,26 +30,18 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = AppColors.primary;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
-    final borderColor = isDark
-        ? AppColors.borderSubtle
-        : const Color(0xFFE2E8F0);
+    final colorScheme = theme.colorScheme;
+    final primaryColor = colorScheme.primary;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
+    final borderColor = colorScheme.outlineVariant;
     final foren = theme.extension<ForenColors>()!;
 
     final state = ref.watch(investigationProvider);
     final notifier = ref.read(investigationProvider.notifier);
 
     return Scaffold(
-      backgroundColor: isDark
-          ? theme.scaffoldBackgroundColor
-          : const Color(0xFFFAFAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       bottomNavigationBar: ForenBottomNav(
         currentIndex: 3,
         onTap: (index) {
@@ -96,7 +88,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                       }
                     },
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Brand Shield Logo Mark
                   Container(
@@ -104,9 +96,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                     height: 38,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isDark
-                          ? AppColors.surface
-                          : AppColors.lightSurface,
+                      color: colorScheme.surface,
                       border: Border.all(
                         color: primaryColor.withValues(alpha: 0.3),
                         width: 1.5,
@@ -208,11 +198,11 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Notification Bell
                   GestureDetector(
-                    onTap: () => context.push(RouteConstants.settings),
+                    onTap: () => context.push(RouteConstants.notifications),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -235,9 +225,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                               color: primaryColor,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isDark
-                                    ? theme.scaffoldBackgroundColor
-                                    : Colors.white,
+                                color: colorScheme.surface,
                                 width: 1.5,
                               ),
                             ),
@@ -282,7 +270,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                                   letterSpacing: -0.3,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: AppSpacing.xs),
                               Text(
                                 'Analyze digital evidence, build timelines and solve real-world cyber cases.',
                                 style: TextStyle(
@@ -295,7 +283,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                           ),
                         ),
 
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
 
                         // My Cases Button
                         GestureDetector(
@@ -306,7 +294,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark ? AppColors.surface : Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: AppRadius.borderRadiusSm,
                               border: Border.all(color: borderColor),
                             ),
@@ -352,7 +340,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                               physics: const BouncingScrollPhysics(),
                               itemCount: _tabs.length,
                               separatorBuilder: (_, _) =>
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppSpacing.sm),
                               itemBuilder: (context, index) {
                                 final tab = _tabs[index];
                                 final isSelected =
@@ -367,9 +355,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? primaryColor
-                                          : (isDark
-                                                ? AppColors.surface
-                                                : Colors.white),
+                                          : colorScheme.surface,
                                       borderRadius: AppRadius.borderRadiusSm,
                                       border: Border.all(
                                         color: isSelected
@@ -408,7 +394,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark ? AppColors.surface : Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: AppRadius.borderRadiusSm,
                               border: Border.all(color: borderColor),
                             ),
@@ -483,18 +469,16 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                         horizontal: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surface : Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: AppRadius.borderRadiusLg,
                         border: Border.all(color: borderColor),
-                        boxShadow: isDark
-                            ? []
-                            : [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.02),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.shadow.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -576,7 +560,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                     ),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surface : Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: AppRadius.borderRadiusLg,
                         border: Border.all(color: borderColor),
                       ),
@@ -596,9 +580,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                           Divider(
                             height: 1,
                             thickness: 1,
-                            color: isDark
-                                ? AppColors.borderSubtle
-                                : const Color(0xFFF1F5F9),
+                            color: colorScheme.outlineVariant,
                           ),
                           _buildRecentActivityRow(
                             context,
@@ -636,7 +618,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
       case InvestigationStatus.initial:
       case InvestigationStatus.loading:
         return const Padding(
-          padding: EdgeInsets.all(32.0),
+          padding: EdgeInsets.all(AppSpacing.xxl),
           child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
         );
 
@@ -709,34 +691,28 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
   // ── Case Card Item ──
   Widget _buildCaseCard(BuildContext context, CaseEntity c) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = AppColors.primary;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
+    final colorScheme = theme.colorScheme;
+    final primaryColor = colorScheme.primary;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
     final foren = theme.extension<ForenColors>()!;
 
     final config = _getCaseConfig(c.title, c.difficulty);
 
     return Container(
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surface : Colors.white,
+        color: colorScheme.surface,
         borderRadius: AppRadius.borderRadiusLg,
         border: Border.all(
-          color: isDark ? foren.borderSubtle : const Color(0xFFE2E8F0),
+          color: colorScheme.outlineVariant,
         ),
-        boxShadow: isDark
-            ? []
-            : [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.02),
-                  blurRadius: 8,
-                  offset: const Offset(0, 2),
-                ),
-              ],
+        boxShadow: [
+          BoxShadow(
+            color: colorScheme.shadow.withValues(alpha: 0.08),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       child: InkWell(
         onTap: () => context.push('${RouteConstants.caseDetail}/${c.id}'),
@@ -817,7 +793,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                               size: 14,
                               color: textSecondary,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppSpacing.xs),
                             Text(
                               '${c.evidenceList.isNotEmpty ? c.evidenceList.length : (c.title.contains("USB")
                                         ? 5
@@ -842,7 +818,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                               size: 14,
                               color: textSecondary,
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppSpacing.xs),
                             Text(
                               config.durationStr,
                               style: TextStyle(
@@ -912,7 +888,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                           ),
                         ],
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppSpacing.sm),
                       Icon(
                         Icons.chevron_right_rounded,
                         color: textSecondary,
@@ -1046,7 +1022,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
             ),
             child: Center(child: Icon(icon, size: 18, color: iconColor)),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             value,
             style: TextStyle(
@@ -1113,7 +1089,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
             ),
             child: Center(child: Icon(icon, size: 18, color: iconColor)),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1134,7 +1110,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
 
           // Score / Progress Pill
           Container(

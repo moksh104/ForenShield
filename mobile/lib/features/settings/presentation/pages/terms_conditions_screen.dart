@@ -44,7 +44,7 @@ class TermsConditionsScreen extends StatelessWidget {
                   color: theme.colorScheme.primary,
                 ),
               ),
-              const SizedBox(height: 4),
+              const SizedBox(height: AppSpacing.xs),
               Text(
                 'Effective Date: August 5, 2026',
                 style: TextStyle(color: foren.textDisabled, fontSize: 12),

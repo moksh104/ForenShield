@@ -188,7 +188,7 @@ class _AccountSetupScreenState extends ConsumerState<AccountSetupScreen> {
                                 fontSize: 15,
                               ),
                             ),
-                            const SizedBox(width: 8),
+                            const SizedBox(width: AppSpacing.sm),
                             const Icon(
                               Icons.arrow_forward,
                               size: 18,
@@ -607,7 +607,7 @@ class _Step2Profile extends StatelessWidget {
                         fontSize: 22,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Tell us a bit about yourself\nso we can personalize your experience.',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -1028,7 +1028,7 @@ class _Step3Customize extends StatelessWidget {
                         fontSize: 24,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Choose what you want to focus on.\nWe\'ll show relevant content and labs.',
                       style: theme.textTheme.bodyMedium?.copyWith(
@@ -1468,7 +1468,7 @@ class _Step4Complete extends StatelessWidget {
           ),
           child: Center(child: Icon(icon, size: 20, color: primaryColor)),
         ),
-        const SizedBox(width: 12),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,

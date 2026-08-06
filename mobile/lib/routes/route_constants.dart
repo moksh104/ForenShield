@@ -33,6 +33,8 @@ class RouteConstants {
   static const String caseTimeline = '/investigation/timeline';
   static const String caseVerdict = '/investigation/verdict';
   static const String profile = '/profile';
+  static const String leaderboard = '/leaderboard';
+  static const String achievements = '/achievements';
   static const String achievementsWall = '/profile/achievements';
   static const String profileStats = '/profile/stats';
   static const String profileAccount = '/profile/account';

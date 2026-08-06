@@ -84,7 +84,7 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
-              const SizedBox(height: 16),
+              const SizedBox(height: AppSpacing.lg),
               Text(
                 'Profile Picture Options',
                 style: TextStyle(
@@ -93,7 +93,7 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: AppSpacing.md),
               ListTile(
                 leading: Icon(Icons.camera_alt_outlined, color: primaryColor),
                 title: Text(
@@ -524,7 +524,7 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Device: Mobile / Web Client · Token Valid',
                       style: TextStyle(color: foren.textDisabled, fontSize: 11),

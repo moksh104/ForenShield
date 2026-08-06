@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/theme/foren_theme.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -29,22 +30,14 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = AppColors.primary;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
-    final borderColor = isDark
-        ? AppColors.borderSubtle
-        : const Color(0xFFE2E8F0);
+    final colorScheme = theme.colorScheme;
+    final primaryColor = colorScheme.primary;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
+    final borderColor = colorScheme.outlineVariant;
 
     return Scaffold(
-      backgroundColor: isDark
-          ? theme.scaffoldBackgroundColor
-          : const Color(0xFFFAFAFC),
+      backgroundColor: theme.scaffoldBackgroundColor,
       bottomNavigationBar: ForenBottomNav(
         currentIndex: 2,
         onTap: (index) {
@@ -91,7 +84,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                       }
                     },
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Brand Shield Logo Mark
                   Container(
@@ -99,9 +92,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                     height: 38,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: isDark
-                          ? AppColors.surface
-                          : AppColors.lightSurface,
+                      color: colorScheme.surface,
                       border: Border.all(
                         color: primaryColor.withValues(alpha: 0.3),
                         width: 1.5,
@@ -203,11 +194,11 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSpacing.xs),
 
                   // Notification Bell
                   GestureDetector(
-                    onTap: () => context.push(RouteConstants.settings),
+                    onTap: () => context.push(RouteConstants.notifications),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: [
@@ -230,9 +221,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                               color: primaryColor,
                               shape: BoxShape.circle,
                               border: Border.all(
-                                color: isDark
-                                    ? theme.scaffoldBackgroundColor
-                                    : Colors.white,
+                                color: colorScheme.surface,
                                 width: 1.5,
                               ),
                             ),
@@ -277,7 +266,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                                   letterSpacing: -0.3,
                                 ),
                               ),
-                              const SizedBox(height: 4),
+                              const SizedBox(height: AppSpacing.xs),
                               Text(
                                 'Practice real-world cyber attacks in a safe and controlled environment.',
                                 style: TextStyle(
@@ -290,7 +279,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                           ),
                         ),
 
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppSpacing.md),
 
                         // My Results Button
                         GestureDetector(
@@ -301,7 +290,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                               vertical: 10,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark ? AppColors.surface : Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: AppRadius.borderRadiusSm,
                               border: Border.all(color: borderColor),
                             ),
@@ -347,7 +336,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                               physics: const BouncingScrollPhysics(),
                               itemCount: _tabs.length,
                               separatorBuilder: (_, _) =>
-                                  const SizedBox(width: 8),
+                                  const SizedBox(width: AppSpacing.sm),
                               itemBuilder: (context, index) {
                                 final tab = _tabs[index];
                                 final isSelected = tab == _selectedTab;
@@ -362,9 +351,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                                     decoration: BoxDecoration(
                                       color: isSelected
                                           ? primaryColor
-                                          : (isDark
-                                                ? AppColors.surface
-                                                : Colors.white),
+                                          : colorScheme.surface,
                                       borderRadius: AppRadius.borderRadiusSm,
                                       border: Border.all(
                                         color: isSelected
@@ -403,7 +390,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                               vertical: 8,
                             ),
                             decoration: BoxDecoration(
-                              color: isDark ? AppColors.surface : Colors.white,
+                              color: colorScheme.surface,
                               borderRadius: AppRadius.borderRadiusSm,
                               border: Border.all(color: borderColor),
                             ),
@@ -585,18 +572,16 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                         horizontal: 8,
                       ),
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surface : Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: AppRadius.borderRadiusLg,
                         border: Border.all(color: borderColor),
-                        boxShadow: isDark
-                            ? []
-                            : [
-                                BoxShadow(
-                                  color: Colors.black.withValues(alpha: 0.02),
-                                  blurRadius: 8,
-                                  offset: const Offset(0, 2),
-                                ),
-                              ],
+                        boxShadow: [
+                          BoxShadow(
+                            color: colorScheme.shadow.withValues(alpha: 0.08),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
+                          ),
+                        ],
                       ),
                       child: Row(
                         children: [
@@ -677,7 +662,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                     ),
                     child: Container(
                       decoration: BoxDecoration(
-                        color: isDark ? AppColors.surface : Colors.white,
+                        color: colorScheme.surface,
                         borderRadius: AppRadius.borderRadiusLg,
                         border: Border.all(color: borderColor),
                       ),
@@ -695,9 +680,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                           Divider(
                             height: 1,
                             thickness: 1,
-                            color: isDark
-                                ? AppColors.borderSubtle
-                                : const Color(0xFFF1F5F9),
+                            color: colorScheme.outlineVariant,
                           ),
                           _buildRecentSimulationRow(
                             context,
@@ -737,33 +720,30 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
     required VoidCallback onTap,
   }) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textPrimary = isDark ? AppColors.textPrimary : const Color(0xFF0F172A);
-    final textSecondary = isDark ? AppColors.textSecondary : const Color(0xFF64748B);
-    final effectiveIconBg = isDark ? iconColor.withValues(alpha: 0.15) : iconBg;
-    final effectiveLevelBg = isDark
-        ? levelColor.withValues(alpha: 0.15)
-        : levelBg;
+    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+    final colorScheme = theme.colorScheme;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
+    final effectiveIconBg = iconColor.withValues(alpha: 0.15);
+    final effectiveLevelBg = levelColor.withValues(alpha: 0.15);
 
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surface : Colors.white,
+          color: colorScheme.surface,
           borderRadius: AppRadius.borderRadiusLg,
           border: Border.all(
-            color: isDark ? AppColors.borderSubtle : const Color(0xFFE2E8F0),
+            color: colorScheme.outlineVariant,
           ),
-          boxShadow: isDark
-              ? []
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
-                  ),
-                ],
+          boxShadow: [
+            BoxShadow(
+              color: colorScheme.shadow.withValues(alpha: 0.08),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -804,7 +784,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppSpacing.xs),
 
             // Description
             Text(
@@ -831,7 +811,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                 ),
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppSpacing.md),
 
             // Footer Metadata (Scenarios | Duration)
             Wrap(
@@ -847,7 +827,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                       size: 13,
                       color: textSecondary,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       scenarios,
                       style: TextStyle(
@@ -866,7 +846,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
                       size: 13,
                       color: textSecondary,
                     ),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       duration,
                       style: TextStyle(
@@ -938,13 +918,9 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
     required String label,
   }) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
+    final colorScheme = theme.colorScheme;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
 
     return Expanded(
       child: Column(
@@ -955,7 +931,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
             decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
             child: Center(child: Icon(icon, size: 18, color: iconColor)),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppSpacing.sm),
           Text(
             value,
             style: TextStyle(
@@ -992,13 +968,9 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
     required Color iconColor,
   }) {
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : const Color(0xFF0F172A);
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : const Color(0xFF64748B);
+    final colorScheme = theme.colorScheme;
+    final textPrimary = colorScheme.onSurface;
+    final textSecondary = colorScheme.onSurfaceVariant;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -1013,7 +985,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
             decoration: BoxDecoration(color: iconBg, shape: BoxShape.circle),
             child: Center(child: Icon(icon, size: 18, color: iconColor)),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -1034,7 +1006,7 @@ class _SimulationLabScreenState extends State<SimulationLabScreen> {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
 
           // Score Pill
           Container(

@@ -130,7 +130,7 @@ class AchievementsScreen extends ConsumerWidget {
                                             fontWeight: FontWeight.w700,
                                           ),
                                     ),
-                                    const SizedBox(height: 4),
+                                    const SizedBox(height: AppSpacing.xs),
                                     Text(
                                       'Complete courses, quizzes, and forensic investigation cases to earn specialist badges.',
                                       textAlign: TextAlign.center,
@@ -330,7 +330,7 @@ class _BadgeTileState extends State<_BadgeTile> {
       borderRadius: AppRadius.borderRadiusMd,
       child: ListTile(
         leading: Container(
-          padding: const EdgeInsets.all(8),
+          padding: const EdgeInsets.all(AppSpacing.sm),
           decoration: BoxDecoration(
             color: b.isUnlocked
                 ? primaryColor.withValues(alpha: 0.20)

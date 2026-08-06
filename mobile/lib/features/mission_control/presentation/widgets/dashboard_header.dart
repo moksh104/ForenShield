@@ -31,14 +31,7 @@ class DashboardHeader extends ConsumerWidget {
     final riverpodUnread = ref.watch(unreadNotificationCountProvider);
     final count = riverpodUnread > 0 ? riverpodUnread : unreadNotifications;
     final theme = Theme.of(context);
-    final isDark = theme.brightness == Brightness.dark;
-    final primaryColor = AppColors.primary;
-    final textPrimary = isDark
-        ? AppColors.textPrimary
-        : AppColors.lightTextPrimary;
-    final textSecondary = isDark
-        ? AppColors.textSecondary
-        : AppColors.lightTextSecondary;
+    final colorScheme = theme.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.fromLTRB(
@@ -61,9 +54,9 @@ class DashboardHeader extends ConsumerWidget {
               height: 38,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: primaryColor.withValues(alpha: 0.1),
+                color: colorScheme.primary.withValues(alpha: 0.1),
               ),
-              child: Icon(Icons.shield_rounded, size: 20, color: primaryColor),
+              child: Icon(Icons.shield_rounded, size: 20, color: colorScheme.primary),
             ),
           ),
           const SizedBox(width: 10),
@@ -78,8 +71,8 @@ class DashboardHeader extends ConsumerWidget {
                 children: [
                   Text(
                     'FOREN',
-                    style: TextStyle(
-                      color: textPrimary,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.onSurface,
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
@@ -88,8 +81,8 @@ class DashboardHeader extends ConsumerWidget {
                   ),
                   Text(
                     'SHIELD',
-                    style: TextStyle(
-                      color: primaryColor,
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: colorScheme.primary,
                       fontSize: 16,
                       fontWeight: FontWeight.w800,
                       letterSpacing: 1.2,
@@ -101,8 +94,8 @@ class DashboardHeader extends ConsumerWidget {
               const SizedBox(height: 1),
               Text(
                 'LEARN · INVESTIGATE · DEFEND',
-                style: TextStyle(
-                  color: textSecondary,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
                   fontSize: 7.5,
                   fontWeight: FontWeight.w700,
                   letterSpacing: 1.0,
@@ -114,28 +107,34 @@ class DashboardHeader extends ConsumerWidget {
           const Spacer(),
 
           // Good Morning, User Greeting
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                'Good morning,',
-                style: TextStyle(
-                  color: textSecondary,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+          Flexible(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  'Good morning,',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colorScheme.onSurfaceVariant,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Text(
-                userName.isNotEmpty ? userName : 'Samlee',
-                style: TextStyle(
-                  color: textPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'Outfit',
+                Text(
+                  userName.isNotEmpty ? userName : 'Samlee',
+                  style: theme.textTheme.titleSmall?.copyWith(
+                    color: colorScheme.onSurface,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'Outfit',
+                  ),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
 
           const SizedBox(width: 10),
@@ -151,17 +150,15 @@ class DashboardHeader extends ConsumerWidget {
                   height: 36,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: isDark ? AppColors.surface : Colors.white,
+                    color: colorScheme.surface,
                     border: Border.all(
-                      color: isDark
-                          ? AppColors.borderSubtle
-                          : const Color(0xFFE2E8F0),
+                      color: colorScheme.outlineVariant,
                     ),
                   ),
                   child: Icon(
                     Icons.notifications_none_rounded,
                     size: 20,
-                    color: textPrimary,
+                    color: colorScheme.onSurface,
                   ),
                 ),
                 if (count > 0)
@@ -171,12 +168,10 @@ class DashboardHeader extends ConsumerWidget {
                     child: Container(
                       padding: const EdgeInsets.all(3),
                       decoration: BoxDecoration(
-                        color: AppColors.critical,
+                        color: colorScheme.error,
                         shape: BoxShape.circle,
                         border: Border.all(
-                          color: isDark
-                              ? theme.scaffoldBackgroundColor
-                              : Colors.white,
+                          color: theme.scaffoldBackgroundColor,
                           width: 1.5,
                         ),
                       ),
@@ -186,8 +181,8 @@ class DashboardHeader extends ConsumerWidget {
                       ),
                       child: Text(
                         count > 99 ? '99+' : '$count',
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colorScheme.onError,
                           fontSize: 9,
                           fontWeight: FontWeight.bold,
                         ),

@@ -68,7 +68,7 @@ class _ActiveInvestigationCardState extends State<ActiveInvestigationCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.biotech, size: 12, color: invColor),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       'ACTIVE INVESTIGATION',
                       style: theme.textTheme.labelSmall?.copyWith(
@@ -107,7 +107,7 @@ class _ActiveInvestigationCardState extends State<ActiveInvestigationCard> {
                   fontWeight: FontWeight.w700,
                 ),
               ),
-              const SizedBox(width: 8),
+              const SizedBox(width: AppSpacing.sm),
               Expanded(
                 child: Text(
                   widget.caseTitle,
@@ -121,7 +121,7 @@ class _ActiveInvestigationCardState extends State<ActiveInvestigationCard> {
               ),
             ],
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: AppSpacing.xs),
           Row(
             children: [
               Icon(
@@ -129,7 +129,7 @@ class _ActiveInvestigationCardState extends State<ActiveInvestigationCard> {
                 size: 13,
                 color: foren.textDisabled,
               ),
-              const SizedBox(width: 4),
+              const SizedBox(width: AppSpacing.xs),
               Text(
                 '${widget.evidenceCount} Evidence Artifacts Collected · ${widget.caseType}',
                 style: theme.textTheme.bodySmall?.copyWith(

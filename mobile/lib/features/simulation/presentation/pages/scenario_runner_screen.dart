@@ -84,7 +84,7 @@ class ScenarioRunnerScreen extends ConsumerWidget {
                 child: Row(
                   children: [
                     Icon(Icons.timer_outlined, size: 14, color: primaryColor),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       _formatTime(state.secondsElapsed),
                       style: TextStyle(

@@ -95,7 +95,7 @@ class _ActivityRow extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppSpacing.sm),
           Text(
             item.timestamp,
             style: TextStyle(color: foren.textDisabled, fontSize: 10),

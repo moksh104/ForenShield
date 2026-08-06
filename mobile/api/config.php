@@ -12,9 +12,9 @@ define('JWT_SECRET', 'forenshield_super_secret_key');
 // CLOUDINARY CONFIGURATION
 // ======================================
 
-// define('CLOUDINARY_CLOUD_NAME', 'n82axrnr');
-// define('CLOUDINARY_API_KEY', '213326428898443');
-// define('CLOUDINARY_API_SECRET', 'Mw3KpnWvAUJJ7lNhJ1LpZ9qSrAU');
+define('CLOUDINARY_CLOUD_NAME', 'n82axrnr');
+define('CLOUDINARY_API_KEY', '213326428898443');
+define('CLOUDINARY_API_SECRET', 'Mw3KpnWvAUJJ7lNhJ1LpZ9qSrAU');
 
 // ======================================
 // DATABASE CONNECTION

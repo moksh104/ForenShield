@@ -60,7 +60,7 @@ class _ProgressCardState extends State<ProgressCard> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(Icons.school_outlined, size: 12, color: academyColor),
-                    const SizedBox(width: 4),
+                    const SizedBox(width: AppSpacing.xs),
                     Text(
                       'CONTINUE LEARNING',
                       style: theme.textTheme.labelSmall?.copyWith(

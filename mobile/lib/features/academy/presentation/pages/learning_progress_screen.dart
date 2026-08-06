@@ -174,7 +174,7 @@ class _CertificateTile extends StatelessWidget {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: warningColor.withValues(alpha: 0.15),
               shape: BoxShape.circle,

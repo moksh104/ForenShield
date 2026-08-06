@@ -53,7 +53,7 @@ class SimulationDashboardHeader extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Simulation engine ready',
                       style: theme.textTheme.labelSmall?.copyWith(

@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../providers/feature_provider.dart';
@@ -40,7 +41,7 @@ class FeaturePage extends ConsumerWidget {
     }
 
     return ListView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSpacing.lg),
       itemCount: featureState.features.length,
       itemBuilder: (context, index) {
         final feature = featureState.features[index];

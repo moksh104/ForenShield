@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import '../components/foren_cards.dart';
 
@@ -50,7 +51,7 @@ class AppCard extends StatelessWidget {
     this.subtitle,
     this.elevation = 1,
     this.hasBorder = true,
-    this.padding = const EdgeInsets.all(16.0),
+    this.padding = const EdgeInsets.all(AppSpacing.lg),
     this.onTap,
     this.borderRadius,
   });

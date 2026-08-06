@@ -225,7 +225,7 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                                                   ),
                                               ],
                                             ),
-                                            const SizedBox(height: 4),
+                                            const SizedBox(height: AppSpacing.xs),
                                             Text(
                                               notification.message,
                                               style: TextStyle(

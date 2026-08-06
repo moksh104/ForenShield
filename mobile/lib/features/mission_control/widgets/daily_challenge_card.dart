@@ -93,7 +93,7 @@ class DailyChallengeCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         challengeTitle,
                         style: theme.textTheme.titleSmall?.copyWith(
@@ -114,7 +114,7 @@ class DailyChallengeCard extends StatelessWidget {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Container(
                             width: 3,
                             height: 3,
@@ -125,7 +125,7 @@ class DailyChallengeCard extends StatelessWidget {
                               shape: BoxShape.circle,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Icon(
                             Icons.timer_outlined,
                             size: 11,

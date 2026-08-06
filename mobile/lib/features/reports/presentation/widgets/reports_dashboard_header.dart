@@ -48,7 +48,7 @@ class ReportsDashboardHeader extends StatelessWidget {
                         shape: BoxShape.circle,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     Text(
                       'Threat intelligence active',
                       style: theme.textTheme.labelSmall?.copyWith(

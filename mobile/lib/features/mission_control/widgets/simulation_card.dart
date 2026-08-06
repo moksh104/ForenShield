@@ -76,7 +76,7 @@ class SimulationCard extends StatelessWidget {
                               fontSize: 9,
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppSpacing.sm),
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 6,
@@ -97,7 +97,7 @@ class SimulationCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppSpacing.xs),
                       Text(
                         scenarioTitle,
                         style: theme.textTheme.titleSmall?.copyWith(

@@ -73,7 +73,7 @@ class OnboardingActionBar extends StatelessWidget {
                         fontSize: 15,
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppSpacing.sm),
                     const Icon(
                       Icons.arrow_forward,
                       size: 18,

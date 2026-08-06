@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -38,9 +39,9 @@ class NotificationBadgeIconButton extends ConsumerWidget {
             top: 8,
             right: 8,
             child: Container(
-              padding: const EdgeInsets.all(4),
+              padding: const EdgeInsets.all(AppSpacing.xs),
               decoration: BoxDecoration(
-                color: foren.danger.t500,
+                color: foren.critical.t500,
                 shape: BoxShape.circle,
               ),
               constraints: const BoxConstraints(

@@ -1,3 +1,4 @@
+import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'dart:math' as math;
 
@@ -134,7 +135,7 @@ class _SecurityStatusCardState extends State<SecurityStatusCard>
                         ),
                       ],
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       'Security posture',
                       style: theme.textTheme.bodySmall?.copyWith(

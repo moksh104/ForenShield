@@ -236,7 +236,7 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                                               size: 16,
                                               color: primaryColor,
                                             ),
-                                            const SizedBox(width: 8),
+                                            const SizedBox(width: AppSpacing.sm),
                                             Expanded(
                                               child: Text(
                                                 obj,
