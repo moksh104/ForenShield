@@ -36,7 +36,7 @@ class AuthState {
       error: error,
     );
   }
-}  
+}
 
 /// Auth state notifier
 class AuthNotifier extends StateNotifier<AuthState> {

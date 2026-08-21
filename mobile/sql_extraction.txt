@@ -1,0 +1,162 @@
+
+--- academy_courses.php ---
+SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type =
+INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id,
+
+--- achievement_engine.php ---
+SELECT a.id, a.code, a.title, a.xp_reward, a.target_metric, a.threshold FROM achievements a LEFT JOIN user_achievements ua ON a.id = ua.achievement_id AND ua.user_id = :uid WHERE ua.id IS NULL
+INSERT INTO user_achievements (user_id, achievement_id, unlocked_at) VALUES (:uid, :ach_id, NOW())
+INSERT INTO notifications (user_id, title, message, type) VALUES (:uid, :title, :message,
+SELECT id FROM notifications WHERE user_id = :uid AND title = :title AND created_at > NOW() - INTERVAL
+INSERT INTO notifications (user_id, title, message, type) VALUES (:uid, :title, :message,
+
+--- achievement_service.php ---
+SELECT id FROM achievements WHERE user_id = :user_id AND title = :title
+INSERT INTO achievements (user_id, title, description, badge, xp, unlocked) VALUES (:user_id, :title, :description, :badge, :xp, FALSE)
+SELECT id, user_id, title, description, badge, xp, unlocked, unlocked_at, created_at FROM achievements WHERE user_id = :user_id ORDER BY unlocked DESC, id ASC
+
+--- current_user.php ---
+SELECT id, full_name, email, created_at FROM users WHERE id = :id
+
+--- forgot_password.php ---
+SELECT id, full_name FROM users WHERE email = :email
+INSERT INTO otp_codes (user_id, otp_code, expires_at) VALUES (:user_id, :otp_code, NOW() + INTERVAL
+
+--- investigation_cases.php ---
+SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type =
+INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id,
+
+--- leaderboard.php ---
+WITH RankedUsers AS ( SELECT user_id, total_xp, current_streak, investigations_completed, courses_completed, RANK() OVER (ORDER BY total_xp DESC) as rnk FROM leaderboard_stats ) SELECT sub.user_id, COALESCE(u.full_name,
+
+--- login.php ---
+SELECT id, full_name, email, password_hash FROM users WHERE email = :email
+INSERT INTO refresh_tokens (user_id, refresh_token, created_at) VALUES (:user_id, :refresh_token, NOW())
+INSERT INTO device_sessions (user_id, device_name, platform, app_version, ip_address, session_token, is_current) VALUES (?, ?, ?, ?, ?, ?, true)
+INSERT INTO login_history (user_id, device_name, platform, ip_address, status) VALUES (?, ?, ?, ?, ?)
+
+--- logout.php ---
+SELECT user_id FROM refresh_tokens WHERE refresh_token = :refresh_token
+UPDATE login_history SET logout_time = CURRENT_TIMESTAMP WHERE user_id = ? AND logout_time IS NULL AND status = \
+DELETE FROM device_sessions WHERE session_token = ?
+DELETE FROM refresh_tokens WHERE refresh_token = :refresh_token
+
+--- mark_as_read.php ---
+UPDATE notifications SET is_read = TRUE WHERE user_id = :user_id
+UPDATE notifications SET is_read = TRUE WHERE id = :id AND user_id = :user_id
+
+--- mission_control.php ---
+SELECT full_name, avatar_url FROM users WHERE id = :id
+SELECT COUNT(*) FROM notifications WHERE user_id = :user_id
+INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id, :title, :message, :type, FALSE)
+SELECT * FROM leaderboard_stats WHERE user_id = :user_id
+SELECT a.code as id, a.title, a.description, a.icon as icon_name, a.xp_reward, ua.unlocked_at as unlocked_date FROM user_achievements ua JOIN achievements a ON ua.achievement_id = a.id WHERE ua.user_id = :user_id LIMIT 3
+SELECT id, title, message, created_at as timestamp, NOT is_read as is_unread, type FROM notifications WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 3
+SELECT id, action as title, source_module as subtitle, created_at as timestamp, event_type as type, \
+
+--- notifications.php ---
+UPDATE notifications SET is_read = TRUE WHERE user_id = :user_id
+UPDATE notifications SET is_read = TRUE WHERE id = :id AND user_id = :user_id
+SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND is_read = FALSE
+
+--- profile.php ---
+SELECT id, full_name, email, phone, avatar_url, created_at FROM users WHERE id = :id
+SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type =
+INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id,
+SELECT * FROM leaderboard_stats WHERE user_id = :user_id
+SELECT id, action as title, source_module as source, xp_earned as xp_amount, created_at as timestamp FROM xp_transactions WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 5
+SELECT a.code as id, a.title, a.description, a.icon as icon_name, a.xp_reward, ua.unlocked_at as unlocked_date FROM user_achievements ua JOIN achievements a ON ua.achievement_id = a.id WHERE ua.user_id = :user_id
+
+--- rank_service.php ---
+SELECT user_id FROM leaderboard_stats WHERE user_id = :user_id
+INSERT INTO leaderboard_stats (user_id, total_xp, current_streak, investigations_completed, courses_completed, reports_completed, threats_resolved, last_updated) VALUES (:user_id, 0, 0, 0, 0, 0, 0, NOW())
+SELECT id FROM leaderboard WHERE user_id = :user_id
+INSERT INTO leaderboard (user_id, username, xp, rank, completed_courses, completed_cases, streak, last_activity) VALUES (:user_id, :username, 0, 0, 0, 0, 0, NOW())
+SELECT rnk FROM ( SELECT user_id, RANK() OVER (ORDER BY total_xp DESC) as rnk FROM leaderboard_stats ) sub WHERE user_id = :user_id
+
+--- refresh_token.php ---
+SELECT r.user_id, u.email, u.full_name FROM refresh_tokens r JOIN users u ON u.id = r.user_id WHERE r.refresh_token = :refresh_token
+
+--- register.php ---
+SELECT id FROM users WHERE email = :email
+INSERT INTO users (full_name, email, password_hash, created_at) VALUES (:full_name, :email, :password_hash, NOW()) RETURNING id
+INSERT INTO refresh_tokens (user_id, refresh_token, created_at) VALUES (:user_id, :refresh_token, NOW())
+
+--- reports.php ---
+SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type =
+INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id,
+
+--- save_fcm_token.php ---
+UPDATE users SET fcm_token = :fcm_token WHERE id = :id
+
+--- streak_service.php ---
+SELECT streak FROM leaderboard WHERE user_id = :user_id
+SELECT streak, last_activity FROM leaderboard WHERE user_id = :user_id
+UPDATE leaderboard SET streak = :streak, last_activity = NOW() WHERE user_id = :user_id
+
+--- update_profile.php ---
+SELECT id, full_name, email, phone, avatar_url, created_at FROM users WHERE id = :id
+
+--- update_xp.php ---
+SELECT id FROM xp_transactions WHERE user_id = :uid AND event_type = :ev_type AND reference_id = :ref_id
+SELECT * FROM leaderboard_stats WHERE user_id = :uid
+INSERT INTO xp_transactions (user_id, action, xp_earned, reason, reference_id, event_type, source_module) VALUES (:uid, :act, :xp, :reason, :ref_id, :ev_type, :src_mod)
+INSERT INTO daily_activity (user_id, date, xp_earned, courses_completed, cases_completed, reports_completed) VALUES (:uid, :dt, :xp, :c_crs, :c_cas, :c_rep) ON CONFLICT (user_id, date) DO UPDATE SET xp_earned = daily_activity.xp_earned + EXCLUDED.xp_earned, courses_completed = daily_activity.courses_completed + EXCLUDED.courses_completed, cases_completed = daily_activity.cases_completed + EXCLUDED.cases_completed, reports_completed = daily_activity.reports_completed + EXCLUDED.reports_completed
+UPDATE leaderboard_stats SET total_xp = total_xp + :xp, courses_completed = courses_completed + :c_crs, investigations_completed = investigations_completed + :c_cas, reports_completed = reports_completed + :c_rep, missions_completed = missions_completed + :m_comp, last_updated = NOW() WHERE user_id = :uid
+UPDATE leaderboard SET xp = xp + :xp, completed_courses = completed_courses + :c_crs, completed_cases = completed_cases + :c_cas, last_activity = NOW() WHERE user_id = :uid
+UPDATE leaderboard_stats SET current_streak = :st WHERE user_id = :uid
+SELECT * FROM leaderboard_stats WHERE user_id = :uid
+UPDATE daily_activity SET xp_earned = xp_earned + :xp WHERE user_id = :uid AND date = :dt
+UPDATE leaderboard_stats SET total_xp = total_xp + :xp WHERE user_id = :uid
+UPDATE leaderboard SET xp = xp + :xp WHERE user_id = :uid
+
+--- verify_otp.php ---
+SELECT o.id, o.user_id, o.otp_code, o.expires_at, u.email, u.full_name FROM otp_codes o JOIN users u ON u.id = o.user_id WHERE u.email = :email AND o.otp_code = :otp_code
+DELETE FROM otp_codes WHERE id = :id
+
+--- check.php ---
+SELECT * FROM leaderboard_stats WHERE user_id = :uid
+
+--- list.php ---
+SELECT * FROM leaderboard_stats WHERE user_id = :uid
+
+--- progress.php ---
+SELECT * FROM leaderboard_stats WHERE user_id = :uid
+
+--- unlock.php ---
+SELECT * FROM achievements WHERE code = :code
+INSERT INTO user_achievements (user_id, achievement_id, unlocked_at) VALUES (:uid, :ach_id, NOW()) ON CONFLICT DO NOTHING
+INSERT INTO notifications (user_id, title, message, type) VALUES (:uid, :title, :message,
+UPDATE leaderboard_stats SET total_xp = total_xp + :xp WHERE user_id = :uid
+
+--- profile_rank.php ---
+SELECT COUNT(*) FROM leaderboard_stats
+WITH WeeklyAgg AS ( SELECT user_id, SUM(xp_earned) as weekly_xp FROM daily_activity WHERE date >= CURRENT_DATE - INTERVAL
+WITH MonthlyAgg AS ( SELECT user_id, SUM(xp_earned) as monthly_xp FROM daily_activity WHERE date >= CURRENT_DATE - INTERVAL
+
+--- delete_account.php ---
+SELECT password_hash FROM users WHERE id = :user_id
+DELETE FROM refresh_tokens WHERE user_id = ?
+DELETE FROM device_sessions WHERE user_id = ?
+DELETE FROM login_history WHERE user_id = ?
+DELETE FROM notifications WHERE user_id = ?
+DELETE FROM achievements WHERE user_id = ?
+DELETE FROM leaderboard WHERE user_id = ?
+DELETE FROM users WHERE id = ?
+
+--- devices.php ---
+SELECT id, device_name, platform, app_version, ip_address, login_at, last_active, is_current, fcm_token FROM device_sessions WHERE user_id = :user_id ORDER BY last_active DESC
+
+--- export_data.php ---
+SELECT id, full_name, email, role, avatar_url, created_at FROM users WHERE id = ?
+SELECT * FROM achievements WHERE user_id = ?
+SELECT * FROM leaderboard WHERE user_id = ?
+SELECT * FROM login_history WHERE user_id = ? ORDER BY login_time DESC
+SELECT * FROM device_sessions WHERE user_id = ?
+SELECT * FROM notifications WHERE user_id = ? ORDER BY created_at DESC
+
+--- login_history.php ---
+SELECT id, device_name, platform, ip_address, login_time, logout_time, status FROM login_history WHERE user_id = :user_id ORDER BY login_time DESC LIMIT :limit OFFSET :offset
+
+--- revoke_device.php ---
+DELETE FROM device_sessions WHERE id = ? AND user_id = ?

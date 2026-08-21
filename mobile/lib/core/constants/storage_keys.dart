@@ -52,6 +52,8 @@ class StorageKeys {
   static const String settingsBiometricLogin = 'settings_biometric_login';
   static const String settingsAutoUpdates = 'settings_auto_updates';
   static const String settingsDeveloperMode = 'settings_developer_mode';
-  static const String settingsAutoLogoutMinutes = 'settings_auto_logout_minutes';
-  static const String settingsDataCollectionEnabled = 'settings_data_collection_enabled';
+  static const String settingsAutoLogoutMinutes =
+      'settings_auto_logout_minutes';
+  static const String settingsDataCollectionEnabled =
+      'settings_data_collection_enabled';
 }

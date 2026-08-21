@@ -83,7 +83,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -112,8 +112,8 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
 
     if (caseDetail == null || verdict == null) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
-        appBar: AppBar(backgroundColor: AppColors.bgBase),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(backgroundColor: theme.colorScheme.surface),
         body: Center(
           child: Text(
             'Verdict formulation unavailable.',
@@ -127,7 +127,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
       final isCorrect = _selectedIndex == verdict.correctOptionIndex;
 
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: ParticleBackground(
           numberOfParticles: 40,
           particleColor: AppColors.logoGold,
@@ -283,9 +283,9 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
     }
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => context.pop(),

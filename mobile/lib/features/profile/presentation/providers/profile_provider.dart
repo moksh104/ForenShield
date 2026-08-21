@@ -101,22 +101,28 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 
   Future<void> updateAvatar(String avatarPath) async {
     if (state.profile == null) return;
-    
+
     // Set to loading to show progress indicator if UI supports it
     state = state.copyWith(status: ProfileStatus.loading);
-    
+
     String finalUrl = avatarPath;
-    
+
     // Upload if it's a local file path
     if (avatarPath.isNotEmpty && !avatarPath.startsWith('http')) {
       final uploadService = _ref.read(uploadServiceProvider);
       final file = File(avatarPath);
       final compressed = await uploadService.compressImage(file);
-      final url = await uploadService.uploadImage(compressed ?? file, folder: 'forenshield/users');
-      
+      final url = await uploadService.uploadImage(
+        compressed ?? file,
+        folder: 'forenshield/users',
+      );
+
       if (url == null) {
         if (!mounted) return;
-        state = state.copyWith(status: ProfileStatus.error, errorMessage: 'Failed to upload image');
+        state = state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: 'Failed to upload image',
+        );
         return;
       }
       finalUrl = url;
@@ -130,7 +136,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       phone: state.profile!.phone,
       avatarUrl: finalUrl,
     );
-    
+
     if (!mounted) return;
 
     result.when(
@@ -138,13 +144,17 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         state = state.copyWith(status: ProfileStatus.success, profile: updated);
       },
       failure: (e) {
-        state = state.copyWith(status: ProfileStatus.error, errorMessage: e.toString());
+        state = state.copyWith(
+          status: ProfileStatus.error,
+          errorMessage: e.toString(),
+        );
       },
     );
   }
 
   Future<void> removeAvatar() async {
-    if (state.profile?.avatarUrl != null && state.profile!.avatarUrl.startsWith('http')) {
+    if (state.profile?.avatarUrl != null &&
+        state.profile!.avatarUrl.startsWith('http')) {
       // Optional: Delete from Cloudinary using UploadService
       // Assuming publicId can be extracted or not needed right now
     }

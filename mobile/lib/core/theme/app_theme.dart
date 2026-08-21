@@ -7,9 +7,9 @@ export 'foren_theme.dart';
 
 /// Legacy alias class delegating to [ForenTheme] for backwards compatibility.
 abstract class AppTheme {
-  /// Dark theme — primary experience (SOC control-room feel).
+  /// Dark theme — secondary experience.
   static ThemeData get darkTheme => ForenTheme.dark;
 
-  /// Light theme — full parity secondary experience.
+  /// Light theme — primary ForenShield experience.
   static ThemeData get lightTheme => ForenTheme.light;
 }

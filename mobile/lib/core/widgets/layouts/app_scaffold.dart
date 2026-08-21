@@ -47,6 +47,9 @@ class AppScaffold extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     Widget content = body;
 
     if (safeArea) {
@@ -54,9 +57,11 @@ class AppScaffold extends StatelessWidget {
     }
 
     return AnnotatedRegion<SystemUiOverlayStyle>(
-      value: systemUiOverlayStyle ?? SystemUiOverlayStyle.light,
+      value:
+          systemUiOverlayStyle ??
+          (isDark ? SystemUiOverlayStyle.light : SystemUiOverlayStyle.dark),
       child: Scaffold(
-        backgroundColor: backgroundColor ?? AppColors.background,
+        backgroundColor: backgroundColor ?? theme.scaffoldBackgroundColor,
         appBar: appBar,
         body: content,
         bottomNavigationBar: bottomNavigationBar,

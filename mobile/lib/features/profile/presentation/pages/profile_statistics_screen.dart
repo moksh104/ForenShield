@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/particle_background.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
@@ -70,9 +67,9 @@ class ProfileStatisticsScreen extends ConsumerWidget {
     ];
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -87,27 +84,18 @@ class ProfileStatisticsScreen extends ConsumerWidget {
           ),
         ),
       ),
-      body: ParticleBackground(
-        numberOfParticles: 40,
-        particleColor: AppColors.logoGold,
-        duration: const Duration(seconds: 18),
-        child: Stack(
-          children: [
-            SafeArea(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSpacing.lg),
-                child: Column(
-                  children: List.generate(
-                    tiles.length,
-                    (index) => Padding(
-                      padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                      child: _StatBigTile(data: tiles[index]),
-                    ),
-                  ),
-                ),
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            children: List.generate(
+              tiles.length,
+              (index) => Padding(
+                padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                child: _StatBigTile(data: tiles[index]),
               ),
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -132,98 +120,76 @@ class _StatTileData {
   });
 }
 
-class _StatBigTile extends StatefulWidget {
+class _StatBigTile extends StatelessWidget {
   final _StatTileData data;
 
   const _StatBigTile({required this.data});
 
   @override
-  State<_StatBigTile> createState() => _StatBigTileState();
-}
-
-class _StatBigTileState extends State<_StatBigTile> {
-  bool _isHovered = false;
-
-  @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
-    final data = widget.data;
 
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 180),
-        transform: Matrix4.translationValues(_isHovered ? 4 : 0, 0, 0),
-        child: GlassEffect(
-          border: Border.all(
-            color: _isHovered ? data.color : foren.borderSubtle,
-            width: 1.0,
-          ),
-          borderRadius: AppRadius.borderRadiusLg,
-          child: Padding(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            child: Row(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: data.color.withValues(alpha: 0.15),
-                    borderRadius: AppRadius.borderRadiusMd,
-                  ),
-                  child: Icon(data.icon, color: data.color, size: 24),
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    final displayVal = data.isDecimal
+        ? data.value.toStringAsFixed(1)
+        : data.value.toInt().toString();
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.colorScheme.surface,
+        border: Border.all(color: foren.borderSubtle, width: 1.0),
+        borderRadius: AppRadius.borderRadiusLg,
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              decoration: BoxDecoration(
+                color: data.color.withValues(alpha: 0.15),
+                borderRadius: AppRadius.borderRadiusMd,
+              ),
+              child: Icon(data.icon, color: data.color, size: 24),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.baseline,
+                    textBaseline: TextBaseline.alphabetic,
                     children: [
-                      TweenAnimationBuilder<double>(
-                        tween: Tween<double>(begin: 0, end: data.value),
-                        duration: const Duration(milliseconds: 900),
-                        curve: Curves.easeOutCubic,
-                        builder: (context, animatedVal, child) {
-                          final displayVal = data.isDecimal
-                              ? animatedVal.toStringAsFixed(1)
-                              : animatedVal.toInt().toString();
-
-                          return Row(
-                            crossAxisAlignment: CrossAxisAlignment.baseline,
-                            textBaseline: TextBaseline.alphabetic,
-                            children: [
-                              Text(
-                                displayVal,
-                                style: theme.textTheme.titleLarge?.copyWith(
-                                  color: data.color,
-                                  fontWeight: FontWeight.w800,
-                                ),
-                              ),
-                              Text(
-                                data.suffix,
-                                style: theme.textTheme.labelLarge?.copyWith(
-                                  color: data.color,
-                                  fontWeight: FontWeight.w700,
-                                ),
-                              ),
-                            ],
-                          );
-                        },
-                      ),
-                      const SizedBox(height: 2),
                       Text(
-                        data.label,
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: foren.textSecondary,
+                        displayVal,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          color: data.color,
+                          fontWeight: FontWeight.w800,
+                        ),
+                      ),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        data.suffix,
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          color: data.color,
                           fontWeight: FontWeight.w700,
                         ),
                       ),
                     ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 2),
+                  Text(
+                    data.label,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: foren.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -1,4 +1,5 @@
 import '../../../../core/network/api_client.dart';
+import '../../../../core/constants/api_endpoints.dart';
 import '../models/mission_control_model.dart';
 
 /// Remote data source for Mission Control API calls.
@@ -11,7 +12,7 @@ class MissionControlRemoteDataSource {
   Future<MissionControlModel> getDashboardData() async {
     try {
       final response = await _apiClient.get<Map<String, dynamic>>(
-        '/mission_control.php',
+        ApiEndpoints.missionControl,
       );
       if (response.data != null) {
         return MissionControlModel.fromJson(response.data!);

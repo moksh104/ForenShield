@@ -1,52 +1,50 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../data/models/settings_model.dart';
-import '../widgets/settings_card.dart';
+import '../providers/login_history_provider.dart';
 
-/// Login History Page displaying security audit log (UI Mock Data).
-class LoginHistoryPage extends StatelessWidget {
+/// Login History Page displaying security audit log
+class LoginHistoryPage extends ConsumerStatefulWidget {
   const LoginHistoryPage({super.key});
 
-  List<LoginHistoryModel> get _mockHistory => [
-        LoginHistoryModel(
-          id: 'log_1',
-          ipAddress: '127.0.0.1',
-          location: 'Bangalore, India',
-          device: 'Chrome / Windows',
-          timestamp: DateTime.now().subtract(const Duration(minutes: 12)),
-          isSuccessful: true,
-        ),
-        LoginHistoryModel(
-          id: 'log_2',
-          ipAddress: '49.207.192.12',
-          location: 'Mumbai, India',
-          device: 'ForenShield Mobile (Android)',
-          timestamp: DateTime.now().subtract(const Duration(hours: 5)),
-          isSuccessful: true,
-        ),
-        LoginHistoryModel(
-          id: 'log_3',
-          ipAddress: '185.220.101.4',
-          location: 'Frankfurt, Germany (Tor Proxy)',
-          device: 'Unknown Client',
-          timestamp: DateTime.now().subtract(const Duration(days: 1)),
-          isSuccessful: false,
-        ),
-        LoginHistoryModel(
-          id: 'log_4',
-          ipAddress: '103.22.140.5',
-          location: 'Singapore',
-          device: 'MacBook Pro Client',
-          timestamp: DateTime.now().subtract(const Duration(days: 3)),
-          isSuccessful: true,
-        ),
-      ];
+  @override
+  ConsumerState<LoginHistoryPage> createState() => _LoginHistoryPageState();
+}
+
+class _LoginHistoryPageState extends ConsumerState<LoginHistoryPage> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      ref.read(loginHistoryProvider.notifier).loadMore();
+    }
+  }
+
+  Future<void> _onRefresh() async {
+    await ref.read(loginHistoryProvider.notifier).refresh();
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+    final asyncHistory = ref.watch(loginHistoryProvider);
 
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
@@ -54,82 +52,162 @@ class LoginHistoryPage extends StatelessWidget {
         title: const Text('Login Audit History'),
         centerTitle: false,
       ),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(bottom: AppSpacing.md),
-            child: Text(
-              'Security audit log of recent authentication events associated with your account credentials.',
-              style: TextStyle(color: foren.textSecondary, fontSize: 13),
+      body: RefreshIndicator(
+        onRefresh: _onRefresh,
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Text(
+                  'Security audit log of recent authentication events associated with your account credentials.',
+                  style: TextStyle(color: foren.textSecondary, fontSize: 13),
+                ),
+              ),
             ),
-          ),
-          SettingsCard(
-            children: _mockHistory.map<Widget>((LoginHistoryModel item) {
-              final isLast = item == _mockHistory.last;
+            asyncHistory.when(
+              data: (history) {
+                if (history.isEmpty) {
+                  return SliverFillRemaining(
+                    child: Center(
+                      child: Text(
+                        'No login history found.',
+                        style: TextStyle(color: foren.textSecondary),
+                      ),
+                    ),
+                  );
+                }
+                return SliverPadding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                  ),
+                  sliver: SliverList(
+                    delegate: SliverChildBuilderDelegate((context, index) {
+                      if (index == history.length) {
+                        return Padding(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          child: Center(
+                            child:
+                                ref.read(loginHistoryProvider.notifier).hasMore
+                                ? const CircularProgressIndicator()
+                                : Text(
+                                    'End of history',
+                                    style: TextStyle(
+                                      color: foren.textDisabled,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                          ),
+                        );
+                      }
+                      return _buildHistoryItem(
+                        history[index],
+                        theme,
+                        foren,
+                        index == history.length - 1,
+                      );
+                    }, childCount: history.length + 1),
+                  ),
+                );
+              },
+              loading: () => const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator()),
+              ),
+              error: (err, stack) => SliverFillRemaining(
+                child: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: foren.critical.t500,
+                      ),
+                      const SizedBox(height: 16),
+                      const Text('Failed to load login history.'),
+                      const SizedBox(height: 16),
+                      ElevatedButton(
+                        onPressed: _onRefresh,
+                        child: const Text('Retry'),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 
-              return Column(
-                children: [
-                  ListTile(
-                    leading: Container(
-                      padding: const EdgeInsets.all(AppSpacing.sm),
-                      decoration: BoxDecoration(
-                        color: item.isSuccessful
-                            ? foren.success.t500.withValues(alpha: 0.15)
-                            : foren.critical.t500.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        item.isSuccessful
-                            ? Icons.check_circle_outline_rounded
-                            : Icons.gpp_bad_rounded,
-                        color: item.isSuccessful
-                            ? foren.success.t300
-                            : foren.critical.t300,
-                        size: 20,
-                      ),
-                    ),
-                    title: Row(
-                      children: [
-                        Expanded(
-                          child: Text(
-                            item.device,
-                            style: TextStyle(
-                              color: theme.colorScheme.onSurface,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
-                        Text(
-                          item.isSuccessful ? 'SUCCESS' : 'FAILED',
-                          style: TextStyle(
-                            color: item.isSuccessful
-                                ? foren.success.t300
-                                : foren.critical.t300,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w800,
-                          ),
-                        ),
-                      ],
-                    ),
-                    subtitle: Text(
-                      '${item.ipAddress} · ${item.location}\n${item.timestamp.toLocal().toString().split('.')[0]}',
-                      style: TextStyle(color: foren.textSecondary, fontSize: 11),
+  Widget _buildHistoryItem(
+    LoginHistoryModel item,
+    ThemeData theme,
+    ForenColors foren,
+    bool isLast,
+  ) {
+    return Column(
+      children: [
+        Container(
+          decoration: BoxDecoration(
+            color: theme.cardColor,
+            border: Border.all(color: foren.borderSubtle),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          margin: const EdgeInsets.only(bottom: 8),
+          child: ListTile(
+            leading: Container(
+              padding: const EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: item.isSuccessful
+                    ? foren.success.t500.withValues(alpha: 0.15)
+                    : foren.critical.t500.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                item.isSuccessful
+                    ? Icons.check_circle_outline_rounded
+                    : Icons.gpp_bad_rounded,
+                color: item.isSuccessful
+                    ? foren.success.t300
+                    : foren.critical.t300,
+                size: 20,
+              ),
+            ),
+            title: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    item.device,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
-                  if (!isLast)
-                    Divider(
-                      height: 1,
-                      indent: 56,
-                      color: foren.borderSubtle,
-                    ),
-                ],
-              );
-            }).toList(),
+                ),
+                Text(
+                  item.isSuccessful ? 'SUCCESS' : 'FAILED',
+                  style: TextStyle(
+                    color: item.isSuccessful
+                        ? foren.success.t300
+                        : foren.critical.t300,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ],
+            ),
+            subtitle: Text(
+              '${item.ipAddress} · ${item.location}\n${DateFormat('MMM d, y, h:mm a').format(item.timestamp.toLocal())}',
+              style: TextStyle(color: foren.textSecondary, fontSize: 11),
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }

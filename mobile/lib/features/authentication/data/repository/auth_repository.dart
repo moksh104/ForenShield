@@ -20,9 +20,7 @@ abstract class AuthRepository {
   });
 
   /// Requests a password reset OTP code.
-  Future<Result<bool>> forgotPassword({
-    required String email,
-  });
+  Future<Result<bool>> forgotPassword({required String email});
 
   /// Verifies a 6-digit OTP code.
   Future<Result<AuthResponseModel>> verifyOtp({
@@ -71,9 +69,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
   @override
   Future<Result<bool>> forgotPassword({required String email}) async {
-    return _execute(
-      () => _remoteDataSource.forgotPassword(email: email),
-    );
+    return _execute(() => _remoteDataSource.forgotPassword(email: email));
   }
 
   @override

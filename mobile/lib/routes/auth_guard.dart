@@ -52,8 +52,10 @@ class AuthGuard {
     // 3. Enforce Authentication Flow for Authenticated Users FIRST
     if (isLoggedIn) {
       if (isSplash || isOnboarding || isAuthRoute) {
-        AppLogger.d('[AuthGuard] Authenticated user on non-protected page "$location". Redirecting to Mission Control.');
-        return RouteConstants.missionControl;
+        AppLogger.d(
+          '[AuthGuard] Authenticated user on non-protected page "$location". Redirecting to Dashboard.',
+        );
+        return RouteConstants.dashboard;
       }
       return null;
     }
@@ -61,11 +63,15 @@ class AuthGuard {
     // 4. Enforce Onboarding Flow for Unauthenticated Users
     if (!hasSeenOnboarding) {
       if (!isOnboarding && !isSplash) {
-        AppLogger.d('[AuthGuard] Unauthenticated user needs onboarding. Redirecting to Onboarding.');
+        AppLogger.d(
+          '[AuthGuard] Unauthenticated user needs onboarding. Redirecting to Onboarding.',
+        );
         return RouteConstants.onboarding;
       }
       if (isSplash) {
-        AppLogger.d('[AuthGuard] Splash route with uncompleted onboarding. Redirecting to Onboarding.');
+        AppLogger.d(
+          '[AuthGuard] Splash route with uncompleted onboarding. Redirecting to Onboarding.',
+        );
         return RouteConstants.onboarding;
       }
       return null;
@@ -73,12 +79,16 @@ class AuthGuard {
 
     // 5. Unauthenticated users accessing protected routes must be redirected to login.
     if (isProtectedRoute || (!isAuthRoute && !isSplash && !isOnboarding)) {
-      AppLogger.d('[AuthGuard] Unauthenticated user attempting to access protected route "$location". Redirecting to Login.');
+      AppLogger.d(
+        '[AuthGuard] Unauthenticated user attempting to access protected route "$location". Redirecting to Login.',
+      );
       return RouteConstants.login;
     }
 
     if (isSplash || isOnboarding) {
-      AppLogger.d('[AuthGuard] Onboarding complete. Redirecting splash/onboarding to Login.');
+      AppLogger.d(
+        '[AuthGuard] Onboarding complete. Redirecting splash/onboarding to Login.',
+      );
       return RouteConstants.login;
     }
 

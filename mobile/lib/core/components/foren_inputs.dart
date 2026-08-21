@@ -316,12 +316,16 @@ class _ForenTextFieldState extends State<ForenTextField> {
             ),
             border: OutlineInputBorder(
               borderRadius: effectiveRadius,
-              borderSide: const BorderSide(color: AppColors.borderSubtle),
+              borderSide: BorderSide(
+                color: foren?.borderSubtle ?? theme.colorScheme.outlineVariant,
+              ),
             ),
             enabledBorder: OutlineInputBorder(
               borderRadius: effectiveRadius,
               borderSide: BorderSide(
-                color: widget.isSuccess ? successColor : AppColors.borderSubtle,
+                color: widget.isSuccess
+                    ? successColor
+                    : (foren?.borderSubtle ?? theme.colorScheme.outlineVariant),
                 width: widget.isSuccess ? 1.5 : 1.0,
               ),
             ),
@@ -343,7 +347,8 @@ class _ForenTextFieldState extends State<ForenTextField> {
             disabledBorder: OutlineInputBorder(
               borderRadius: effectiveRadius,
               borderSide: BorderSide(
-                color: AppColors.borderSubtle.withValues(alpha: 0.5),
+                color: (foren?.borderSubtle ?? theme.colorScheme.outlineVariant)
+                    .withValues(alpha: 0.5),
               ),
             ),
             errorStyle: AppTypography.bodySmall.copyWith(color: errorColor),
@@ -432,11 +437,15 @@ class _ForenTextFieldState extends State<ForenTextField> {
     required bool isFocused,
   }) {
     if (!widget.showCounter || maxLength == null) return null;
-    final textSecondary = AppColors.textSecondary;
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final secondaryColor =
+        foren?.textSecondary ?? theme.colorScheme.onSurfaceVariant;
+    final primaryColor = foren?.textSecondary ?? theme.colorScheme.onSurface;
     return Text(
       '$currentLength / $maxLength',
       style: AppTypography.labelSmall.copyWith(
-        color: isFocused ? AppColors.textPrimary : textSecondary,
+        color: isFocused ? primaryColor : secondaryColor,
       ),
     );
   }
@@ -493,7 +502,9 @@ class ForenFilterChip extends StatelessWidget {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>();
     final ramp = foren?.forFeature(feature ?? ForenFeature.missionControl);
-    final fg = selected ? Colors.white : AppColors.textSecondary;
+    final fg = selected
+        ? Colors.white
+        : (foren?.textSecondary ?? theme.colorScheme.onSurfaceVariant);
     final bg = selected
         ? (ramp?.t500 ?? AppColors.primary)
         : (foren?.surfaceRaised1 ?? AppColors.surfaceHighlight);
@@ -539,19 +550,25 @@ class ForenDropdown<T> extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final fillColor =
+        foren?.surfaceRaised1 ?? theme.colorScheme.surfaceContainerHighest;
+    final borderColor = foren?.borderSubtle ?? theme.colorScheme.outlineVariant;
+
     return DropdownButtonFormField<T>(
       initialValue: value,
       decoration: InputDecoration(
         labelText: label,
         filled: true,
-        fillColor: AppColors.surfaceHighlight,
+        fillColor: fillColor,
         contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.md,
         ),
         border: OutlineInputBorder(
           borderRadius: AppRadius.buttonRadius,
-          borderSide: const BorderSide(color: AppColors.borderSubtle),
+          borderSide: BorderSide(color: borderColor),
         ),
       ),
       items: [

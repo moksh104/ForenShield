@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../data/repositories/leaderboard_repository.dart';
 import '../../providers/leaderboard_providers.dart';
 import '../widgets/leaderboard_card.dart';
 import '../widgets/leaderboard_tile.dart';
+import 'dart:async';
 
-/// Main Leaderboard Screen with All Time / Weekly / Monthly tabs.
+/// Main Leaderboard Screen with 5 tabs and Search.
 class LeaderboardScreen extends ConsumerStatefulWidget {
   const LeaderboardScreen({super.key});
 
@@ -18,20 +18,49 @@ class LeaderboardScreen extends ConsumerStatefulWidget {
 class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     with SingleTickerProviderStateMixin {
   late final TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+  String _searchQuery = '';
+  Timer? _debounce;
 
-  static const _periods = ['all', 'weekly', 'monthly'];
-  static const _tabLabels = ['All Time', 'Weekly', 'Monthly'];
+  static const _periods = [
+    'all',
+    'weekly',
+    'monthly',
+    'investigators',
+    'learners',
+  ];
+  static const _tabLabels = [
+    'All Time',
+    'Weekly',
+    'Monthly',
+    'Investigators',
+    'Learners',
+  ];
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 5, vsync: this);
   }
 
   @override
   void dispose() {
     _tabController.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          _searchQuery = query;
+        });
+      }
+    });
   }
 
   @override
@@ -42,13 +71,42 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
-        title: const Text('Leaderboard'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Search user, #rank, >xp...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+                style: TextStyle(color: theme.colorScheme.onSurface),
+                onChanged: _onSearchChanged,
+              )
+            : const Text('Leaderboard'),
         centerTitle: false,
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                }
+                _isSearching = !_isSearching;
+              });
+            },
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           indicatorColor: theme.colorScheme.primary,
           labelColor: theme.colorScheme.primary,
           unselectedLabelColor: foren.textSecondary,
+          isScrollable: true,
           labelStyle: const TextStyle(
             fontSize: 13,
             fontWeight: FontWeight.w700,
@@ -59,38 +117,72 @@ class _LeaderboardScreenState extends ConsumerState<LeaderboardScreen>
       body: TabBarView(
         controller: _tabController,
         children: _periods.map((period) {
-          return _LeaderboardTab(period: period);
+          return _LeaderboardTab(period: period, searchQuery: _searchQuery);
         }).toList(),
       ),
     );
   }
 }
 
-class _LeaderboardTab extends ConsumerWidget {
+class _LeaderboardTab extends ConsumerStatefulWidget {
   final String period;
+  final String searchQuery;
 
-  const _LeaderboardTab({required this.period});
+  const _LeaderboardTab({required this.period, required this.searchQuery});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<_LeaderboardTab> createState() => _LeaderboardTabState();
+}
+
+class _LeaderboardTabState extends ConsumerState<_LeaderboardTab> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final args = LeaderboardNotifierArgs(widget.period, widget.searchQuery);
+      ref.read(leaderboardProvider(args).notifier).loadMore();
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
-    final leaderboardAsync = ref.watch(leaderboardProvider(period));
+
+    final args = LeaderboardNotifierArgs(widget.period, widget.searchQuery);
+    final leaderboardAsync = ref.watch(leaderboardProvider(args));
+    final profileAsync = ref.watch(profileRankProvider);
 
     return leaderboardAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => _ErrorView(
         message: err.toString(),
-        onRetry: () => ref.invalidate(leaderboardProvider(period)),
+        onRetry: () => ref.invalidate(leaderboardProvider(args)),
       ),
-      data: (LeaderboardResult result) {
-        if (result.entries.isEmpty) {
+      data: (entries) {
+        if (entries.isEmpty && widget.searchQuery.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.leaderboard_rounded,
-                    size: 64, color: foren.textDisabled),
+                Icon(
+                  Icons.leaderboard_rounded,
+                  size: 64,
+                  color: foren.textDisabled,
+                ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
                   'No leaderboard data yet',
@@ -103,10 +195,7 @@ class _LeaderboardTab extends ConsumerWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'Complete lessons and investigations to earn XP!',
-                  style: TextStyle(
-                    color: foren.textDisabled,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: foren.textDisabled, fontSize: 13),
                 ),
               ],
             ),
@@ -115,32 +204,56 @@ class _LeaderboardTab extends ConsumerWidget {
 
         return RefreshIndicator(
           onRefresh: () async {
-            ref.invalidate(leaderboardProvider(period));
+            ref.invalidate(leaderboardProvider(args));
+            ref.invalidate(profileRankProvider);
           },
           child: ListView.builder(
+            controller: _scrollController,
             padding: const EdgeInsets.all(AppSpacing.md),
-            itemCount: result.entries.length + 1, // +1 for the user card
+            itemCount:
+                entries.length +
+                (widget.searchQuery.isEmpty ? 1 : 0) +
+                1, // +1 for loading indicator
             itemBuilder: (context, index) {
-              if (index == 0) {
-                // Current user stats card
-                if (result.currentUser != null) {
-                  return LeaderboardCard(
-                    entry: result.currentUser!,
-                    myRank: result.myRank,
-                    totalPlayers: result.totalPlayers,
+              if (widget.searchQuery.isEmpty && index == 0) {
+                // Profile Rank Card
+                return profileAsync.when(
+                  data: (profile) {
+                    if (profile.currentUser != null) {
+                      return LeaderboardCard(
+                        entry: profile.currentUser!,
+                        myRank: profile.currentUser!.rank,
+                        totalPlayers: profile.totalPlayers,
+                      );
+                    }
+                    return const SizedBox.shrink();
+                  },
+                  loading: () => const Padding(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    child: Center(child: CircularProgressIndicator()),
+                  ),
+                  error: (_, _) => const SizedBox.shrink(),
+                );
+              }
+
+              final itemIndex = widget.searchQuery.isEmpty ? index - 1 : index;
+
+              if (itemIndex >= entries.length) {
+                final notifier = ref.read(leaderboardProvider(args).notifier);
+                if (notifier.hasMore) {
+                  return const Padding(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    child: Center(child: CircularProgressIndicator()),
                   );
                 }
                 return const SizedBox.shrink();
               }
 
-              final entry = result.entries[index - 1];
-              final isMe = result.currentUser != null &&
-                  entry.userId == result.currentUser!.userId;
+              final entry = entries[itemIndex];
+              final isMe =
+                  profileAsync.value?.currentUser?.userId == entry.userId;
 
-              return LeaderboardTile(
-                entry: entry,
-                isCurrentUser: isMe,
-              );
+              return LeaderboardTile(entry: entry, isCurrentUser: isMe);
             },
           ),
         );
@@ -166,8 +279,11 @@ class _ErrorView extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline_rounded,
-                size: 48, color: foren.critical.t300),
+            Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: foren.critical.t300,
+            ),
             const SizedBox(height: AppSpacing.md),
             Text(
               'Failed to load leaderboard',

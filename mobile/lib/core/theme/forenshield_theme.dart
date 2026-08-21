@@ -13,7 +13,7 @@ export 'foren_theme.dart';
 
 /// Primary ForenShield Material 3 theme configuration class.
 abstract class ForenShieldTheme {
-  /// Dark theme — primary experience (SOC control-room feel).
+  /// Dark theme — secondary experience.
   static ThemeData get darkTheme => ForenTheme.dark;
 
   /// Light theme — full parity secondary experience.
@@ -23,11 +23,11 @@ abstract class ForenShieldTheme {
   static ColorScheme get darkColorScheme => ColorScheme.dark(
     brightness: Brightness.dark,
     primary: AppColors.primary,
-    onPrimary: Colors.black,
+    onPrimary: Colors.white,
     secondary: AppColors.secondary,
     onSecondary: Colors.white,
     tertiary: AppColors.accent,
-    onTertiary: Colors.black,
+    onTertiary: Colors.white,
     error: AppColors.error,
     onError: Colors.white,
     surface: AppColors.surface,
@@ -44,7 +44,7 @@ abstract class ForenShieldTheme {
     secondary: AppColors.secondaryDark,
     onSecondary: Colors.white,
     tertiary: AppColors.accent,
-    onTertiary: Colors.black,
+    onTertiary: Colors.white,
     error: AppColors.error,
     onError: Colors.white,
     surface: AppColors.lightSurface,
@@ -74,30 +74,44 @@ abstract class ForenShieldTheme {
       );
 
   /// Configures [InputDecorationTheme].
-  static InputDecorationTheme getInputDecorationTheme(
-    ColorScheme colorScheme,
-  ) => InputDecorationTheme(
-    filled: true,
-    fillColor: AppColors.surfaceHighlight,
-    contentPadding: AppSpacing.buttonPadding,
-    border: OutlineInputBorder(
-      borderRadius: AppRadius.buttonRadius,
-      borderSide: const BorderSide(color: AppColors.borderDefault),
-    ),
-    enabledBorder: OutlineInputBorder(
-      borderRadius: AppRadius.buttonRadius,
-      borderSide: const BorderSide(color: AppColors.borderDefault),
-    ),
-    focusedBorder: OutlineInputBorder(
-      borderRadius: AppRadius.buttonRadius,
-      borderSide: BorderSide(color: colorScheme.primary, width: 2),
-    ),
-    errorBorder: OutlineInputBorder(
-      borderRadius: AppRadius.buttonRadius,
-      borderSide: BorderSide(color: colorScheme.error, width: 1.5),
-    ),
-    hintStyle: AppTypography.bodyMedium.copyWith(color: AppColors.textDisabled),
-  );
+  ///
+  /// Derives fill and border colors from the given [colorScheme] so that
+  /// both light and dark modes render correctly.
+  static InputDecorationTheme getInputDecorationTheme(ColorScheme colorScheme) {
+    // Theme-aware fill: use surfaceContainerHighest for M3 parity,
+    // falling back to a subtle surface tint.
+    final fillColor = colorScheme.brightness == Brightness.dark
+        ? AppColors.surfaceHighlight
+        : AppColors.lightSurface;
+    final borderColor = colorScheme.brightness == Brightness.dark
+        ? AppColors.borderDefault
+        : AppColors.lightBorderDefault;
+
+    return InputDecorationTheme(
+      filled: true,
+      fillColor: fillColor,
+      contentPadding: AppSpacing.buttonPadding,
+      border: OutlineInputBorder(
+        borderRadius: AppRadius.buttonRadius,
+        borderSide: BorderSide(color: borderColor),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: AppRadius.buttonRadius,
+        borderSide: BorderSide(color: borderColor),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: AppRadius.buttonRadius,
+        borderSide: BorderSide(color: colorScheme.primary, width: 2),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: AppRadius.buttonRadius,
+        borderSide: BorderSide(color: colorScheme.error, width: 1.5),
+      ),
+      hintStyle: AppTypography.bodyMedium.copyWith(
+        color: AppColors.textDisabled,
+      ),
+    );
+  }
 
   /// Configures [NavigationBarThemeData].
   static NavigationBarThemeData getNavigationBarTheme(

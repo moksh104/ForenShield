@@ -49,7 +49,9 @@ class ForenFirebaseService {
       // Handle Terminated state (app launched from a notification tap when terminated)
       final initialMessage = await messaging.getInitialMessage();
       if (initialMessage != null) {
-        debugPrint("TERMINATED STATE NOTIFICATION: ${initialMessage.notification?.title}");
+        debugPrint(
+          "TERMINATED STATE NOTIFICATION: ${initialMessage.notification?.title}",
+        );
         debugPrint("TERMINATED DATA: ${initialMessage.data}");
       }
 
@@ -69,7 +71,9 @@ class ForenFirebaseService {
 
       // Handle Notification Open (when app is in background and user taps notification)
       FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-        debugPrint("NOTIFICATION OPENED FROM BACKGROUND: ${message.notification?.title}");
+        debugPrint(
+          "NOTIFICATION OPENED FROM BACKGROUND: ${message.notification?.title}",
+        );
         debugPrint("DATA: ${message.data}");
       });
     } catch (e, stackTrace) {

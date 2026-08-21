@@ -1,4 +1,6 @@
 import '../../../../core/network/api_client.dart';
+import '../../../../core/constants/api_endpoints.dart';
+import '../../../../core/exceptions/app_exceptions.dart';
 import '../models/profile_model.dart';
 
 /// Remote Data Source for Profile & Settings API calls.
@@ -9,35 +11,34 @@ class ProfileRemoteDataSource {
 
   /// Fetches profile data from backend API.
   Future<ProfileModel> getProfile() async {
-    try {
-      final response = await _apiClient.get<Map<String, dynamic>>('/profile.php');
-      if (response.data != null) {
-        return ProfileModel.fromJson(response.data!);
-      }
-    } catch (_) {
-      // Fallback
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      ApiEndpoints.profile,
+    );
+    if (response.data != null) {
+      return ProfileModel.fromJson(response.data!);
     }
-    return ProfileModel.fromJson(const {});
+    throw const ApiException('Invalid profile data received from server');
   }
 
-  /// Updates profile details (fullName, email).
+  /// Updates profile details (fullName, email, phone, avatarUrl).
   Future<ProfileModel> updateProfile({
     required String fullName,
     required String email,
+    String? phone,
+    String? avatarUrl,
   }) async {
-    try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
-        '/update_profile.php',
-        data: {'full_name': fullName, 'email': email},
-      );
-      if (response.data != null) {
-        return ProfileModel.fromJson(response.data!);
-      }
-    } catch (_) {
-      // Fallback update
+    final data = <String, dynamic>{'full_name': fullName, 'email': email};
+    if (phone != null) data['phone'] = phone;
+    if (avatarUrl != null) data['avatar_url'] = avatarUrl;
+
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      ApiEndpoints.updateProfile,
+      data: data,
+    );
+    if (response.data != null) {
+      return ProfileModel.fromJson(response.data!);
     }
-    final current = await getProfile();
-    return current.copyWith(fullName: fullName, email: email) as ProfileModel;
+    throw const ApiException('Failed to parse updated profile data');
   }
 
   /// Changes password.
@@ -45,16 +46,9 @@ class ProfileRemoteDataSource {
     required String currentPassword,
     required String newPassword,
   }) async {
-    try {
-      await _apiClient.post<Map<String, dynamic>>(
-        '/profile/change-password',
-        data: {
-          'current_password': currentPassword,
-          'new_password': newPassword,
-        },
-      );
-    } catch (_) {
-      // Simulated API response
-    }
+    await _apiClient.post<Map<String, dynamic>>(
+      '/profile/change-password',
+      data: {'current_password': currentPassword, 'new_password': newPassword},
+    );
   }
 }

@@ -24,6 +24,7 @@ class RouteConstants {
   static const String academyProgress = '/academy/progress';
   static const String simulation = '/simulation';
   static const String simulationRun = '/simulation/run';
+  static const String legacyScenarioRunner = '/scenario-runner';
   static const String simulationDebrief = '/simulation/debrief';
   static const String reports = '/reports';
   static const String reportDetail = '/reports/report';

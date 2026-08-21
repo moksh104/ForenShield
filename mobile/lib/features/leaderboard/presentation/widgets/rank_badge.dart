@@ -5,11 +5,7 @@ class RankBadge extends StatelessWidget {
   final int rank;
   final double size;
 
-  const RankBadge({
-    super.key,
-    required this.rank,
-    this.size = 32,
-  });
+  const RankBadge({super.key, required this.rank, this.size = 32});
 
   Color _badgeColor() {
     switch (rank) {
@@ -43,10 +39,7 @@ class RankBadge extends StatelessWidget {
             ? _badgeColor().withValues(alpha: 0.2)
             : Colors.transparent,
         shape: BoxShape.circle,
-        border: Border.all(
-          color: _badgeColor(),
-          width: isTopThree ? 2 : 1,
-        ),
+        border: Border.all(color: _badgeColor(), width: isTopThree ? 2 : 1),
         boxShadow: isTopThree
             ? [
                 BoxShadow(
@@ -59,10 +52,7 @@ class RankBadge extends StatelessWidget {
       ),
       child: Center(
         child: isTopThree
-            ? Text(
-                _badgeText(),
-                style: TextStyle(fontSize: size * 0.5),
-              )
+            ? Text(_badgeText(), style: TextStyle(fontSize: size * 0.5))
             : Text(
                 _badgeText(),
                 style: TextStyle(

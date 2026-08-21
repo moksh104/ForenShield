@@ -74,7 +74,7 @@ class _InvestigationTimelineScreenState
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -101,8 +101,8 @@ class _InvestigationTimelineScreenState
     final caseDetail = _caseDetail;
     if (caseDetail == null) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
-        appBar: AppBar(backgroundColor: AppColors.bgBase),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(backgroundColor: theme.colorScheme.surface),
         body: Center(
           child: Text(
             'Timeline unavailable.',
@@ -122,9 +122,9 @@ class _InvestigationTimelineScreenState
     }).toList();
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => context.pop(),
@@ -327,7 +327,9 @@ class _InvestigationTimelineScreenState
                                                   ),
                                                 ),
                                                 if (event.isExpanded) ...[
-                                                  const SizedBox(height: AppSpacing.sm),
+                                                  const SizedBox(
+                                                    height: AppSpacing.sm,
+                                                  ),
                                                   Text(
                                                     event.description,
                                                     style: TextStyle(

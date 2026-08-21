@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/foren_theme.dart';
 import 'skeleton_state.dart';
 
 /// Reusable generic LoadingState widget.
@@ -31,7 +31,10 @@ class LoadingState extends StatelessWidget {
       );
     }
 
-    final spinnerColor = color ?? AppColors.primary;
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final cs = theme.colorScheme;
+    final spinnerColor = color ?? cs.primary;
 
     return Center(
       child: Padding(
@@ -44,7 +47,7 @@ class LoadingState extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: AppColors.surfaceHighlight,
+                color: foren?.surfaceRaised1 ?? cs.surfaceContainerHighest,
                 borderRadius: AppRadius.cardRadius,
               ),
               child: CircularProgressIndicator(
@@ -56,8 +59,8 @@ class LoadingState extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               Text(
                 message!,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren?.textSecondary ?? cs.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),

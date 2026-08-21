@@ -3,12 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../../../core/components/foren_navigation.dart';
 import '../../../../routes/route_constants.dart';
+import '../../../../shared/widgets/foren_brand_header.dart';
 import '../providers/profile_provider.dart';
 
 /// My Profile Screen matching exact white-theme design spec screenshot.
@@ -73,109 +73,19 @@ class ProfileScreen extends ConsumerWidget {
                   ),
                   const SizedBox(width: AppSpacing.xs),
 
-                  // Brand Shield Logo Mark
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.surfaceContainerHighest,
-                      border: Border.all(
-                        color: colorScheme.primary.withValues(alpha: 0.3),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 28,
-                        height: 28,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [AppColors.primary, Color(0xFF1D4ED8)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Icon(
-                                Icons.shield_rounded,
-                                size: 18,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                'F',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'Outfit',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-
-                  // Brand Name + Tagline
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'FOREN',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              fontFamily: 'Outfit',
-                            ),
-                          ),
-                          Text(
-                            'SHIELD',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              color: colorScheme.primary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              fontFamily: 'Outfit',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        'LEARN · INVESTIGATE · DEFEND',
-                        style: theme.textTheme.labelSmall?.copyWith(
-                          color: colorScheme.onSurfaceVariant,
-                          fontSize: 7.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Shared Brand Header
+                  const ForenShieldBrandHeader(),
 
                   const Spacer(),
 
-                  // Search Button
+                  // Settings Gear Icon
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => context.push(RouteConstants.settings),
                     child: SizedBox(
                       width: 36,
                       height: 36,
                       child: Icon(
-                        Icons.search_rounded,
+                        Icons.settings_outlined,
                         size: 22,
                         color: colorScheme.onSurface,
                       ),
@@ -244,7 +154,7 @@ class ProfileScreen extends ConsumerWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Mission Control',
+                                'My Profile',
                                 style: theme.textTheme.headlineSmall?.copyWith(
                                   color: colorScheme.onSurface,
                                   fontSize: 24,
@@ -323,7 +233,9 @@ class ProfileScreen extends ConsumerWidget {
                             ? []
                             : [
                                 BoxShadow(
-                                  color: colorScheme.shadow.withValues(alpha: 0.05),
+                                  color: colorScheme.shadow.withValues(
+                                    alpha: 0.05,
+                                  ),
                                   blurRadius: 10,
                                   offset: const Offset(0, 2),
                                 ),
@@ -351,16 +263,32 @@ class ProfileScreen extends ConsumerWidget {
                                         decoration: BoxDecoration(
                                           shape: BoxShape.circle,
                                           color: const Color(0xFFDBEAFE),
-                                          image: (state.profile?.avatarUrl.isNotEmpty ?? false)
-                                              ? (state.profile!.avatarUrl.startsWith('http')
-                                                  ? DecorationImage(
-                                                      image: NetworkImage(state.profile!.avatarUrl),
-                                                      fit: BoxFit.cover,
-                                                    )
-                                                  : DecorationImage(
-                                                      image: FileImage(File(state.profile!.avatarUrl)),
-                                                      fit: BoxFit.cover,
-                                                    ))
+                                          image:
+                                              (state
+                                                      .profile
+                                                      ?.avatarUrl
+                                                      .isNotEmpty ??
+                                                  false)
+                                              ? (state.profile!.avatarUrl
+                                                        .startsWith('http')
+                                                    ? DecorationImage(
+                                                        image: NetworkImage(
+                                                          state
+                                                              .profile!
+                                                              .avatarUrl,
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : DecorationImage(
+                                                        image: FileImage(
+                                                          File(
+                                                            state
+                                                                .profile!
+                                                                .avatarUrl,
+                                                          ),
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                      ))
                                               : null,
                                         ),
                                         child:
@@ -413,24 +341,27 @@ class ProfileScreen extends ConsumerWidget {
                                         state.profile?.fullName.isNotEmpty ??
                                                 false
                                             ? state.profile!.fullName
-                                            : 'Samlee',
-                                        style: theme.textTheme.titleLarge?.copyWith(
-                                          color: colorScheme.onSurface,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w800,
-                                          fontFamily: 'Outfit',
-                                        ),
+                                            : 'Agent',
+                                        style: theme.textTheme.titleLarge
+                                            ?.copyWith(
+                                              color: colorScheme.onSurface,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w800,
+                                              fontFamily: 'Outfit',
+                                            ),
                                       ),
                                       const SizedBox(height: 3),
                                       Row(
                                         children: [
                                           Text(
-                                            'Cyber Detective',
-                                            style: theme.textTheme.labelLarge?.copyWith(
-                                              color: colorScheme.primary,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w700,
-                                            ),
+                                            state.profile?.rankTitle ??
+                                                'Cyber Detective',
+                                            style: theme.textTheme.labelLarge
+                                                ?.copyWith(
+                                                  color: colorScheme.primary,
+                                                  fontSize: 13,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
                                           ),
                                           const SizedBox(width: AppSpacing.xs),
                                           Icon(
@@ -442,19 +373,29 @@ class ProfileScreen extends ConsumerWidget {
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        'Level 12',
-                                        style: theme.textTheme.labelMedium?.copyWith(
-                                          color: colorScheme.onSurface,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w700,
-                                        ),
+                                        'Level ${state.profile?.level ?? 1}',
+                                        style: theme.textTheme.labelMedium
+                                            ?.copyWith(
+                                              color: colorScheme.onSurface,
+                                              fontSize: 12,
+                                              fontWeight: FontWeight.w700,
+                                            ),
                                       ),
                                       const SizedBox(height: AppSpacing.xs),
                                       // Progress Bar
                                       ClipRRect(
                                         borderRadius: BorderRadius.circular(3),
+                                        // Progress to next level
                                         child: LinearProgressIndicator(
-                                          value: 0.55,
+                                          value:
+                                              state.profile != null &&
+                                                  state.profile!.nextLevelXp > 0
+                                              ? (state.profile!.xpPoints %
+                                                        state
+                                                            .profile!
+                                                            .nextLevelXp) /
+                                                    state.profile!.nextLevelXp
+                                              : 0.0,
                                           minHeight: 5,
                                           backgroundColor: foren.surfaceRaised1,
                                           valueColor:
@@ -465,11 +406,12 @@ class ProfileScreen extends ConsumerWidget {
                                       ),
                                       const SizedBox(height: AppSpacing.xs),
                                       Text(
-                                        '2,800 XP to Level 13',
-                                        style: theme.textTheme.bodySmall?.copyWith(
-                                          color: foren.textSecondary,
-                                          fontSize: 11,
-                                        ),
+                                        '${state.profile?.nextLevelXp ?? 0} XP to Level ${(state.profile?.level ?? 0) + 1}',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(
+                                              color: foren.textSecondary,
+                                              fontSize: 11,
+                                            ),
                                       ),
                                     ],
                                   ),
@@ -487,13 +429,14 @@ class ProfileScreen extends ConsumerWidget {
                                     ),
                                     child: Center(
                                       child: Text(
-                                        '12',
-                                        style: theme.textTheme.titleLarge?.copyWith(
-                                          color: colorScheme.primary,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w900,
-                                          fontFamily: 'Outfit',
-                                        ),
+                                        '${state.profile?.level ?? 1}',
+                                        style: theme.textTheme.titleLarge
+                                            ?.copyWith(
+                                              color: colorScheme.primary,
+                                              fontSize: 20,
+                                              fontWeight: FontWeight.w900,
+                                              fontFamily: 'Outfit',
+                                            ),
                                       ),
                                     ),
                                   ),
@@ -502,7 +445,11 @@ class ProfileScreen extends ConsumerWidget {
                             ),
                           ),
 
-                          Divider(height: 1, thickness: 1, color: foren.borderSubtle),
+                          Divider(
+                            height: 1,
+                            thickness: 1,
+                            color: foren.borderSubtle,
+                          ),
 
                           // Bottom Half 4-Stat Metrics Row
                           Padding(
@@ -513,7 +460,7 @@ class ProfileScreen extends ConsumerWidget {
                                   context,
                                   icon: Icons.star_rounded,
                                   iconColor: colorScheme.primary,
-                                  value: '3,200',
+                                  value: '${state.profile?.xpPoints ?? 0}',
                                   label: 'XP Earned',
                                 ),
                                 _buildVerticalDivider(foren.borderSubtle),
@@ -521,7 +468,8 @@ class ProfileScreen extends ConsumerWidget {
                                   context,
                                   icon: Icons.adjust_rounded,
                                   iconColor: const Color(0xFF16A34A),
-                                  value: '25',
+                                  value:
+                                      '${state.profile?.stats.casesSolved ?? 0}',
                                   label: 'Cases Solved',
                                 ),
                                 _buildVerticalDivider(foren.borderSubtle),
@@ -529,15 +477,17 @@ class ProfileScreen extends ConsumerWidget {
                                   context,
                                   icon: Icons.local_fire_department_outlined,
                                   iconColor: const Color(0xFFEA580C),
-                                  value: '15',
+                                  value:
+                                      '${state.profile?.stats.currentStreakDays ?? 0}',
                                   label: 'Day Streak',
                                 ),
                                 _buildVerticalDivider(foren.borderSubtle),
                                 _buildStatMetric(
                                   context,
                                   icon: Icons.workspace_premium_outlined,
-                                  iconColor: const Color(0xFF9333EA),
-                                  value: '12',
+                                  iconColor: colorScheme.primary,
+                                  value:
+                                      '${state.profile?.badges.where((b) => b.isUnlocked).length ?? 0}',
                                   label: 'Badges Earned',
                                 ),
                               ],
@@ -605,18 +555,10 @@ class ProfileScreen extends ConsumerWidget {
                       ),
                       child: Row(
                         children: [
-                          Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              color: colorScheme.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.shield_rounded,
-                              size: 28,
-                              color: colorScheme.primary,
-                            ),
+                          Image.asset(
+                            'assets/logos/app_logo.png',
+                            width: 54,
+                            height: 54,
                           ),
                           const SizedBox(width: 14),
                           Expanded(
@@ -624,7 +566,7 @@ class ProfileScreen extends ConsumerWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(
-                                  'Cyber Detective',
+                                  state.profile?.rankTitle ?? 'Agent',
                                   style: theme.textTheme.titleSmall?.copyWith(
                                     color: colorScheme.onSurface,
                                     fontSize: 15,
@@ -633,13 +575,6 @@ class ProfileScreen extends ConsumerWidget {
                                   ),
                                 ),
                                 const SizedBox(height: 2),
-                                Text(
-                                  'Top 28% of ForenShield learners',
-                                  style: theme.textTheme.bodySmall?.copyWith(
-                                    color: foren.textSecondary,
-                                    fontSize: 11,
-                                  ),
-                                ),
                               ],
                             ),
                           ),
@@ -741,7 +676,7 @@ class ProfileScreen extends ConsumerWidget {
                           context,
                           value: '75%',
                           label: 'Overall\nProgress',
-                          primaryColor: const Color(0xFF9333EA),
+                          primaryColor: colorScheme.primary,
                         ),
                       ],
                     ),
@@ -877,7 +812,7 @@ class ProfileScreen extends ConsumerWidget {
                             title: 'Investigate\nCases',
                             icon: Icons.search_rounded,
                             iconBg: const Color(0xFFFAF5FF),
-                            iconColor: const Color(0xFF9333EA),
+                            iconColor: colorScheme.primary,
                             onTap: () =>
                                 context.push(RouteConstants.investigation),
                           ),
@@ -1042,12 +977,22 @@ class ProfileScreen extends ConsumerWidget {
           const SizedBox(height: 2),
           Text(
             subtitle,
-            style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary, fontSize: 9.5, height: 1.2),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+              fontSize: 9.5,
+              height: 1.2,
+            ),
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 6),
-          Text(date, style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary, fontSize: 9)),
+          Text(
+            date,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+              fontSize: 9,
+            ),
+          ),
         ],
       ),
     );
@@ -1065,7 +1010,9 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
     final colorScheme = theme.colorScheme;
-    final effectiveIconBg = theme.brightness == Brightness.dark ? iconColor.withValues(alpha: 0.15) : iconBg;
+    final effectiveIconBg = theme.brightness == Brightness.dark
+        ? iconColor.withValues(alpha: 0.15)
+        : iconBg;
 
     return GestureDetector(
       onTap: onTap,

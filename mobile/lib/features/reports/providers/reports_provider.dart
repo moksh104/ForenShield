@@ -4,20 +4,24 @@ import '../data/datasources/reports_remote_data_source.dart';
 import '../models/report_case.dart';
 import '../services/mock_reports_service.dart';
 
-final reportsRemoteDataSourceProvider = Provider<ReportsRemoteDataSource>((ref) {
+final reportsRemoteDataSourceProvider = Provider<ReportsRemoteDataSource>((
+  ref,
+) {
   final apiClient = ref.watch(apiClientProvider);
   return ReportsRemoteDataSource(apiClient);
 });
 
-final reportsProvider = StateNotifierProvider<ReportsNotifier, List<ReportCase>>((ref) {
-  final dataSource = ref.watch(reportsRemoteDataSourceProvider);
-  return ReportsNotifier(dataSource);
-});
+final reportsProvider =
+    StateNotifierProvider.autoDispose<ReportsNotifier, List<ReportCase>>((ref) {
+      final dataSource = ref.watch(reportsRemoteDataSourceProvider);
+      return ReportsNotifier(dataSource);
+    });
 
 class ReportsNotifier extends StateNotifier<List<ReportCase>> {
   final ReportsRemoteDataSource _dataSource;
 
-  ReportsNotifier(this._dataSource) : super(const MockReportsService().fetchReports()) {
+  ReportsNotifier(this._dataSource)
+    : super(const MockReportsService().fetchReports()) {
     loadReports();
   }
 

@@ -38,9 +38,21 @@ class ReportCase {
       generatedAt: json['generated_at'] as String? ?? '',
       analyst: json['analyst'] as String? ?? 'Analyst',
       summary: json['summary'] as String? ?? '',
-      findings: (json['findings'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
-      remediationActions: (json['remediation_actions'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
-      artifacts: (json['artifacts'] as List<dynamic>?)?.map((e) => e as String).toList() ?? [],
+      findings:
+          (json['findings'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      remediationActions:
+          (json['remediation_actions'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
+      artifacts:
+          (json['artifacts'] as List<dynamic>?)
+              ?.map((e) => e as String)
+              .toList() ??
+          [],
     );
   }
 

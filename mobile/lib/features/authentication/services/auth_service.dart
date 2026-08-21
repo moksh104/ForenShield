@@ -40,10 +40,7 @@ class ApiAuthService implements AuthService {
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         ApiEndpoints.login,
-        data: {
-          'email': email,
-          'password': password,
-        },
+        data: {'email': email, 'password': password},
       );
 
       final data = response.data;
@@ -73,11 +70,7 @@ class ApiAuthService implements AuthService {
     try {
       final response = await _apiClient.post<Map<String, dynamic>>(
         ApiEndpoints.register,
-        data: {
-          'full_name': displayName,
-          'email': email,
-          'password': password,
-        },
+        data: {'full_name': displayName, 'email': email, 'password': password},
       );
 
       final data = response.data;

@@ -17,12 +17,26 @@ class StorageManagementPage extends ConsumerStatefulWidget {
       _StorageManagementPageState();
 }
 
-class _StorageManagementPageState
-    extends ConsumerState<StorageManagementPage> {
+class _StorageManagementPageState extends ConsumerState<StorageManagementPage> {
   bool _isClearingCache = false;
-  double _cacheSizeMB = 42.5;
-  final double _evidenceFilesMB = 128.0;
-  final double _offlineCoursesMB = 85.2;
+  double _cacheSizeMB = 0.0;
+  final double _evidenceFilesMB = 12.8; // Mock data since not implemented
+  final double _offlineCoursesMB = 8.5; // Mock data since not implemented
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCacheSize();
+  }
+
+  Future<void> _loadCacheSize() async {
+    final size = await ref.read(settingsProvider.notifier).getCacheSize();
+    if (mounted) {
+      setState(() {
+        _cacheSizeMB = size;
+      });
+    }
+  }
 
   Future<void> _clearCache() async {
     final confirmed = await SettingsDialog.showConfirmation(
@@ -45,7 +59,8 @@ class _StorageManagementPageState
       _isClearingCache = false;
     });
 
-    final foren = Theme.of(context).extension<ForenColors>() ?? ForenColors.dark;
+    final foren =
+        Theme.of(context).extension<ForenColors>() ?? ForenColors.dark;
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('Cleared $cleared MB of cached temporary files.'),
@@ -126,15 +141,24 @@ class _StorageManagementPageState
                   children: [
                     Text(
                       'Cache: ${_cacheSizeMB.toStringAsFixed(1)} MB',
-                      style: TextStyle(color: foren.textSecondary, fontSize: 11),
+                      style: TextStyle(
+                        color: foren.textSecondary,
+                        fontSize: 11,
+                      ),
                     ),
                     Text(
                       'Evidence: ${_evidenceFilesMB.toStringAsFixed(1)} MB',
-                      style: TextStyle(color: foren.textSecondary, fontSize: 11),
+                      style: TextStyle(
+                        color: foren.textSecondary,
+                        fontSize: 11,
+                      ),
                     ),
                     Text(
                       'Academy: ${_offlineCoursesMB.toStringAsFixed(1)} MB',
-                      style: TextStyle(color: foren.textSecondary, fontSize: 11),
+                      style: TextStyle(
+                        color: foren.textSecondary,
+                        fontSize: 11,
+                      ),
                     ),
                   ],
                 ),
@@ -174,7 +198,8 @@ class _StorageManagementPageState
               SettingsTile(
                 icon: Icons.folder_zip_rounded,
                 title: 'Investigation Evidence Files',
-                subtitle: '${_evidenceFilesMB.toStringAsFixed(1)} MB local RAM dumps & artifacts',
+                subtitle:
+                    '${_evidenceFilesMB.toStringAsFixed(1)} MB local RAM dumps & artifacts',
                 trailing: Text(
                   '12 Files',
                   style: TextStyle(color: foren.textSecondary, fontSize: 12),
@@ -184,7 +209,8 @@ class _StorageManagementPageState
               SettingsTile(
                 icon: Icons.school_rounded,
                 title: 'Downloaded Academy Modules',
-                subtitle: '${_offlineCoursesMB.toStringAsFixed(1)} MB offline course content',
+                subtitle:
+                    '${_offlineCoursesMB.toStringAsFixed(1)} MB offline course content',
                 trailing: Text(
                   '3 Courses',
                   style: TextStyle(color: foren.textSecondary, fontSize: 12),

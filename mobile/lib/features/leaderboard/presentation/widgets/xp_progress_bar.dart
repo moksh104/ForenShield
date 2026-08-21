@@ -8,11 +8,7 @@ class XpProgressBar extends StatelessWidget {
   final int xp;
   final bool showLabels;
 
-  const XpProgressBar({
-    super.key,
-    required this.xp,
-    this.showLabels = true,
-  });
+  const XpProgressBar({super.key, required this.xp, this.showLabels = true});
 
   @override
   Widget build(BuildContext context) {
@@ -61,9 +57,7 @@ class XpProgressBar extends StatelessWidget {
                 value: value,
                 minHeight: 8,
                 backgroundColor: foren.surfaceRaised1,
-                valueColor: AlwaysStoppedAnimation(
-                  theme.colorScheme.primary,
-                ),
+                valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
               );
             },
           ),
@@ -74,10 +68,7 @@ class XpProgressBar extends StatelessWidget {
             isMaxLevel
                 ? '$xp XP — Maximum Level Reached!'
                 : '$xp / $nextLevelXp XP',
-            style: TextStyle(
-              color: foren.textSecondary,
-              fontSize: 11,
-            ),
+            style: TextStyle(color: foren.textSecondary, fontSize: 11),
           ),
         ],
       ],

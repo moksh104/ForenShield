@@ -42,6 +42,19 @@ $refreshToken = bin2hex(random_bytes(32));
 $stmt = $db->prepare('INSERT INTO refresh_tokens (user_id, refresh_token, created_at) VALUES (:user_id, :refresh_token, NOW())');
 $stmt->execute(['user_id' => $user['id'], 'refresh_token' => $refreshToken]);
 
+$deviceName = $payload['device_name'] ?? 'Unknown Device';
+$platform = $payload['platform'] ?? 'Unknown Platform';
+$appVersion = $payload['app_version'] ?? 'Unknown Version';
+$ipAddress = $_SERVER['REMOTE_ADDR'] ?? 'Unknown IP';
+
+// Record device session
+$stmtSession = $db->prepare('INSERT INTO device_sessions (user_id, device_name, platform, app_version, ip_address, session_token, is_current) VALUES (?, ?, ?, ?, ?, ?, true)');
+$stmtSession->execute([$user['id'], $deviceName, $platform, $appVersion, $ipAddress, $refreshToken]);
+
+// Record login history
+$stmtHistory = $db->prepare('INSERT INTO login_history (user_id, device_name, platform, ip_address, status) VALUES (?, ?, ?, ?, ?)');
+$stmtHistory->execute([$user['id'], $deviceName, $platform, $ipAddress, 'success']);
+
 $response = [
     'accessToken' => $accessToken,
     'refreshToken' => $refreshToken,

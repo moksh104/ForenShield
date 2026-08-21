@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'app_colors.dart';
 
 /// Defines reusable gradients for a premium, enterprise cybersecurity feel.
+/// All feature gradients use the ForenShield cobalt blue accent ramp.
 abstract class AppGradients {
-  /// Primary brand gradient (e.g., Cyan to Deep Blue)
+  /// Primary brand gradient (Cobalt Blue to Deep Blue)
   static const LinearGradient brand = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -13,7 +14,7 @@ abstract class AppGradients {
     ],
   );
 
-  /// Secondary brand gradient (e.g., Purple to Neon Accent)
+  /// Secondary brand gradient (Slate to Cobalt Blue)
   static const LinearGradient secondary = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -27,24 +28,24 @@ abstract class AppGradients {
     colors: [AppColors.surfaceHighlight, AppColors.surface],
   );
 
-  /// Status: Investigation specific gradient
+  /// Feature gradient: Investigation
   static const LinearGradient investigation = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [AppColors.investigation, Color(0xFF7B1FA2)],
+    colors: [AppColors.primary, AppColors.primaryDark],
   );
 
-  /// Status: Academy specific gradient
+  /// Feature gradient: Academy
   static const LinearGradient academy = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [AppColors.academy, Color(0xFFE65100)],
+    colors: [AppColors.primary, AppColors.primaryDark],
   );
 
-  /// Status: Simulation specific gradient
+  /// Feature gradient: Simulation
   static const LinearGradient simulation = LinearGradient(
     begin: Alignment.centerLeft,
     end: Alignment.centerRight,
-    colors: [AppColors.simulation, Color(0xFF00B0FF)],
+    colors: [AppColors.primary, AppColors.primaryLight],
   );
 }

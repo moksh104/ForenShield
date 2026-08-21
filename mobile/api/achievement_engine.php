@@ -1,143 +1,88 @@
 <?php
 
 /**
- * ForenShield — Achievement Engine
+ * ForenShield — Production Achievement Engine
  *
- * Evaluates whether a user has met the unlock conditions for each
- * achievement and triggers unlock + notification insertion.
+ * Generic rule engine that evaluates achievement unlocks dynamically based
+ * on threshold rules defined in the achievements table.
  */
 
-require_once __DIR__ . '/achievement_service.php';
-require_once __DIR__ . '/rank_service.php';
-
 /**
- * Evaluate all achievement conditions for a user.
+ * Evaluates all locked achievements for a user and unlocks them if thresholds are met.
+ * Must be called within an active PDO transaction.
  *
  * @param PDO $pdo        Database connection
  * @param int $userId     Authenticated user ID
- * @param array $stats    Current leaderboard stats: xp, rank, completed_courses, completed_cases, streak
- * @return array          List of newly unlocked achievement titles
+ * @param array $stats    Current leaderboard_stats row for the user
+ * @return array          List of newly unlocked achievement arrays
  */
 function evaluateAchievements(PDO $pdo, int $userId, array $stats): array
 {
-    // Ensure achievement rows exist
-    seedAchievements($pdo, $userId);
-
-    $xp = (int)($stats['xp'] ?? 0);
-    $completedCases = (int)($stats['completed_cases'] ?? 0);
-    $completedCourses = (int)($stats['completed_courses'] ?? 0);
-    $streak = (int)($stats['streak'] ?? 0);
-    $level = getLevelForXp($xp);
-
-    // Define unlock conditions: title => condition
-    $conditions = [
-        'Beginner Investigator' => $completedCases >= 1,
-        'Threat Hunter'         => $completedCases >= 5,
-        'Cyber Defender'        => $level >= 3,
-        'Academy Master'        => $completedCourses >= 5,
-        'Speed Analyst'         => false, // Requires time-based tracking (future)
-        'Seven-Day Streak'      => $streak >= 7,
-        'Threat Specialist'     => $level >= 5,
-        'Forensic Expert'       => $xp >= 5000,
-    ];
+    // Fetch all achievements the user has NOT unlocked yet
+    $stmt = $pdo->prepare("
+        SELECT a.id, a.code, a.title, a.xp_reward, a.target_metric, a.threshold
+        FROM achievements a
+        LEFT JOIN user_achievements ua ON a.id = ua.achievement_id AND ua.user_id = :uid
+        WHERE ua.id IS NULL
+    ");
+    $stmt->execute(['uid' => $userId]);
+    $lockedAchievements = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
     $newlyUnlocked = [];
 
-    foreach ($conditions as $title => $met) {
-        if (!$met) continue;
+    foreach ($lockedAchievements as $ach) {
+        $metric = $ach['target_metric'];
+        $threshold = (int)$ach['threshold'];
 
-        // Check if already unlocked
-        $check = $pdo->prepare("
-            SELECT id, unlocked FROM achievements
-            WHERE user_id = :user_id AND title = :title
-        ");
-        $check->execute(['user_id' => $userId, 'title' => $title]);
-        $row = $check->fetch(PDO::FETCH_ASSOC);
-
-        if ($row && !$row['unlocked']) {
-            // Unlock it
-            $unlock = $pdo->prepare("
-                UPDATE achievements
-                SET unlocked = TRUE, unlocked_at = NOW()
-                WHERE id = :id
+        // Determine if condition is met based on the dynamic metric from stats
+        $currentValue = isset($stats[$metric]) ? (int)$stats[$metric] : 0;
+        
+        if ($currentValue >= $threshold) {
+            // Unlock!
+            $ins = $pdo->prepare("
+                INSERT INTO user_achievements (user_id, achievement_id, unlocked_at)
+                VALUES (:uid, :ach_id, NOW())
             ");
-            $unlock->execute(['id' => $row['id']]);
+            $ins->execute([
+                'uid' => $userId,
+                'ach_id' => $ach['id']
+            ]);
 
-            // Award achievement XP
-            $pdo->prepare("UPDATE leaderboard SET xp = xp + 200 WHERE user_id = :uid")
-                ->execute(['uid' => $userId]);
-
-            // Insert notification
+            // Create notification
+            $xpStr = $ach['xp_reward'] > 0 ? " +{$ach['xp_reward']} XP" : "";
             $notif = $pdo->prepare("
                 INSERT INTO notifications (user_id, title, message, type)
                 VALUES (:uid, :title, :message, 'achievement')
             ");
             $notif->execute([
                 'uid' => $userId,
-                'title' => '🏆 Achievement Unlocked!',
-                'message' => "You earned \"$title\" and received 200 XP!",
+                'title' => '🏆 Achievement Unlocked',
+                'message' => "{$ach['title']}{$xpStr}",
             ]);
 
-            $newlyUnlocked[] = $title;
+            // Add to return array so the caller can award XP and log transaction
+            $newlyUnlocked[] = $ach;
         }
     }
 
-    // Check for level-up notification
-    if ($level >= 2) {
-        // Only notify if XP just crossed the threshold (rough check)
-        $levelThresholds = [2 => 250, 3 => 500, 4 => 1000, 5 => 2500, 6 => 5000];
-        foreach ($levelThresholds as $lvl => $threshold) {
-            if ($xp >= $threshold && $xp < $threshold + 200) {
-                $notif = $pdo->prepare("
-                    INSERT INTO notifications (user_id, title, message, type)
-                    VALUES (:uid, :title, :message, 'level_up')
-                ");
-                $notif->execute([
-                    'uid' => $userId,
-                    'title' => "⬆️ Level $lvl Reached!",
-                    'message' => "Congratulations! You've reached Level $lvl.",
-                ]);
-                break;
+    // Level up check
+    $xp = (int)($stats['total_xp'] ?? 0);
+    $levelThresholds = [2 => 250, 3 => 500, 4 => 1000, 5 => 2500, 6 => 5000];
+    foreach ($levelThresholds as $lvl => $thresh) {
+        // Only notify if exactly matching threshold area (simple check for recent level up)
+        if ($xp >= $thresh && $xp < $thresh + 200) {
+            $checkNotif = $pdo->prepare("SELECT id FROM notifications WHERE user_id = :uid AND title = :title AND created_at > NOW() - INTERVAL '1 day'");
+            $titleStr = "⬆️ Level $lvl Reached!";
+            $checkNotif->execute(['uid' => $userId, 'title' => $titleStr]);
+            if (!$checkNotif->fetch()) {
+                $pdo->prepare("INSERT INTO notifications (user_id, title, message, type) VALUES (:uid, :title, :message, 'level_up')")
+                    ->execute([
+                        'uid' => $userId,
+                        'title' => $titleStr,
+                        'message' => "Congratulations! You've reached Level $lvl."
+                    ]);
             }
         }
-    }
-
-    // Check for top rank notification
-    $rank = getUserRank($pdo, $userId);
-    if ($rank > 0 && $rank <= 3) {
-        $ordinals = [1 => '1st', 2 => '2nd', 3 => '3rd'];
-        // Simple: only notify if rank is in top 3 (could be enhanced with duplicate checks)
-        $checkNotif = $pdo->prepare("
-            SELECT id FROM notifications
-            WHERE user_id = :uid AND type = 'rank_top'
-            AND created_at > NOW() - INTERVAL '24 hours'
-        ");
-        $checkNotif->execute(['uid' => $userId]);
-        if (!$checkNotif->fetch()) {
-            $notif = $pdo->prepare("
-                INSERT INTO notifications (user_id, title, message, type)
-                VALUES (:uid, :title, :message, 'rank_top')
-            ");
-            $notif->execute([
-                'uid' => $userId,
-                'title' => '🥇 Top Ranked!',
-                'message' => "You're now ranked {$ordinals[$rank]} on the global leaderboard!",
-            ]);
-        }
-    }
-
-    // Check streak milestones
-    $streakMilestones = [7, 14, 30, 60, 100];
-    if (in_array($streak, $streakMilestones)) {
-        $notif = $pdo->prepare("
-            INSERT INTO notifications (user_id, title, message, type)
-            VALUES (:uid, :title, :message, 'streak_milestone')
-        ");
-        $notif->execute([
-            'uid' => $userId,
-            'title' => "🔥 $streak-Day Streak!",
-            'message' => "Incredible! You've maintained a $streak-day activity streak!",
-        ]);
     }
 
     return $newlyUnlocked;

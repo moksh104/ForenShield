@@ -27,23 +27,7 @@ class AboutPage extends StatelessWidget {
           Center(
             child: Column(
               children: [
-                Container(
-                  width: 80,
-                  height: 80,
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: theme.colorScheme.primary,
-                      width: 2,
-                    ),
-                  ),
-                  child: Icon(
-                    Icons.shield_rounded,
-                    size: 44,
-                    color: theme.colorScheme.primary,
-                  ),
-                ),
+                Image.asset('assets/logos/app_logo.png', width: 90, height: 90),
                 const SizedBox(height: AppSpacing.sm),
                 Text(
                   'ForenShield Mobile',
@@ -57,15 +41,14 @@ class AboutPage extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   'Enterprise Digital Forensics & Incident Response',
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 13,
-                  ),
+                  style: TextStyle(color: foren.textSecondary, fontSize: 13),
                 ),
                 const SizedBox(height: 6),
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: foren.success.t500.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
@@ -119,7 +102,9 @@ class AboutPage extends StatelessWidget {
                 subtitle: 'Review enterprise usage agreement',
                 onTap: () {
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Opening Terms of Service...')),
+                    const SnackBar(
+                      content: Text('Opening Terms of Service...'),
+                    ),
                   );
                 },
                 showDivider: true,

@@ -1,11 +1,27 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../../core/config/api_config.dart';
+import '../../../../core/providers/core_providers.dart';
 import '../../../../core/services/notification_service.dart';
 import '../../../../core/utils/result.dart';
 import '../../data/models/notification_model.dart';
+import '../../data/datasource/notification_remote_data_source.dart';
 import '../../data/repository/notification_repository.dart';
+import '../../data/repository/notification_repository_impl.dart';
+import '../../data/repository/mock_notification_repository.dart';
+
+final notificationDataSourceProvider = Provider<NotificationRemoteDataSource>((
+  ref,
+) {
+  final apiClient = ref.watch(apiClientProvider);
+  return NotificationRemoteDataSource(apiClient);
+});
 
 final notificationRepositoryProvider = Provider<NotificationRepository>((ref) {
-  return NotificationRepository();
+  if (ApiConfig.useMockApi) {
+    return MockNotificationRepository();
+  }
+  final dataSource = ref.watch(notificationDataSourceProvider);
+  return NotificationRepositoryImpl(dataSource);
 });
 
 class NotificationState {
@@ -43,11 +59,22 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
     fetchNotifications();
   }
 
-  Future<void> fetchNotifications({int page = 1, bool unreadOnly = false}) async {
+  Future<void> fetchNotifications({
+    int page = 1,
+    bool unreadOnly = false,
+  }) async {
     state = state.copyWith(isLoading: true, error: null);
-    final result = await _repo.getNotifications(page: page, unreadOnly: unreadOnly);
+    final result = await _repo.getNotifications(
+      page: page,
+      unreadOnly: unreadOnly,
+    );
     if (result.isSuccess) {
-      final data = (result as Success<({List<NotificationModel> notifications, int unreadCount})>).data;
+      final data =
+          (result
+                  as Success<
+                    ({List<NotificationModel> notifications, int unreadCount})
+                  >)
+              .data;
       state = state.copyWith(
         notifications: data.notifications,
         unreadCount: data.unreadCount,
@@ -69,14 +96,19 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
         return n;
       }).toList();
       final newUnread = (state.unreadCount > 0) ? state.unreadCount - 1 : 0;
-      state = state.copyWith(notifications: updatedList, unreadCount: newUnread);
+      state = state.copyWith(
+        notifications: updatedList,
+        unreadCount: newUnread,
+      );
     }
   }
 
   Future<void> markAllAsRead() async {
     final result = await _repo.markAsRead(markAll: true);
     if (result.isSuccess) {
-      final updatedList = state.notifications.map((n) => n.copyWith(isRead: true)).toList();
+      final updatedList = state.notifications
+          .map((n) => n.copyWith(isRead: true))
+          .toList();
       state = state.copyWith(notifications: updatedList, unreadCount: 0);
     }
   }
@@ -91,10 +123,12 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
 }
 
 final notificationStateProvider =
-    StateNotifierProvider<NotificationNotifier, NotificationState>((ref) {
-  final repo = ref.watch(notificationRepositoryProvider);
-  return NotificationNotifier(repo);
-});
+    StateNotifierProvider.autoDispose<NotificationNotifier, NotificationState>((
+      ref,
+    ) {
+      final repo = ref.watch(notificationRepositoryProvider);
+      return NotificationNotifier(repo);
+    });
 
 final unreadNotificationCountProvider = Provider<int>((ref) {
   return ref.watch(notificationStateProvider).unreadCount;

@@ -83,10 +83,6 @@ class ApiClient {
     String path, {
     required FormData data,
   }) async {
-    return _dio.post<T>(
-      path,
-      data: data,
-      options: Options(headers: {'Content-Type': 'multipart/form-data'}),
-    );
+    return _dio.post<T>(path, data: data);
   }
 }

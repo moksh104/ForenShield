@@ -3,12 +3,10 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
-import '../../data/datasources/simulation_mock_data.dart';
 import '../../providers/simulation_runner_notifier.dart';
 
 /// Scenario Completion & Incident Remediation Debrief Screen.
@@ -24,20 +22,20 @@ class ScenarioDebriefScreen extends ConsumerWidget {
     final primaryColor = theme.colorScheme.primary;
 
     final state = ref.watch(simulationRunnerProvider(scenarioId));
+    final scenario = state.scenario;
 
-    final scenario = SimulationMockData.scenarios.firstWhere(
-      (s) => s.id == scenarioId,
-      orElse: () => SimulationMockData.scenarios.first,
-    );
+    if (scenario == null) {
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
+    }
 
     final mins = state.secondsElapsed ~/ 60;
     final secs = state.secondsElapsed % 60;
     final timeStr = '${mins}m ${secs}s';
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         automaticallyImplyLeading: false,
         title: Text(
@@ -198,9 +196,7 @@ class ScenarioDebriefScreen extends ConsumerWidget {
                 width: double.infinity,
                 child: OutlinedButton.icon(
                   onPressed: () {
-                    ref
-                        .read(simulationRunnerProvider(scenarioId).notifier)
-                        .initScenario(scenarioId);
+                    ref.invalidate(simulationRunnerProvider(scenarioId));
                     context.go('${RouteConstants.simulationRun}/$scenarioId');
                   },
                   style: OutlinedButton.styleFrom(

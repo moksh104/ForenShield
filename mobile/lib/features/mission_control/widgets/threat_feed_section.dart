@@ -195,22 +195,29 @@ class _ThreatTile extends ConsumerWidget {
             onPressed: () async {
               final uploadService = ref.read(uploadServiceProvider);
               final file = await uploadService.pickImage();
-              
+
               if (!context.mounted) return;
-              
+
               if (file != null) {
                 ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('Uploading threat screenshot...')),
+                  const SnackBar(
+                    content: Text('Uploading threat screenshot...'),
+                  ),
                 );
                 final compressed = await uploadService.compressImage(file);
-                final url = await uploadService.uploadImage(compressed ?? file, folder: 'forenshield/threats');
-                
+                final url = await uploadService.uploadImage(
+                  compressed ?? file,
+                  folder: 'forenshield/threats',
+                );
+
                 if (!context.mounted) return;
-                
+
                 if (url != null) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
-                      content: Text('Screenshot uploaded successfully! URL: $url'),
+                      content: Text(
+                        'Screenshot uploaded successfully! URL: $url',
+                      ),
                       backgroundColor: Colors.green,
                     ),
                   );

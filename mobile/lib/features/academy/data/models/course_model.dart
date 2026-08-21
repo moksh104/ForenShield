@@ -56,6 +56,15 @@ class CourseModel extends CourseEntity {
   });
 
   factory CourseModel.fromJson(Map<String, dynamic> json) {
+    final rawCompletion =
+        num.tryParse(
+          json['completion_percentage']?.toString() ?? '',
+        )?.toDouble() ??
+        0.0;
+    final completionPercentage = rawCompletion > 1
+        ? rawCompletion / 100
+        : rawCompletion;
+
     return CourseModel(
       id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
@@ -81,8 +90,7 @@ class CourseModel extends CourseEntity {
               .toList() ??
           const [],
       isEnrolled: json['is_enrolled'] as bool? ?? false,
-      completionPercentage:
-          (json['completion_percentage'] as num?)?.toDouble() ?? 0.0,
+      completionPercentage: completionPercentage.clamp(0.0, 1.0),
       totalXp: json['total_xp'] as int? ?? 500,
       quiz: json['quiz'] != null
           ? QuizModel.fromJson(json['quiz'] as Map<String, dynamic>)

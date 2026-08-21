@@ -169,9 +169,8 @@ class _StatChip extends StatelessWidget {
         Text(
           label,
           style: TextStyle(
-            color: Theme.of(context)
-                    .extension<ForenColors>()
-                    ?.textSecondary ??
+            color:
+                Theme.of(context).extension<ForenColors>()?.textSecondary ??
                 Colors.grey,
             fontSize: 11,
             fontWeight: FontWeight.w500,

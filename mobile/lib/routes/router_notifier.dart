@@ -28,7 +28,9 @@ class RouterNotifier extends ChangeNotifier {
     }, fireImmediately: true);
 
     _ref.listen<AsyncValue<UserModel?>>(authStateProvider, (_, next) {
-      AppLogger.d('[RouterNotifier] Auth state updated: value=${next.value?.email}, isLoading=${next.isLoading}');
+      AppLogger.d(
+        '[RouterNotifier] Auth state updated: value=${next.value?.email}, isLoading=${next.isLoading}',
+      );
       _authState = next;
       notifyListeners();
     }, fireImmediately: true);

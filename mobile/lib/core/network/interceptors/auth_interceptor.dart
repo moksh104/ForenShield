@@ -23,7 +23,7 @@ class AuthInterceptor extends Interceptor {
     this._storage, {
     TokenService? tokenService,
     this._onSessionExpired,
-  })  : _tokenService = tokenService ?? TokenService();
+  }) : _tokenService = tokenService ?? TokenService();
 
   final Dio _refreshDio = Dio(
     BaseOptions(
@@ -56,7 +56,8 @@ class AuthInterceptor extends Interceptor {
       return handler.next(options);
     }
 
-    final token = await _tokenService.getToken() ?? await _storage.getAccessToken();
+    final token =
+        await _tokenService.getToken() ?? await _storage.getAccessToken();
     if (token != null && token.isNotEmpty) {
       options.headers['Authorization'] = 'Bearer $token';
     }
@@ -72,8 +73,9 @@ class AuthInterceptor extends Interceptor {
     if (err.response?.statusCode == 401 &&
         !_isAuthEndpoint(requestOptions.path) &&
         requestOptions.extra['retried'] != true) {
-      
-      final refreshToken = await _tokenService.getRefreshToken() ?? await _storage.getRefreshToken();
+      final refreshToken =
+          await _tokenService.getRefreshToken() ??
+          await _storage.getRefreshToken();
 
       if (refreshToken == null || refreshToken.isEmpty) {
         await _handleSessionExpired();
@@ -93,14 +95,17 @@ class AuthInterceptor extends Interceptor {
       _refreshCompleter = Completer<String?>();
 
       try {
-        AppLogger.i('Attempting automatic JWT refresh via POST /refresh_token.php...');
+        AppLogger.i(
+          'Attempting automatic JWT refresh via POST /refresh_token.php...',
+        );
 
         final response = await _refreshDio.post(
           ApiEndpoints.refresh,
           data: {'refreshToken': refreshToken},
         );
 
-        if (response.statusCode == 200 && response.data is Map<String, dynamic>) {
+        if (response.statusCode == 200 &&
+            response.data is Map<String, dynamic>) {
           final data = response.data as Map<String, dynamic>;
           final newAccessToken = data['accessToken'] as String?;
           final newRefreshToken = data['refreshToken'] as String?;
@@ -125,7 +130,6 @@ class AuthInterceptor extends Interceptor {
         _refreshCompleter?.complete(null);
         await _handleSessionExpired();
         return handler.next(err);
-
       } catch (e, stackTrace) {
         AppLogger.e('Automatic token refresh failed', e, stackTrace);
         _refreshCompleter?.complete(null);
@@ -141,7 +145,9 @@ class AuthInterceptor extends Interceptor {
   }
 
   Future<void> _handleSessionExpired() async {
-    AppLogger.w('Refresh token expired or invalid. Clearing session and redirecting to login.');
+    AppLogger.w(
+      'Refresh token expired or invalid. Clearing session and redirecting to login.',
+    );
     await _tokenService.removeToken();
     await _storage.clearSession();
     _onSessionExpired?.call();

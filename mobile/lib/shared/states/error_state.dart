@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/foren_theme.dart';
 
 /// Reusable generic ErrorState widget.
 /// Used for API failures, data load errors, or unexpected exceptions.
@@ -25,15 +26,20 @@ class ErrorState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final cs = theme.colorScheme;
+    final errorColor = foren?.critical.t500 ?? AppColors.error;
+
     return Center(
       child: Padding(
         padding: AppSpacing.pagePadding,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: cs.surface,
             borderRadius: AppRadius.cardRadius,
-            border: Border.all(color: AppColors.error.withValues(alpha: 0.3)),
+            border: Border.all(color: errorColor.withValues(alpha: 0.3)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -43,16 +49,16 @@ class ErrorState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.error.withValues(alpha: 0.12),
+                  color: errorColor.withValues(alpha: 0.12),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 48, color: AppColors.error),
+                child: Icon(icon, size: 48, color: errorColor),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: cs.onSurface,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -61,8 +67,8 @@ class ErrorState extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   message!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: foren?.textSecondary ?? cs.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -77,8 +83,8 @@ class ErrorState extends StatelessWidget {
                   icon: const Icon(Icons.refresh_rounded, size: 18),
                   label: Text(retryLabel),
                   style: OutlinedButton.styleFrom(
-                    foregroundColor: AppColors.error,
-                    side: const BorderSide(color: AppColors.error),
+                    foregroundColor: errorColor,
+                    side: BorderSide(color: errorColor),
                     padding: AppSpacing.buttonPadding,
                     shape: RoundedRectangleBorder(
                       borderRadius: AppRadius.buttonRadius,

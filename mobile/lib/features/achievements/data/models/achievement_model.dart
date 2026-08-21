@@ -1,89 +1,86 @@
-/// Represents a single achievement in the ForenShield achievement engine.
+import 'package:flutter/material.dart';
+
+enum AchievementRarity { common, uncommon, rare, epic, legendary }
+
 class AchievementModel {
   final int id;
-  final int userId;
+  final String code;
   final String title;
   final String description;
-  final String badge;
-  final int xp;
-  final bool unlocked;
+  final String icon;
+  final String category;
+  final int xpReward;
+  final AchievementRarity rarity;
+  final String targetMetric;
+  final int threshold;
+  final int progress;
+  final bool isCompleted;
   final DateTime? unlockedAt;
-  final DateTime? createdAt;
 
   const AchievementModel({
     required this.id,
-    required this.userId,
+    required this.code,
     required this.title,
     required this.description,
-    required this.badge,
-    required this.xp,
-    required this.unlocked,
+    required this.icon,
+    required this.category,
+    required this.xpReward,
+    required this.rarity,
+    required this.targetMetric,
+    required this.threshold,
+    required this.progress,
+    required this.isCompleted,
     this.unlockedAt,
-    this.createdAt,
   });
 
   factory AchievementModel.fromJson(Map<String, dynamic> json) {
     return AchievementModel(
-      id: json['id'] is int
-          ? json['id']
-          : int.tryParse(json['id']?.toString() ?? '0') ?? 0,
-      userId: json['user_id'] is int
-          ? json['user_id']
-          : int.tryParse(json['user_id']?.toString() ?? '0') ?? 0,
-      title: (json['title'] ?? '').toString(),
-      description: (json['description'] ?? '').toString(),
-      badge: (json['badge'] ?? '🏆').toString(),
-      xp: json['xp'] is int
-          ? json['xp']
-          : int.tryParse(json['xp']?.toString() ?? '0') ?? 0,
-      unlocked: json['unlocked'] == true ||
-          json['unlocked'] == 1 ||
-          json['unlocked'] == 't' ||
-          json['unlocked'] == 'true',
+      id: json['id'] as int,
+      code: json['code'] as String,
+      title: json['title'] as String,
+      description: json['description'] as String? ?? '',
+      icon: json['icon'] as String? ?? '🏆',
+      category: json['category'] as String? ?? 'general',
+      xpReward: json['xp_reward'] as int? ?? 0,
+      rarity: _parseRarity(json['rarity'] as String?),
+      targetMetric: json['target_metric'] as String? ?? '',
+      threshold: json['threshold'] as int? ?? 1,
+      progress: json['progress'] as int? ?? 0,
+      isCompleted: json['is_completed'] as bool? ?? false,
       unlockedAt: json['unlocked_at'] != null
-          ? DateTime.tryParse(json['unlocked_at'].toString())
-          : null,
-      createdAt: json['created_at'] != null
-          ? DateTime.tryParse(json['created_at'].toString())
+          ? DateTime.parse(json['unlocked_at'] as String)
           : null,
     );
   }
 
-  Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'user_id': userId,
-      'title': title,
-      'description': description,
-      'badge': badge,
-      'xp': xp,
-      'unlocked': unlocked,
-      'unlocked_at': unlockedAt?.toIso8601String(),
-      'created_at': createdAt?.toIso8601String(),
-    };
+  static AchievementRarity _parseRarity(String? rarityStr) {
+    switch (rarityStr?.toLowerCase()) {
+      case 'legendary':
+        return AchievementRarity.legendary;
+      case 'epic':
+        return AchievementRarity.epic;
+      case 'rare':
+        return AchievementRarity.rare;
+      case 'uncommon':
+        return AchievementRarity.uncommon;
+      case 'common':
+      default:
+        return AchievementRarity.common;
+    }
   }
 
-  AchievementModel copyWith({
-    int? id,
-    int? userId,
-    String? title,
-    String? description,
-    String? badge,
-    int? xp,
-    bool? unlocked,
-    DateTime? unlockedAt,
-    DateTime? createdAt,
-  }) {
-    return AchievementModel(
-      id: id ?? this.id,
-      userId: userId ?? this.userId,
-      title: title ?? this.title,
-      description: description ?? this.description,
-      badge: badge ?? this.badge,
-      xp: xp ?? this.xp,
-      unlocked: unlocked ?? this.unlocked,
-      unlockedAt: unlockedAt ?? this.unlockedAt,
-      createdAt: createdAt ?? this.createdAt,
-    );
+  Color getRarityColor() {
+    switch (rarity) {
+      case AchievementRarity.legendary:
+        return const Color(0xFFFFD700); // Gold
+      case AchievementRarity.epic:
+        return const Color(0xFF9C27B0); // Purple
+      case AchievementRarity.rare:
+        return const Color(0xFF2196F3); // Blue
+      case AchievementRarity.uncommon:
+        return const Color(0xFF4CAF50); // Green
+      case AchievementRarity.common:
+        return const Color(0xFF9E9E9E); // Gray
+    }
   }
 }

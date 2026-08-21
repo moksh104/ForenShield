@@ -27,10 +27,7 @@ class SettingsCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: theme.colorScheme.surface,
         borderRadius: BorderRadius.circular(AppRadius.card),
-        border: Border.all(
-          color: foren.borderDefault,
-          width: 1,
-        ),
+        border: Border.all(color: foren.borderDefault, width: 1),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.15),
@@ -39,10 +36,7 @@ class SettingsCard extends StatelessWidget {
           ),
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: children,
-      ),
+      child: Column(mainAxisSize: MainAxisSize.min, children: children),
     );
   }
 }

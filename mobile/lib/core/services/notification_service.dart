@@ -35,7 +35,10 @@ class ForenNotification {
       title: json['title'] ?? '',
       message: json['message'] ?? '',
       type: json['type'] ?? 'info',
-      isRead: json['is_read'] == true || json['is_read'] == 1 || json['is_read'] == '1',
+      isRead:
+          json['is_read'] == true ||
+          json['is_read'] == 1 ||
+          json['is_read'] == '1',
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
@@ -45,11 +48,13 @@ class ForenNotification {
 
 /// Production-ready Notification Service for FCM token sync, topic management, and notifications API.
 class NotificationService {
-  static final Dio _dio = Dio(BaseOptions(
-    baseUrl: ApiConfig.baseUrl,
-    connectTimeout: const Duration(seconds: 10),
-    receiveTimeout: const Duration(seconds: 10),
-  ));
+  static final Dio _dio = Dio(
+    BaseOptions(
+      baseUrl: ApiConfig.baseUrl,
+      connectTimeout: const Duration(seconds: 10),
+      receiveTimeout: const Duration(seconds: 10),
+    ),
+  );
 
   /// Retrieves the current device's FCM registration token.
   static Future<String?> retrieveToken() async {
@@ -71,16 +76,15 @@ class NotificationService {
 
       final accessToken = await StorageService().getAccessToken();
       if (accessToken == null || accessToken.isEmpty) {
-        debugPrint('NotificationService: Access token missing for FCM token save.');
+        debugPrint(
+          'NotificationService: Access token missing for FCM token save.',
+        );
         return false;
       }
 
       final response = await _dio.post(
         ApiEndpoints.saveFcmToken,
-        data: {
-          'user_id': userId,
-          'fcm_token': token,
-        },
+        data: {'user_id': userId, 'fcm_token': token},
         options: Options(
           headers: {
             'Authorization': 'Bearer $accessToken',
@@ -90,7 +94,9 @@ class NotificationService {
       );
 
       if (response.statusCode == 200 && response.data['success'] == true) {
-        debugPrint('NotificationService: FCM token saved successfully for user $userId.');
+        debugPrint(
+          'NotificationService: FCM token saved successfully for user $userId.',
+        );
         return true;
       }
       return false;
@@ -117,14 +123,11 @@ class NotificationService {
           'limit': limit,
           if (unreadOnly) 'unread_only': 'true',
         },
-        options: Options(
-          headers: {
-            'Authorization': 'Bearer $accessToken',
-          },
-        ),
+        options: Options(headers: {'Authorization': 'Bearer $accessToken'}),
       );
 
-      if (response.statusCode == 200 && response.data['notifications'] != null) {
+      if (response.statusCode == 200 &&
+          response.data['notifications'] != null) {
         final List raw = response.data['notifications'];
         return raw.map((item) => ForenNotification.fromJson(item)).toList();
       }
@@ -136,7 +139,10 @@ class NotificationService {
   }
 
   /// Marks a specific notification (or all) as read.
-  static Future<bool> markAsRead({int? notificationId, bool markAll = false}) async {
+  static Future<bool> markAsRead({
+    int? notificationId,
+    bool markAll = false,
+  }) async {
     try {
       final accessToken = await StorageService().getAccessToken();
       if (accessToken == null || accessToken.isEmpty) return false;
@@ -144,6 +150,7 @@ class NotificationService {
       final response = await _dio.put(
         ApiEndpoints.notifications,
         data: {
+          // ignore: use_null_aware_elements
           if (notificationId != null) 'notification_id': notificationId,
           'mark_all': markAll,
         },
@@ -168,7 +175,9 @@ class NotificationService {
       await FirebaseMessaging.instance.subscribeToTopic(topic);
       AppLogger.i('NotificationService: Subscribed to topic "$topic"');
     } catch (e) {
-      AppLogger.e('NotificationService: Error subscribing to topic "$topic": $e');
+      AppLogger.e(
+        'NotificationService: Error subscribing to topic "$topic": $e',
+      );
     }
   }
 
@@ -178,7 +187,9 @@ class NotificationService {
       await FirebaseMessaging.instance.unsubscribeFromTopic(topic);
       AppLogger.i('NotificationService: Unsubscribed from topic "$topic"');
     } catch (e) {
-      AppLogger.e('NotificationService: Error unsubscribing from topic "$topic": $e');
+      AppLogger.e(
+        'NotificationService: Error unsubscribing from topic "$topic": $e',
+      );
     }
   }
 }

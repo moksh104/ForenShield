@@ -12,7 +12,7 @@ class TokenService {
   final FlutterSecureStorage _secureStorage;
 
   TokenService({FlutterSecureStorage? secureStorage})
-      : _secureStorage = secureStorage ?? const FlutterSecureStorage();
+    : _secureStorage = secureStorage ?? const FlutterSecureStorage();
 
   /// Persists the JWT access token securely using FlutterSecureStorage.
   Future<void> saveToken(String token) async {
@@ -23,7 +23,9 @@ class TokenService {
   /// Retrieves the stored JWT access token from FlutterSecureStorage.
   Future<String?> getToken() async {
     final token = await _secureStorage.read(key: _accessTokenKey);
-    AppLogger.d('[TokenService] Get Access Token -> ${token != null && token.isNotEmpty ? 'FOUND' : 'NOT FOUND'}');
+    AppLogger.d(
+      '[TokenService] Get Access Token -> ${token != null && token.isNotEmpty ? 'FOUND' : 'NOT FOUND'}',
+    );
     return token;
   }
 
@@ -36,7 +38,9 @@ class TokenService {
   /// Retrieves the stored JWT refresh token from FlutterSecureStorage.
   Future<String?> getRefreshToken() async {
     final token = await _secureStorage.read(key: _refreshTokenKey);
-    AppLogger.d('[TokenService] Get Refresh Token -> ${token != null && token.isNotEmpty ? 'FOUND' : 'NOT FOUND'}');
+    AppLogger.d(
+      '[TokenService] Get Refresh Token -> ${token != null && token.isNotEmpty ? 'FOUND' : 'NOT FOUND'}',
+    );
     return token;
   }
 

@@ -38,10 +38,27 @@ class ApiEndpoints {
   // ── Profile ────────────────────────────────────────────────────────────────
 
   static const String profile = '/profile.php';
-  static const String leaderboard = '/leaderboard.php';
-  static const String updateXp = '/update_xp.php';
-  static const String achievements = '/achievements.php';
   static const String updateProfile = '/update_profile.php';
+
+  // ── Leaderboard ────────────────────────────────────────────────────────────
+
+  static const String leaderboard = '/leaderboard.php';
+  static const String leaderboardGlobal = '/leaderboard/global.php';
+  static const String leaderboardWeekly = '/leaderboard/weekly.php';
+  static const String leaderboardMonthly = '/leaderboard/monthly.php';
+  static const String leaderboardTopInvestigators =
+      '/leaderboard/top_investigators.php';
+  static const String leaderboardTopLearners = '/leaderboard/top_learners.php';
+  static const String leaderboardProfileRank = '/leaderboard/profile_rank.php';
+
+  // ── XP / Progression ───────────────────────────────────────────────────────
+
+  // ── Achievements ───────────────────────────────────────────────────────────
+
+  static const String achievementsList = '/achievements/list.php';
+  static const String achievementsUnlock = '/achievements/unlock.php';
+  static const String achievementsProgress = '/achievements/progress.php';
+  static const String achievementsCheck = '/achievements/check.php';
 
   // ── Mission Control ────────────────────────────────────────────────────────
 
@@ -50,7 +67,8 @@ class ApiEndpoints {
   // ── Investigation ──────────────────────────────────────────────────────────
 
   static const String investigationCases = '/investigation_cases.php';
-  static const String investigationCaseDetail = '/investigation_case_detail.php';
+  static const String investigationCaseDetail =
+      '/investigation_case_detail.php';
   static const String investigationEvidence = '/investigation_evidence.php';
   static const String investigationVerdict = '/investigation_verdict.php';
 
@@ -67,6 +85,37 @@ class ApiEndpoints {
   // ── Reports ────────────────────────────────────────────────────────────────
 
   static const String reports = '/reports.php';
+
+  // ── Live Intelligence ──────────────────────────────────────────────────────
+
+  /// CISA Known Exploited Vulnerabilities feed
+  static const String cisaKev = '/cisa_kev.php';
+
+  /// MITRE ATT&CK technique catalogue
+  static const String mitreAttack = '/mitre_attack.php';
+
+  /// NVD vulnerability statistics
+  static const String nvd = '/nvd.php';
+
+  /// VirusTotal file/URL/IP analysis (backend-proxied; API key is server-side only)
+  static const String virusTotal = '/virustotal.php';
+
+  // ── Settings ───────────────────────────────────────────────────────────────
+
+  /// List active device sessions
+  static const String settingsDevices = '/settings/devices.php';
+
+  /// Revoke a specific device session
+  static const String settingsRevokeDevice = '/settings/revoke_device.php';
+
+  /// Fetch login history
+  static const String settingsLoginHistory = '/settings/login_history.php';
+
+  /// Delete account (requires password confirmation)
+  static const String settingsDeleteAccount = '/settings/delete_account.php';
+
+  /// Export user data archive
+  static const String settingsExportData = '/settings/export_data.php';
 
   // ── Notifications ──────────────────────────────────────────────────────────
 

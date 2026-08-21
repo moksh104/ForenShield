@@ -4,12 +4,7 @@ import '../../../models/user_model.dart';
 ///
 /// Used by the router guard and authentication provider to represent the
 /// user's current session status with an explicit enum.
-enum AuthStatus {
-  initial,
-  loading,
-  authenticated,
-  unauthenticated,
-}
+enum AuthStatus { initial, loading, authenticated, unauthenticated }
 
 class AuthStateModel {
   final AuthStatus status;
@@ -23,20 +18,21 @@ class AuthStateModel {
   });
 
   const AuthStateModel.initial()
-      : status = AuthStatus.initial,
-        user = null,
-        error = null;
+    : status = AuthStatus.initial,
+      user = null,
+      error = null;
 
   const AuthStateModel.authenticated(this.user)
-      : status = AuthStatus.authenticated,
-        error = null;
+    : status = AuthStatus.authenticated,
+      error = null;
 
   const AuthStateModel.unauthenticated()
-      : status = AuthStatus.unauthenticated,
-        user = null,
-        error = null;
+    : status = AuthStatus.unauthenticated,
+      user = null,
+      error = null;
 
-  bool get isAuthenticated => status == AuthStatus.authenticated && user != null;
+  bool get isAuthenticated =>
+      status == AuthStatus.authenticated && user != null;
 
   AuthStateModel copyWith({
     AuthStatus? status,

@@ -34,6 +34,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
       final updated = await _remoteDataSource.updateProfile(
         fullName: fullName,
         email: email,
+        phone: phone,
+        avatarUrl: avatarUrl,
       );
       return Success(updated);
     } on AppException catch (e) {

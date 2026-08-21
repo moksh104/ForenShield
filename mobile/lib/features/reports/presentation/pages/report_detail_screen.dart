@@ -11,6 +11,7 @@ import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
 import '../../providers/reports_provider.dart';
 import '../../../../core/services/upload_service.dart';
+
 /// Detailed Incident & Forensic Intelligence Report View Screen.
 class ReportDetailScreen extends ConsumerWidget {
   final String reportId;
@@ -27,9 +28,9 @@ class ReportDetailScreen extends ConsumerWidget {
 
     if (report == null) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: AppColors.bgBase,
+          backgroundColor: theme.colorScheme.surface,
           leading: IconButton(
             icon: const Icon(Icons.arrow_back_ios_new, size: 18),
             onPressed: () {
@@ -66,9 +67,9 @@ class ReportDetailScreen extends ConsumerWidget {
     final accentColor = _severityColor(report.severity, foren);
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
@@ -136,29 +137,40 @@ class ReportDetailScreen extends ConsumerWidget {
                       onPressed: () async {
                         final uploadService = ref.read(uploadServiceProvider);
                         final file = await uploadService.pickFile();
-                        
+
                         if (!context.mounted) return;
-                        
+
                         if (file != null) {
                           ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Uploading attachment...')),
+                            const SnackBar(
+                              content: Text('Uploading attachment...'),
+                            ),
                           );
-                          final compressed = await uploadService.compressImage(file);
-                          final url = await uploadService.uploadImage(compressed ?? file, folder: 'forenshield/reports');
-                          
+                          final compressed = await uploadService.compressImage(
+                            file,
+                          );
+                          final url = await uploadService.uploadImage(
+                            compressed ?? file,
+                            folder: 'forenshield/reports',
+                          );
+
                           if (!context.mounted) return;
-                          
+
                           if (url != null) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('Attachment uploaded successfully! URL: $url'),
+                                content: Text(
+                                  'Attachment uploaded successfully! URL: $url',
+                                ),
                                 backgroundColor: foren.success.t500,
                               ),
                             );
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: const Text('Failed to upload attachment'),
+                                content: const Text(
+                                  'Failed to upload attachment',
+                                ),
                                 backgroundColor: foren.critical.t500,
                               ),
                             );

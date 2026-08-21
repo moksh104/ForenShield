@@ -1,6 +1,7 @@
 /// ForenShield Component Library — Status Components
 /// Threat Badge / Difficulty Badge / Status Chip / XP Chip / Notification Badge
 library;
+
 import 'package:forenshield/core/theme/app_spacing.dart';
 
 import 'package:flutter/material.dart';

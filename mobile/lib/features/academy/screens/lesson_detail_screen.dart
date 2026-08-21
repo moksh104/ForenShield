@@ -96,7 +96,15 @@ class LessonDetailScreen extends ConsumerWidget {
                     SizedBox(
                       width: double.infinity,
                       child: FilledButton(
-                        onPressed: () {},
+                        onPressed: () {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Starting "${lesson.title}"...'),
+                              behavior: SnackBarBehavior.floating,
+                              duration: const Duration(seconds: 2),
+                            ),
+                          );
+                        },
                         child: const Text('Start Lesson'),
                       ),
                     ),

@@ -47,24 +47,27 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
 
-    AppLogger.d('[LoginScreen] User clicked login. Validated form for email: ${_emailController.text}');
+    AppLogger.d(
+      '[LoginScreen] User clicked login. Validated form for email: ${_emailController.text}',
+    );
 
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
 
-    final result = await ref.read(authStateProvider.notifier).login(
-      _emailController.text.trim(),
-      _passwordController.text,
-    );
+    final result = await ref
+        .read(authStateProvider.notifier)
+        .login(_emailController.text.trim(), _passwordController.text);
 
     if (!mounted) return;
     setState(() => _isLoading = false);
 
     result.when(
       success: (_) {
-        AppLogger.d('[LoginScreen] Login returned success result. AuthGuard redirect will handle navigation.');
+        AppLogger.d(
+          '[LoginScreen] Login returned success result. AuthGuard redirect will handle navigation.',
+        );
       },
       failure: (exception) {
         AppLogger.w('[LoginScreen] Login returned failure result: $exception');
@@ -116,37 +119,47 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // 1. Logo Block
-                        const AuthLogo().animate().fadeIn(duration: 400.ms, delay: 50.ms).slideY(begin: -0.1, end: 0, curve: Curves.easeOutCubic),
+                        const AuthLogo()
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 50.ms)
+                            .slideY(
+                              begin: -0.1,
+                              end: 0,
+                              curve: Curves.easeOutCubic,
+                            ),
                         const SizedBox(height: AppSpacing.xl),
 
                         // 2. Welcome Headline & Subtitle
                         Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'WELCOME BACK, AGENT',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: 'monospace',
-                                  letterSpacing: 0.5,
-                                ),
+                              alignment: Alignment.centerLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'WELCOME BACK, AGENT',
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      fontFamily: 'monospace',
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xxs),
+                                  Text(
+                                    'Authenticate credentials to access Mission Control',
+                                    style: TextStyle(
+                                      color: foren.textDisabled,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: AppSpacing.xxs),
-                              Text(
-                                'Authenticate credentials to access Mission Control',
-                                style: TextStyle(
-                                  color: foren.textDisabled,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 100.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.lg),
 
                         // Error Banner Transition
@@ -155,13 +168,19 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                           child: _errorMessage != null
                               ? Container(
                                   key: ValueKey(_errorMessage),
-                                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  margin: const EdgeInsets.only(
+                                    bottom: AppSpacing.md,
+                                  ),
                                   padding: const EdgeInsets.all(AppSpacing.sm),
                                   decoration: BoxDecoration(
-                                    color: foren.critical.t500.withValues(alpha: 0.15),
+                                    color: foren.critical.t500.withValues(
+                                      alpha: 0.15,
+                                    ),
                                     borderRadius: AppRadius.borderRadiusMd,
                                     border: Border.all(
-                                      color: foren.critical.t500.withValues(alpha: 0.5),
+                                      color: foren.critical.t500.withValues(
+                                        alpha: 0.5,
+                                      ),
                                     ),
                                   ),
                                   child: Row(
@@ -190,42 +209,50 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         // 3. Email Field
                         AuthTextField(
-                          controller: _emailController,
-                          label: 'Email Address',
-                          hintText: 'agent@forenshield.com',
-                          focusNode: _emailFocus,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          validator: FormValidators.email,
-                          onFieldSubmitted: (_) =>
-                              FocusScope.of(context).requestFocus(_passwordFocus),
-                          prefixIcon: const Icon(Icons.email_outlined),
-                        ).animate().fadeIn(duration: 400.ms, delay: 150.ms).slideY(begin: 0.08, end: 0),
+                              controller: _emailController,
+                              label: 'Email Address',
+                              hintText: 'agent@forenshield.com',
+                              focusNode: _emailFocus,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              validator: FormValidators.email,
+                              onFieldSubmitted: (_) => FocusScope.of(
+                                context,
+                              ).requestFocus(_passwordFocus),
+                              prefixIcon: const Icon(Icons.email_outlined),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 150.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.md),
 
                         // 4. Password Field
                         AuthTextField(
-                          controller: _passwordController,
-                          label: 'Security Access Password',
-                          hintText: '••••••••',
-                          focusNode: _passwordFocus,
-                          obscureText: _obscurePassword,
-                          textInputAction: TextInputAction.done,
-                          validator: FormValidators.password,
-                          onFieldSubmitted: (_) => _handleLogin(),
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                            ),
-                            onPressed: () {
-                              setState(
-                                  () => _obscurePassword = !_obscurePassword);
-                            },
-                          ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.08, end: 0),
+                              controller: _passwordController,
+                              label: 'Security Access Password',
+                              hintText: '••••••••',
+                              focusNode: _passwordFocus,
+                              obscureText: _obscurePassword,
+                              textInputAction: TextInputAction.done,
+                              validator: FormValidators.password,
+                              onFieldSubmitted: (_) => _handleLogin(),
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                onPressed: () {
+                                  setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  );
+                                },
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 200.ms)
+                            .slideY(begin: 0.08, end: 0),
 
                         // Forgot password link
                         Align(
@@ -253,10 +280,13 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         // 5. Login Button
                         AuthButton(
-                          label: 'AUTHENTICATE & ENTER',
-                          isLoading: _isLoading,
-                          onPressed: _isLoading ? null : _handleLogin,
-                        ).animate().fadeIn(duration: 400.ms, delay: 260.ms).slideY(begin: 0.08, end: 0),
+                              label: 'AUTHENTICATE & ENTER',
+                              isLoading: _isLoading,
+                              onPressed: _isLoading ? null : _handleLogin,
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 260.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.lg),
 
                         // Divider
@@ -265,12 +295,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Expanded(
                               child: Container(
                                 height: 1,
-                                color: foren.borderSubtle.withValues(alpha: 0.5),
+                                color: foren.borderSubtle.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsets.symmetric(
-                                  horizontal: AppSpacing.sm),
+                                horizontal: AppSpacing.sm,
+                              ),
                               child: Text(
                                 'OR',
                                 style: TextStyle(
@@ -284,7 +317,9 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
                             Expanded(
                               child: Container(
                                 height: 1,
-                                color: foren.borderSubtle.withValues(alpha: 0.5),
+                                color: foren.borderSubtle.withValues(
+                                  alpha: 0.5,
+                                ),
                               ),
                             ),
                           ],
@@ -293,12 +328,15 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
 
                         // 6. Register Button
                         AuthButton(
-                          label: 'CREATE AGENT ACCOUNT',
-                          isOutlined: true,
-                          onPressed: () {
-                            context.push(RouteConstants.register);
-                          },
-                        ).animate().fadeIn(duration: 400.ms, delay: 320.ms).slideY(begin: 0.08, end: 0),
+                              label: 'CREATE AGENT ACCOUNT',
+                              isOutlined: true,
+                              onPressed: () {
+                                context.push(RouteConstants.register);
+                              },
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 320.ms)
+                            .slideY(begin: 0.08, end: 0),
                       ],
                     ),
                   ),

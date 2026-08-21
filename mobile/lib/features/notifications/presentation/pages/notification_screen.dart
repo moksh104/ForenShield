@@ -119,140 +119,161 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           // Notifications List
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => notifier.fetchNotifications(unreadOnly: _unreadOnly),
+              onRefresh: () =>
+                  notifier.fetchNotifications(unreadOnly: _unreadOnly),
               child: state.isLoading && state.notifications.isEmpty
                   ? const Center(child: CircularProgressIndicator())
                   : filteredList.isEmpty
-                      ? ListView(
-                          children: [
-                            const SizedBox(height: 100),
-                            Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.notifications_off_outlined,
-                                    size: 64,
-                                    color: theme.colorScheme.onSurface.withValues(alpha: 0.4),
+                  ? ListView(
+                      children: [
+                        const SizedBox(height: 100),
+                        Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.notifications_off_outlined,
+                                size: 64,
+                                color: theme.colorScheme.onSurface.withValues(
+                                  alpha: 0.4,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              Text(
+                                _unreadOnly
+                                    ? 'No unread notifications'
+                                    : 'No notifications yet',
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Security alerts and updates will appear here.',
+                                style: TextStyle(
+                                  color: theme.colorScheme.onSurface.withValues(
+                                    alpha: 0.6,
                                   ),
-                                  const SizedBox(height: AppSpacing.md),
-                                  Text(
-                                    _unreadOnly
-                                        ? 'No unread notifications'
-                                        : 'No notifications yet',
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurface,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                  fontSize: 13,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    )
+                  : ListView.separated(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      itemCount: filteredList.length,
+                      separatorBuilder: (_, _) =>
+                          const SizedBox(height: AppSpacing.sm),
+                      itemBuilder: (ctx, index) {
+                        final notification = filteredList[index];
+                        final typeColor = _getTypeColor(
+                          notification.type,
+                          foren,
+                        );
+                        final icon = _getTypeIcon(notification.type);
+
+                        return Material(
+                          color: notification.isRead
+                              ? theme.colorScheme.surface
+                              : theme.colorScheme.surfaceContainerHighest
+                                    .withValues(alpha: 0.5),
+                          borderRadius: BorderRadius.circular(AppRadius.md),
+                          clipBehavior: Clip.antiAlias,
+                          child: InkWell(
+                            onTap: () {
+                              if (!notification.isRead) {
+                                notifier.markAsRead(notification.id);
+                              }
+                              _navigateForType(context, notification.type);
+                            },
+                            child: Padding(
+                              padding: const EdgeInsets.all(AppSpacing.md),
+                              child: Row(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.all(
+                                      AppSpacing.sm,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: typeColor.withValues(alpha: 0.15),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: Icon(
+                                      icon,
+                                      color: typeColor,
+                                      size: 20,
                                     ),
                                   ),
-                                  const SizedBox(height: AppSpacing.xs),
-                                  Text(
-                                    'Security alerts and updates will appear here.',
-                                    style: TextStyle(
-                                      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
-                                      fontSize: 13,
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                notification.title,
+                                                style: TextStyle(
+                                                  color: theme
+                                                      .colorScheme
+                                                      .onSurface,
+                                                  fontWeight:
+                                                      notification.isRead
+                                                      ? FontWeight.w500
+                                                      : FontWeight.bold,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                            ),
+                                            if (!notification.isRead)
+                                              Container(
+                                                width: 8,
+                                                height: 8,
+                                                decoration: BoxDecoration(
+                                                  color: foren.critical.t500,
+                                                  shape: BoxShape.circle,
+                                                ),
+                                              ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: AppSpacing.xs),
+                                        Text(
+                                          notification.message,
+                                          style: TextStyle(
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.8),
+                                            fontSize: 13,
+                                          ),
+                                        ),
+                                        const SizedBox(height: 6),
+                                        Text(
+                                          _formatTime(notification.createdAt),
+                                          style: TextStyle(
+                                            color: theme.colorScheme.onSurface
+                                                .withValues(alpha: 0.5),
+                                            fontSize: 11,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
                                 ],
                               ),
                             ),
-                          ],
-                        )
-                      : ListView.separated(
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          itemCount: filteredList.length,
-                          separatorBuilder: (_, __) => const SizedBox(height: AppSpacing.sm),
-                          itemBuilder: (ctx, index) {
-                            final notification = filteredList[index];
-                            final typeColor = _getTypeColor(notification.type, foren);
-                            final icon = _getTypeIcon(notification.type);
-
-                            return Material(
-                              color: notification.isRead
-                                  ? theme.colorScheme.surface
-                                  : theme.colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                              borderRadius: BorderRadius.circular(AppRadius.md),
-                              clipBehavior: Clip.antiAlias,
-                              child: InkWell(
-                                onTap: () {
-                                  if (!notification.isRead) {
-                                    notifier.markAsRead(notification.id);
-                                  }
-                                  _navigateForType(context, notification.type);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.all(AppSpacing.md),
-                                  child: Row(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.all(AppSpacing.sm),
-                                        decoration: BoxDecoration(
-                                          color: typeColor.withValues(alpha: 0.15),
-                                          shape: BoxShape.circle,
-                                        ),
-                                        child: Icon(icon, color: typeColor, size: 20),
-                                      ),
-                                      const SizedBox(width: AppSpacing.md),
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment: CrossAxisAlignment.start,
-                                          children: [
-                                            Row(
-                                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                              children: [
-                                                Expanded(
-                                                  child: Text(
-                                                    notification.title,
-                                                    style: TextStyle(
-                                                      color: theme.colorScheme.onSurface,
-                                                      fontWeight: notification.isRead
-                                                          ? FontWeight.w500
-                                                          : FontWeight.bold,
-                                                      fontSize: 14,
-                                                    ),
-                                                  ),
-                                                ),
-                                                if (!notification.isRead)
-                                                  Container(
-                                                    width: 8,
-                                                    height: 8,
-                                                    decoration: BoxDecoration(
-                                                      color: foren.critical.t500,
-                                                      shape: BoxShape.circle,
-                                                    ),
-                                                  ),
-                                              ],
-                                            ),
-                                            const SizedBox(height: AppSpacing.xs),
-                                            Text(
-                                              notification.message,
-                                              style: TextStyle(
-                                                color: theme.colorScheme.onSurface
-                                                    .withValues(alpha: 0.8),
-                                                fontSize: 13,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 6),
-                                            Text(
-                                              _formatTime(notification.createdAt),
-                                              style: TextStyle(
-                                                color: theme.colorScheme.onSurface
-                                                    .withValues(alpha: 0.5),
-                                                fontSize: 11,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                          ),
+                        );
+                      },
+                    ),
             ),
           ),
         ],

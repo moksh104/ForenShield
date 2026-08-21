@@ -90,10 +90,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       _otpCode = code;
     });
 
-    final result = await ref.read(authStateProvider.notifier).verifyOtp(
-      email: _targetEmail,
-      otpCode: code,
-    );
+    final result = await ref
+        .read(authStateProvider.notifier)
+        .verifyOtp(email: _targetEmail, otpCode: code);
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -145,7 +144,10 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             padding: const EdgeInsets.only(right: AppSpacing.md),
             child: Center(
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 5,
+                ),
                 decoration: BoxDecoration(
                   color: primaryColor.withValues(alpha: 0.1),
                   borderRadius: AppRadius.borderRadiusCircular,
@@ -221,7 +223,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                           height: 1.4,
                         ),
                         children: [
-                          const TextSpan(text: "We've sent a 6-digit code to\n"),
+                          const TextSpan(
+                            text: "We've sent a 6-digit code to\n",
+                          ),
                           TextSpan(
                             text: _targetEmail,
                             style: TextStyle(
@@ -229,17 +233,19 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                               fontWeight: FontWeight.w700,
                             ),
                           ),
-                          const TextSpan(text: '\nEnter the code below to continue.'),
+                          const TextSpan(
+                            text: '\nEnter the code below to continue.',
+                          ),
                         ],
                       ),
                     ).animate().fadeIn(duration: 400.ms, delay: 100.ms),
                     const SizedBox(height: AppSpacing.lg),
 
                     // Center Security Graphic Illustration
-                    _buildSecurityIllustration(primaryColor, foren)
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: 150.ms)
-                        .scale(),
+                    _buildSecurityIllustration(
+                      primaryColor,
+                      foren,
+                    ).animate().fadeIn(duration: 400.ms, delay: 150.ms).scale(),
                     const SizedBox(height: AppSpacing.xl),
 
                     // Error Banner if present
@@ -311,7 +317,8 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                             _verifyOtpCode(_otpCode!);
                           } else {
                             setState(() {
-                              _errorMessage = 'Enter the 6-digit verification code.';
+                              _errorMessage =
+                                  'Enter the 6-digit verification code.';
                             });
                           }
                         },
@@ -320,9 +327,11 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                     const SizedBox(height: AppSpacing.xl),
 
                     // Security Highlights Info Card
-                    _buildSecurityInfoCard(theme, foren, primaryColor)
-                        .animate()
-                        .fadeIn(duration: 400.ms, delay: 280.ms),
+                    _buildSecurityInfoCard(
+                      theme,
+                      foren,
+                      primaryColor,
+                    ).animate().fadeIn(duration: 400.ms, delay: 280.ms),
                     const SizedBox(height: AppSpacing.xl),
 
                     // Resend Timer Row
@@ -342,7 +351,9 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
                               child: Icon(
                                 Icons.near_me_outlined,
                                 size: 18,
-                                color: _canResend ? primaryColor : foren.textDisabled,
+                                color: _canResend
+                                    ? primaryColor
+                                    : foren.textDisabled,
                               ),
                             ),
                             const SizedBox(width: AppSpacing.sm),
@@ -414,15 +425,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
             decoration: BoxDecoration(
               color: primaryColor.withValues(alpha: 0.12),
               borderRadius: AppRadius.borderRadiusMd,
-              border: Border.all(
-                color: primaryColor.withValues(alpha: 0.3),
-              ),
+              border: Border.all(color: primaryColor.withValues(alpha: 0.3)),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
                     color: primaryColor,
                     borderRadius: AppRadius.borderRadiusSm,
@@ -507,40 +519,35 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   ) {
     return GlassEffect(
       borderRadius: AppRadius.borderRadiusLg,
-      border: Border.all(
-        color: foren.borderSubtle.withValues(alpha: 0.3),
-      ),
+      border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.3)),
       padding: const EdgeInsets.all(AppSpacing.md),
       child: Column(
         children: [
           _buildInfoRow(
             icon: Icons.verified_user_outlined,
             title: 'Your data is protected',
-            subtitle: 'We use industry-standard encryption to keep your data safe.',
+            subtitle:
+                'We use industry-standard encryption to keep your data safe.',
             primaryColor: primaryColor,
             foren: foren,
             theme: theme,
           ),
-          Divider(
-            height: 24,
-            color: foren.borderSubtle.withValues(alpha: 0.3),
-          ),
+          Divider(height: 24, color: foren.borderSubtle.withValues(alpha: 0.3)),
           _buildInfoRow(
             icon: Icons.desktop_windows_outlined,
             title: 'Built for cybersecurity learners',
-            subtitle: 'Practice real-world skills in a safe and guided environment.',
+            subtitle:
+                'Practice real-world skills in a safe and guided environment.',
             primaryColor: primaryColor,
             foren: foren,
             theme: theme,
           ),
-          Divider(
-            height: 24,
-            color: foren.borderSubtle.withValues(alpha: 0.3),
-          ),
+          Divider(height: 24, color: foren.borderSubtle.withValues(alpha: 0.3)),
           _buildInfoRow(
             icon: Icons.track_changes_outlined,
             title: 'Trusted by future defenders',
-            subtitle: 'Join thousands of learners building their cyber defense skills.',
+            subtitle:
+                'Join thousands of learners building their cyber defense skills.',
             primaryColor: primaryColor,
             foren: foren,
             theme: theme,

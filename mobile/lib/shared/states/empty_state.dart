@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/foren_theme.dart';
 
 /// Reusable generic EmptyState widget.
 /// Used for empty lists, search results, or blank workspace placeholders.
@@ -25,15 +25,19 @@ class EmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final cs = theme.colorScheme;
+
     return Center(
       child: Padding(
         padding: AppSpacing.pagePadding,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: cs.surface,
             borderRadius: AppRadius.cardRadius,
-            border: Border.all(color: AppColors.borderSubtle),
+            border: Border.all(color: foren?.borderSubtle ?? cs.outlineVariant),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -43,16 +47,16 @@ class EmptyState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.surfaceHighlight,
+                  color: cs.primary.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 48, color: AppColors.primary),
+                child: Icon(icon, size: 48, color: cs.primary),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: cs.onSurface,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -61,8 +65,8 @@ class EmptyState extends StatelessWidget {
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   message!,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: foren?.textSecondary ?? cs.onSurfaceVariant,
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -75,8 +79,8 @@ class EmptyState extends StatelessWidget {
                 ElevatedButton(
                   onPressed: onAction,
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.black,
+                    backgroundColor: cs.primary,
+                    foregroundColor: cs.onPrimary,
                     padding: AppSpacing.buttonPadding,
                     shape: RoundedRectangleBorder(
                       borderRadius: AppRadius.buttonRadius,

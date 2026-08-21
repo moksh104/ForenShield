@@ -61,7 +61,8 @@ class ErrorInterceptor extends Interceptor {
 
     String message = 'An error occurred';
     if (data is Map<String, dynamic>) {
-      message = data['error'] as String? ?? data['message'] as String? ?? message;
+      message =
+          data['error'] as String? ?? data['message'] as String? ?? message;
     }
 
     switch (statusCode) {
@@ -72,7 +73,9 @@ class ErrorInterceptor extends Interceptor {
           400,
         );
       case 401:
-        return const UnauthorizedException();
+        // Pass through the server's actual message (e.g. 'Invalid credentials.')
+        // rather than always showing 'Session expired'.
+        return UnauthorizedException(message);
       case 403:
         return const ForbiddenException();
       case 404:

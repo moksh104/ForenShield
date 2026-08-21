@@ -1,5 +1,6 @@
 import '../../../../core/config/api_config.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/exceptions/app_exceptions.dart';
 import '../models/course_model.dart';
 import '../models/lesson_model.dart';
 
@@ -17,23 +18,19 @@ class CourseRemoteDataSource {
     if (ApiConfig.useMockApi) {
       return _getFallbackCourses(category: category, searchQuery: searchQuery);
     }
-    try {
-      final response = await _apiClient.get<List<dynamic>>(
-        '/academy_courses.php',
-        queryParameters: {
-          if (category != null && category != 'All') 'category': category,
-          if (searchQuery != null && searchQuery.isNotEmpty) 'q': searchQuery,
-        },
-      );
-      if (response.data != null) {
-        return response.data!
-            .map((e) => CourseModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
-    } catch (_) {
-      // Fallback to local structured data if backend is offline
+    final response = await _apiClient.get<List<dynamic>>(
+      '/academy_courses.php',
+      queryParameters: {
+        if (category != null && category != 'All') 'category': category,
+        if (searchQuery != null && searchQuery.isNotEmpty) 'q': searchQuery,
+      },
+    );
+    if (response.data != null) {
+      return response.data!
+          .map((e) => CourseModel.fromJson(e as Map<String, dynamic>))
+          .toList();
     }
-    return _getFallbackCourses(category: category, searchQuery: searchQuery);
+    throw const ApiException('Invalid courses data received');
   }
 
   /// Fetches course details.
@@ -42,19 +39,14 @@ class CourseRemoteDataSource {
       final all = _getFallbackCourses();
       return all.firstWhere((c) => c.id == courseId, orElse: () => all.first);
     }
-    try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        '/academy_course_detail.php',
-        queryParameters: {'id': courseId},
-      );
-      if (response.data != null) {
-        return CourseModel.fromJson(response.data!);
-      }
-    } catch (_) {
-      // Fallback
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/academy_course_detail.php',
+      queryParameters: {'id': courseId},
+    );
+    if (response.data != null) {
+      return CourseModel.fromJson(response.data!);
     }
-    final all = _getFallbackCourses();
-    return all.firstWhere((c) => c.id == courseId, orElse: () => all.first);
+    throw const ApiException('Invalid course details received');
   }
 
   /// Fetches lesson details.
@@ -62,18 +54,14 @@ class CourseRemoteDataSource {
     if (ApiConfig.useMockApi) {
       return _fallbackLesson;
     }
-    try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        '/academy_lesson.php',
-        queryParameters: {'id': lessonId},
-      );
-      if (response.data != null) {
-        return LessonModel.fromJson(response.data!);
-      }
-    } catch (_) {
-      // Fallback
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/academy_lesson.php',
+      queryParameters: {'id': lessonId},
+    );
+    if (response.data != null) {
+      return LessonModel.fromJson(response.data!);
     }
-    return _fallbackLesson;
+    throw const ApiException('Invalid lesson details received');
   }
 
   /// Submits quiz answers.
@@ -84,18 +72,14 @@ class CourseRemoteDataSource {
     if (ApiConfig.useMockApi) {
       return 85;
     }
-    try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
-        '/academy_quiz_submit.php',
-        data: {'quiz_id': quizId, 'answers': selectedOptions},
-      );
-      if (response.data != null && response.data!['score'] != null) {
-        return response.data!['score'] as int;
-      }
-    } catch (_) {
-      // Fallback score calculation
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      '/academy_quiz_submit.php',
+      data: {'quiz_id': quizId, 'answers': selectedOptions},
+    );
+    if (response.data != null && response.data!['score'] != null) {
+      return response.data!['score'] as int;
     }
-    return 85;
+    throw const ApiException('Invalid quiz submission response');
   }
 
   static final LessonModel _fallbackLesson = LessonModel(

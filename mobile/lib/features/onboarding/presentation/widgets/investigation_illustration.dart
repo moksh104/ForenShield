@@ -126,6 +126,7 @@ class _InvestigationIllustrationState extends State<InvestigationIllustration>
               painter: _BoardBackgroundPainter(
                 connectionsOpacity: _connectionsOpacity.value,
                 timelineProgress: _timelineProgress.value,
+                outlineColor: Theme.of(context).colorScheme.outlineVariant,
               ),
               size: Size.infinite,
             ),
@@ -201,7 +202,7 @@ class _EvidenceCard extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: AppRadius.borderPill,
         border: Border.all(color: color.withValues(alpha: 0.45)),
       ),
@@ -246,10 +247,12 @@ class _RipplePainter extends CustomPainter {
 class _BoardBackgroundPainter extends CustomPainter {
   final double connectionsOpacity;
   final double timelineProgress;
+  final Color outlineColor;
 
   const _BoardBackgroundPainter({
     required this.connectionsOpacity,
     required this.timelineProgress,
+    required this.outlineColor,
   });
 
   static const _alignments = [
@@ -289,7 +292,7 @@ class _BoardBackgroundPainter extends CustomPainter {
         Offset(sx, y),
         Offset(ex, y),
         Paint()
-          ..color = AppColors.outline
+          ..color = outlineColor
           ..strokeWidth = 1.5
           ..style = PaintingStyle.stroke,
       );
@@ -311,7 +314,7 @@ class _BoardBackgroundPainter extends CustomPainter {
           Paint()
             ..color = (i / 4 <= timelineProgress)
                 ? AppColors.accent
-                : AppColors.outline
+                : outlineColor
             ..strokeWidth = 1.5
             ..style = PaintingStyle.stroke,
         );

@@ -42,7 +42,8 @@ class CategoryFilterBar extends StatelessWidget {
                 scrollDirection: Axis.horizontal,
                 physics: const BouncingScrollPhysics(),
                 itemCount: categories.length,
-                separatorBuilder: (_, _) => const SizedBox(width: AppSpacing.sm),
+                separatorBuilder: (_, _) =>
+                    const SizedBox(width: AppSpacing.sm),
                 itemBuilder: (context, index) {
                   final cat = categories[index];
                   final isSelected = cat == selectedCategory;

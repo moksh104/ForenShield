@@ -7,61 +7,76 @@ class LeaderboardRepository {
 
   const LeaderboardRepository(this._dataSource);
 
-  /// Fetches the leaderboard for a given [period].
-  ///
-  /// Returns a map containing leaderboard entries, current user entry,
-  /// and metadata.
-  Future<LeaderboardResult> fetchLeaderboard(String period) async {
+  /// Fetches the leaderboard for a given [period] with pagination and search.
+  Future<List<LeaderboardEntryModel>> fetchLeaderboard(
+    String period, {
+    int page = 1,
+    String search = '',
+  }) async {
     try {
-      final data = await _dataSource.fetchLeaderboard(period);
+      final data = await _dataSource.fetchLeaderboard(
+        period,
+        page: page,
+        search: search,
+      );
 
       final rawEntries = data['leaderboard'] as List<dynamic>? ?? [];
       final entries = rawEntries
-          .map((e) =>
-              LeaderboardEntryModel.fromJson(e as Map<String, dynamic>))
+          .map((e) => LeaderboardEntryModel.fromJson(e as Map<String, dynamic>))
           .toList();
 
-      LeaderboardEntryModel? currentUser;
-      if (data['current_user'] != null) {
-        currentUser = LeaderboardEntryModel.fromJson(
-            data['current_user'] as Map<String, dynamic>);
-      }
-
-      return LeaderboardResult(
-        entries: entries,
-        currentUser: currentUser,
-        myRank: (data['my_rank'] as int?) ?? 0,
-        totalPlayers: (data['total_players'] as int?) ?? entries.length,
-        period: period,
-      );
+      return entries;
     } catch (e) {
       rethrow;
     }
   }
 
-  /// Awards XP and returns updated stats.
-  Future<Map<String, dynamic>> updateXp(int xp, String reason) async {
+  /// Fetches the current user's profile rank data
+  Future<LeaderboardProfileResult> fetchProfileRank() async {
     try {
-      return await _dataSource.updateXp(xp, reason);
+      final data = await _dataSource.fetchProfileRank();
+
+      LeaderboardEntryModel? currentUser;
+      if (data['current_user'] != null) {
+        currentUser = LeaderboardEntryModel.fromJson(
+          data['current_user'] as Map<String, dynamic>,
+        );
+      }
+
+      final rawNearby = data['nearby_players'] as List<dynamic>? ?? [];
+      final nearbyPlayers = rawNearby
+          .map((e) => LeaderboardEntryModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+
+      return LeaderboardProfileResult(
+        currentUser: currentUser,
+        percentile: (data['percentile'] as num?)?.toDouble() ?? 0.0,
+        totalPlayers: (data['total_players'] as int?) ?? 0,
+        weeklyPosition: (data['weekly_position'] as int?) ?? 0,
+        monthlyPosition: (data['monthly_position'] as int?) ?? 0,
+        nearbyPlayers: nearbyPlayers,
+      );
     } catch (e) {
       rethrow;
     }
   }
 }
 
-/// Value object for leaderboard query results.
-class LeaderboardResult {
-  final List<LeaderboardEntryModel> entries;
+/// Value object for profile rank results.
+class LeaderboardProfileResult {
   final LeaderboardEntryModel? currentUser;
-  final int myRank;
+  final double percentile;
   final int totalPlayers;
-  final String period;
+  final int weeklyPosition;
+  final int monthlyPosition;
+  final List<LeaderboardEntryModel> nearbyPlayers;
 
-  const LeaderboardResult({
-    required this.entries,
+  const LeaderboardProfileResult({
     this.currentUser,
-    required this.myRank,
+    required this.percentile,
     required this.totalPlayers,
-    required this.period,
+    required this.weeklyPosition,
+    required this.monthlyPosition,
+    required this.nearbyPlayers,
   });
 }

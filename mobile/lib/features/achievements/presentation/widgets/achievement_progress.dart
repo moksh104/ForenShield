@@ -61,9 +61,7 @@ class AchievementProgress extends StatelessWidget {
                 minHeight: 6,
                 backgroundColor: foren.surfaceRaised1,
                 valueColor: AlwaysStoppedAnimation(
-                  isComplete
-                      ? foren.success.t500
-                      : theme.colorScheme.primary,
+                  isComplete ? foren.success.t500 : theme.colorScheme.primary,
                 ),
               );
             },

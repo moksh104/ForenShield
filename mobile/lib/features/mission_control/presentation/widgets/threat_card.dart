@@ -92,7 +92,7 @@ class _ThreatCardState extends State<ThreatCard>
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          '$currentScore',
+                          widget.securityScore <= 0 ? 'N/A' : '$currentScore',
                           style: theme.textTheme.titleLarge?.copyWith(
                             color: themeColor,
                             fontWeight: FontWeight.w800,
@@ -101,7 +101,7 @@ class _ThreatCardState extends State<ThreatCard>
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'SCORE',
+                          widget.securityScore <= 0 ? 'UNAVAILABLE' : 'SCORE',
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: foren.textDisabled,
                             fontWeight: FontWeight.w600,
@@ -177,6 +177,8 @@ class _ThreatCardState extends State<ThreatCard>
       case 'MODERATE':
       case 'MEDIUM':
         return foren.warning.t500;
+      case 'UNKNOWN':
+        return foren.textSecondary;
       case 'LOW':
       default:
         return foren.success.t500;

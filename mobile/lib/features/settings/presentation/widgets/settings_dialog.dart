@@ -41,10 +41,7 @@ class SettingsDialog {
         ),
         content: Text(
           message,
-          style: TextStyle(
-            color: foren.textSecondary,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: foren.textSecondary, fontSize: 14),
         ),
         actions: [
           TextButton(
@@ -123,8 +120,9 @@ class SettingsDialog {
                                 ? theme.colorScheme.primary
                                 : theme.colorScheme.onSurface,
                             fontSize: 14,
-                            fontWeight:
-                                isSelected ? FontWeight.w700 : FontWeight.w500,
+                            fontWeight: isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                           ),
                         ),
                         if (subtitle != null) ...[
@@ -206,7 +204,9 @@ class SettingsDialog {
                 label: '${(selected * 100).toInt()}%',
                 activeColor: theme.colorScheme.primary,
                 onChanged: (val) {
-                  setState(() => selected = double.parse(val.toStringAsFixed(2)));
+                  setState(
+                    () => selected = double.parse(val.toStringAsFixed(2)),
+                  );
                 },
               ),
             ],
@@ -214,7 +214,10 @@ class SettingsDialog {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(ctx, null),
-              child: Text('Cancel', style: TextStyle(color: foren.textSecondary)),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: foren.textSecondary),
+              ),
             ),
             ElevatedButton(
               style: ElevatedButton.styleFrom(

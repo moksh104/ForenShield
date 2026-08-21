@@ -1,17 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/effects/glass_effect.dart';
-import '../../../../core/effects/particle_background.dart';
-import '../../../../core/theme/app_colors.dart';
+
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../domain/entities/evidence_entity.dart';
 import '../providers/investigation_provider.dart';
+import '../../providers/virus_total_provider.dart';
 
-/// Evidence Viewer Screen supporting image zoom, log analysis, header preview, and review toggle.
 class EvidenceViewerScreen extends ConsumerStatefulWidget {
   final String evidenceId;
 
@@ -76,40 +73,20 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>()!;
-    final invColor = foren.investigation.t500;
     final primaryColor = theme.colorScheme.primary;
 
     if (_isLoading) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const SizedBox(
-                width: 36,
-                height: 36,
-                child: CircularProgressIndicator(strokeWidth: 2.5),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Loading evidence…',
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  color: foren.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-        ),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        body: const Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
       );
     }
 
     final ev = _evidence;
     if (ev == null) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
-        appBar: AppBar(backgroundColor: AppColors.bgBase),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(backgroundColor: theme.colorScheme.surface),
         body: Center(
           child: Text(
             'Evidence artifact not found.',
@@ -119,10 +96,30 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
       );
     }
 
+    String? vtIndicator;
+    final keysToSearch = [
+      'SHA-256',
+      'SHA-1',
+      'MD5',
+      'IP Address',
+      'URL',
+      'Domain',
+      'Hash',
+      'IP',
+    ];
+    for (final key in keysToSearch) {
+      if (ev.metadataMap.containsKey(key)) {
+        vtIndicator = ev.metadataMap[key];
+        break;
+      }
+    }
+
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface,
+        elevation: 1,
+        shadowColor: theme.colorScheme.shadow.withValues(alpha: 0.1),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           onPressed: () => context.pop(),
@@ -133,296 +130,300 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
             color: theme.colorScheme.onSurface,
             fontSize: 15,
             fontWeight: FontWeight.w800,
-            fontFamily: 'Geist',
           ),
         ),
       ),
-      body: ParticleBackground(
-        numberOfParticles: 40,
-        particleColor: AppColors.logoGold,
-        duration: const Duration(seconds: 18),
-        child: Stack(
-          children: [
-            SafeArea(
-              child: Column(
-                children: [
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(AppSpacing.lg),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          // Type & Timestamp Header Badge Row
-                          GlassEffect(
-                                blurX: 12.0,
-                                blurY: 12.0,
-                                opacity: 0.12,
-                                border: Border.all(
-                                  color: primaryColor.withValues(alpha: 0.35),
-                                  width: 1.0,
-                                ),
-                                borderRadius: AppRadius.borderRadiusLg,
-                                child: Padding(
-                                  padding: const EdgeInsets.all(AppSpacing.md),
-                                  child: Row(
-                                    children: [
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 3,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: primaryColor.withValues(
-                                            alpha: 0.15,
-                                          ),
-                                          borderRadius:
-                                              AppRadius.borderRadiusXs,
-                                          border: Border.all(
-                                            color: primaryColor.withValues(
-                                              alpha: 0.3,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Text(
-                                          'TYPE: ${ev.type.toUpperCase()}',
-                                          style: TextStyle(
-                                            color: primaryColor,
-                                            fontSize: 10,
-                                            fontWeight: FontWeight.w800,
-                                            fontFamily: 'monospace',
-                                          ),
-                                        ),
-                                      ),
-                                      const Spacer(),
-                                      Text(
-                                        ev.timestamp,
-                                        style: TextStyle(
-                                          color: foren.textSecondary,
-                                          fontSize: 11,
-                                          fontFamily: 'monospace',
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              )
-                              .animate()
-                              .fadeIn(duration: 400.ms)
-                              .slideY(begin: -0.1, end: 0),
-
-                          const SizedBox(height: AppSpacing.md),
-
-                          // Interactive Image Viewer Container
-                          if (ev.type == 'image') ...[
-                            Text(
-                              'INTERACTIVE IMAGE INSPECTOR (PINCH TO ZOOM)',
-                              style: TextStyle(
-                                color: foren.textSecondary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                fontFamily: 'monospace',
-                                letterSpacing: 0.8,
-                              ),
-                            ).animate(delay: 100.ms).fadeIn(duration: 400.ms),
-
-                            const SizedBox(height: AppSpacing.xs),
-
-                            GlassEffect(
-                              blurX: 14.0,
-                              blurY: 14.0,
-                              opacity: 0.12,
-                              border: Border.all(
-                                color: primaryColor.withValues(alpha: 0.4),
-                                width: 1.0,
-                              ),
-                              borderRadius: AppRadius.borderRadiusMd,
-                              child: SizedBox(
-                                height: 220,
-                                child: ClipRRect(
-                                  borderRadius: AppRadius.borderRadiusMd,
-                                  child: InteractiveViewer(
-                                    panEnabled: true,
-                                    minScale: 0.5,
-                                    maxScale: 4.0,
-                                    child: Center(
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Icon(
-                                            Icons.image_search,
-                                            size: 72,
-                                            color: primaryColor.withValues(
-                                              alpha: 0.6,
-                                            ),
-                                          ),
-                                          const SizedBox(height: AppSpacing.sm),
-                                          Text(
-                                            'PINCH TO ZOOM EVIDENCE ARTIFACT',
-                                            style: TextStyle(
-                                              color: primaryColor,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w700,
-                                              fontFamily: 'monospace',
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ).animate(delay: 150.ms).fadeIn(duration: 400.ms),
-
-                            const SizedBox(height: AppSpacing.md),
-                          ],
-
-                          // Raw Payload / Content Box
-                          Text(
-                            'EVIDENCE CONTENT PAYLOAD',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // PRACTICE EVIDENCE Section
+              Text(
+                'PRACTICE EVIDENCE',
+                style: TextStyle(
+                  color: foren.textSecondary,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w800,
+                  fontFamily: 'monospace',
+                  letterSpacing: 1.0,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(AppSpacing.md),
+                decoration: BoxDecoration(
+                  color: theme.colorScheme.surface,
+                  borderRadius: AppRadius.borderRadiusLg,
+                  border: Border.all(color: foren.borderSubtle),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: primaryColor.withValues(alpha: 0.1),
+                            borderRadius: AppRadius.borderRadiusXs,
+                          ),
+                          child: Text(
+                            'TYPE: ',
                             style: TextStyle(
-                              color: foren.textSecondary,
+                              color: primaryColor,
                               fontSize: 10,
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'monospace',
-                              letterSpacing: 0.8,
-                            ),
-                          ).animate(delay: 200.ms).fadeIn(duration: 400.ms),
-
-                          const SizedBox(height: AppSpacing.xs),
-
-                          GlassEffect(
-                            blurX: 14.0,
-                            blurY: 14.0,
-                            opacity: 0.12,
-                            border: Border.all(
-                              color: foren.borderSubtle.withValues(alpha: 0.4),
-                              width: 1.0,
-                            ),
-                            borderRadius: AppRadius.borderRadiusMd,
-                            child: Padding(
-                              padding: const EdgeInsets.all(AppSpacing.md),
-                              child: Text(
-                                ev.contentText,
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
-                                  fontSize: 12,
-                                  fontFamily: 'monospace',
-                                  height: 1.4,
-                                ),
-                              ),
-                            ),
-                          ).animate(delay: 250.ms).fadeIn(duration: 400.ms),
-
-                          const SizedBox(height: AppSpacing.lg),
-
-                          // Metadata Table
-                          if (ev.metadataMap.isNotEmpty) ...[
-                            Text(
-                              'EXTRACTED ARTIFACT METADATA',
-                              style: TextStyle(
-                                color: foren.textSecondary,
-                                fontSize: 10,
-                                fontWeight: FontWeight.w800,
-                                fontFamily: 'monospace',
-                                letterSpacing: 0.8,
-                              ),
-                            ).animate(delay: 350.ms).fadeIn(duration: 400.ms),
-
-                            const SizedBox(height: AppSpacing.xs),
-
-                            GlassEffect(
-                              blurX: 14.0,
-                              blurY: 14.0,
-                              opacity: 0.12,
-                              border: Border.all(
-                                color: foren.borderSubtle.withValues(
-                                  alpha: 0.4,
-                                ),
-                                width: 1.0,
-                              ),
-                              borderRadius: AppRadius.borderRadiusMd,
-                              child: Column(
-                                children: ev.metadataMap.entries.map((entry) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: AppSpacing.md,
-                                      vertical: 10,
-                                    ),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          entry.key.toUpperCase(),
-                                          style: TextStyle(
-                                            color: foren.textSecondary,
-                                            fontSize: 11,
-                                            fontFamily: 'monospace',
-                                          ),
-                                        ),
-                                        const Spacer(),
-                                        Text(
-                                          entry.value,
-                                          style: TextStyle(
-                                            color: primaryColor,
-                                            fontSize: 11,
-                                            fontWeight: FontWeight.w700,
-                                            fontFamily: 'monospace',
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ).animate(delay: 400.ms).fadeIn(duration: 400.ms),
-                          ],
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // Bottom Action Footer
-                  GlassEffect(
-                    blurX: 14.0,
-                    blurY: 14.0,
-                    opacity: 0.15,
-                    border: Border(top: BorderSide(color: foren.borderSubtle)),
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.md),
-                      child: SizedBox(
-                        width: double.infinity,
-                        height: 48,
-                        child: ElevatedButton.icon(
-                          onPressed: ev.isReviewed ? null : _markReviewed,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: invColor,
-                            foregroundColor: theme.scaffoldBackgroundColor,
-                            shape: const RoundedRectangleBorder(
-                              borderRadius: AppRadius.borderRadiusMd,
-                            ),
-                          ),
-                          icon: const Icon(
-                            Icons.check_circle_outline,
-                            size: 18,
-                          ),
-                          label: Text(
-                            ev.isReviewed
-                                ? 'ARTIFACT REVIEWED ✓'
-                                : 'MARK ARTIFACT AS REVIEWED',
-                            style: const TextStyle(
-                              fontSize: 13,
                               fontWeight: FontWeight.w800,
                               fontFamily: 'monospace',
                             ),
                           ),
                         ),
-                      ),
+                        const Spacer(),
+                        Text(
+                          ev.timestamp,
+                          style: TextStyle(
+                            color: foren.textSecondary,
+                            fontSize: 11,
+                            fontFamily: 'monospace',
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppSpacing.lg),
+                    // Metadata Map
+                    ...ev.metadataMap.entries.map((entry) {
+                      return Padding(
+                        padding: const EdgeInsets.only(bottom: AppSpacing.sm),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              entry.key.toUpperCase(),
+                              style: TextStyle(
+                                color: foren.textSecondary,
+                                fontSize: 10,
+                                fontWeight: FontWeight.w700,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                            SelectableText(
+                              entry.value,
+                              style: TextStyle(
+                                color: theme.colorScheme.onSurface,
+                                fontSize: 13,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ],
+                        ),
+                      );
+                    }),
+                  ],
+                ),
+              ),
+              if (ev.contentText.isNotEmpty) ...[
+                const SizedBox(height: AppSpacing.lg),
+                Text(
+                  'EVIDENCE CONTENT',
+                  style: TextStyle(
+                    color: foren.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'monospace',
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: theme.brightness == Brightness.dark
+                        ? const Color(0xFF1E293B)
+                        : const Color(0xFFF1F5F9),
+                    borderRadius: AppRadius.borderRadiusMd,
+                    border: Border.all(color: foren.borderSubtle),
+                  ),
+                  child: SelectableText(
+                    ev.contentText,
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 12,
+                      fontFamily: 'monospace',
+                      height: 1.5,
                     ),
                   ),
-                ],
+                ),
+              ],
+              const SizedBox(height: AppSpacing.xl),
+
+              // EXTERNAL INTELLIGENCE Section (VirusTotal)
+              if (vtIndicator != null) ...[
+                Text(
+                  'EXTERNAL INTELLIGENCE',
+                  style: TextStyle(
+                    color: foren.textSecondary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w800,
+                    fontFamily: 'monospace',
+                    letterSpacing: 1.0,
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.sm),
+                Consumer(
+                  builder: (context, ref, child) {
+                    final vtAsyncValue = ref.watch(
+                      virusTotalProvider(vtIndicator!),
+                    );
+                    return vtAsyncValue.when(
+                      data: (vtModel) {
+                        return Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: AppRadius.borderRadiusLg,
+                            border: Border.all(color: foren.borderSubtle),
+                          ),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.radar_outlined,
+                                    color: primaryColor,
+                                    size: 20,
+                                  ),
+                                  const SizedBox(width: AppSpacing.sm),
+                                  Text(
+                                    'VirusTotal Analysis',
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: AppSpacing.md),
+                              ...vtModel.toMap().entries.map((entry) {
+                                return Padding(
+                                  padding: const EdgeInsets.only(
+                                    bottom: AppSpacing.sm,
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 100,
+                                        child: Text(
+                                          entry.key,
+                                          style: TextStyle(
+                                            color: foren.textSecondary,
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: SelectableText(
+                                          entry.value,
+                                          style: TextStyle(
+                                            color: theme.colorScheme.onSurface,
+                                            fontSize: 13,
+                                            fontFamily: 'monospace',
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                );
+                              }),
+                            ],
+                          ),
+                        );
+                      },
+                      error: (error, stack) {
+                        return Container(
+                          padding: const EdgeInsets.all(AppSpacing.md),
+                          decoration: BoxDecoration(
+                            color: theme.colorScheme.surface,
+                            borderRadius: AppRadius.borderRadiusLg,
+                            border: Border.all(
+                              color: theme.colorScheme.error.withOpacity(0.5),
+                            ),
+                          ),
+                          child: Text(
+                            'Live VirusTotal analysis is currently unavailable.',
+                            style: TextStyle(
+                              color: theme.colorScheme.error,
+                              fontSize: 13,
+                            ),
+                          ),
+                        );
+                      },
+                      loading: () {
+                        return const Center(
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        );
+                      },
+                    );
+                  },
+                ),
+                const SizedBox(height: AppSpacing.xl),
+              ],
+
+              // Review Button
+              SizedBox(
+                width: double.infinity,
+                height: 48,
+                child: ElevatedButton(
+                  onPressed: ev.isReviewed ? null : _markReviewed,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: ev.isReviewed
+                        ? theme.colorScheme.surface
+                        : primaryColor,
+                    foregroundColor: ev.isReviewed
+                        ? foren.success.t500
+                        : Colors.white,
+                    elevation: 0,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: AppRadius.borderRadiusMd,
+                      side: ev.isReviewed
+                          ? BorderSide(color: foren.success.t500)
+                          : BorderSide.none,
+                    ),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        ev.isReviewed
+                            ? Icons.check_circle
+                            : Icons.fact_check_outlined,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        ev.isReviewed ? 'REVIEWED' : 'MARK AS REVIEWED',
+                        style: const TextStyle(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -8,9 +8,9 @@ import 'background_grid.dart';
 
 /// ForenShield Enterprise Splash Branding & Logo Sequence.
 /// Strictly aligned with the official light & dark splash specification:
-/// 1. Logo Reveal (Shield Emblem + FORENSHIELD Title + Subtitle)
+/// 1. Logo Reveal (Shield Emblem + FORENSHIELD Title)
 /// 2. Elements Animate (Orbit ring with 5 nodes: Search, Document, Lock, Monitor, Fingerprint)
-/// 3. Tagline & World Map Fade In ("Uncover the truth. Protect the future.")
+/// 3. Tagline & World Map Fade In ("LEARN • INVESTIGATE • DEFEND")
 class SplashLogo extends StatelessWidget {
   const SplashLogo({super.key});
 
@@ -111,16 +111,32 @@ class SplashLogo extends StatelessWidget {
 
         const SizedBox(height: AppSpacing.xs),
 
+        // Tagline: LEARN • INVESTIGATE • DEFEND
+        Text(
+          'LEARN • INVESTIGATE • DEFEND',
+          style: theme.textTheme.labelMedium?.copyWith(
+            color: primaryColor,
+            fontWeight: FontWeight.w700,
+            letterSpacing: 1.2,
+          ),
+        ).animate().fadeIn(
+          delay: 250.ms,
+          duration: 350.ms,
+          curve: Curves.easeOutCubic,
+        ),
+
+        const SizedBox(height: AppSpacing.xs),
+
         // Subtitle: Cybersecurity · Forensics · Simulation
         Text(
-          'Cybersecurity  ·  Forensics  ·  Simulation',
+          'Cybersecurity • Forensics • Simulation',
           style: theme.textTheme.labelSmall?.copyWith(
             color: textSecondary,
             fontWeight: FontWeight.w600,
             letterSpacing: 0.8,
           ),
         ).animate().fadeIn(
-          delay: 250.ms,
+          delay: 350.ms,
           duration: 350.ms,
           curve: Curves.easeOutCubic,
         ),
@@ -140,33 +156,8 @@ class SplashLogo extends StatelessWidget {
                 .animate(delay: 600.ms)
                 .fadeIn(duration: 500.ms, curve: Curves.easeOutCubic),
 
-            // Tagline Lines
-            Column(
-                  children: [
-                    Text(
-                      'Uncover the truth.',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: textPrimary,
-                        fontWeight: FontWeight.w600,
-                        letterSpacing: 0.2,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.xs),
-                    Text(
-                      'Protect the future.',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: primaryColor,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.2,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                  ],
-                )
-                .animate(delay: 550.ms)
-                .fadeIn(duration: 450.ms, curve: Curves.easeOutCubic)
-                .slideY(begin: 0.08, end: 0),
+            // Optional bottom text area (removed obsolete taglines)
+            Column(children: [const SizedBox(height: AppSpacing.xxl)]),
           ],
         ),
       ],

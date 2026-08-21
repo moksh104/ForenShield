@@ -10,7 +10,8 @@ class StreakIndicator extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final foren = Theme.of(context).extension<ForenColors>() ?? ForenColors.dark;
+    final foren =
+        Theme.of(context).extension<ForenColors>() ?? ForenColors.dark;
 
     if (streak <= 0) return const SizedBox.shrink();
 
@@ -19,9 +20,7 @@ class StreakIndicator extends StatelessWidget {
       decoration: BoxDecoration(
         color: foren.warning.t500.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(
-          color: foren.warning.t500.withValues(alpha: 0.4),
-        ),
+        border: Border.all(color: foren.warning.t500.withValues(alpha: 0.4)),
         boxShadow: streak >= 7
             ? [
                 BoxShadow(
@@ -35,10 +34,7 @@ class StreakIndicator extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            streak >= 7 ? '🔥' : '🔸',
-            style: const TextStyle(fontSize: 16),
-          ),
+          Text(streak >= 7 ? '🔥' : '🔸', style: const TextStyle(fontSize: 16)),
           const SizedBox(width: AppSpacing.xs),
           Text(
             '$streak',

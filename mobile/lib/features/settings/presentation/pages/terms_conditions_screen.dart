@@ -87,7 +87,12 @@ class TermsConditionsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSection(ThemeData theme, ForenColors foren, String title, String body) {
+  Widget _buildSection(
+    ThemeData theme,
+    ForenColors foren,
+    String title,
+    String body,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),
       child: Column(

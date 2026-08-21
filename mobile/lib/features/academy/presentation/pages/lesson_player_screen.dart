@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
@@ -201,7 +200,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                             item.label,
                             style: TextStyle(
                               color: item.isChecked
-                                  ? foren.textDisabled
+                                  ? foren.textSecondary
                                   : theme.colorScheme.onSurface,
                               fontSize: 13,
                               decoration: item.isChecked
@@ -211,7 +210,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                           ),
                           value: item.isChecked,
                           activeColor: foren.success.t500,
-                          checkColor: theme.scaffoldBackgroundColor,
+                          checkColor: theme.colorScheme.onPrimary,
                           onChanged: (_) => _toggleChecklist(i),
                         );
                       }),
@@ -238,6 +237,7 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                           : _markComplete,
                       style: OutlinedButton.styleFrom(
                         foregroundColor: foren.success.t500,
+                        disabledForegroundColor: foren.success.t500,
                         side: BorderSide(color: foren.success.t500),
                         shape: const RoundedRectangleBorder(
                           borderRadius: AppRadius.borderRadiusMd,
@@ -295,9 +295,9 @@ class _CodeSnippetCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.bgBase,
+        color: foren.codeBlockBackground,
         borderRadius: AppRadius.borderRadiusMd,
-        border: Border.all(color: foren.borderSubtle.withValues(alpha: 0.5)),
+        border: Border.all(color: foren.borderDefault),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,7 +308,7 @@ class _CodeSnippetCard extends StatelessWidget {
               Text(
                 language.toUpperCase(),
                 style: TextStyle(
-                  color: theme.colorScheme.primary,
+                  color: foren.academy.t300,
                   fontSize: 10,
                   fontWeight: FontWeight.w700,
                   fontFamily: 'monospace',
@@ -323,11 +323,14 @@ class _CodeSnippetCard extends StatelessWidget {
                 },
                 child: Row(
                   children: [
-                    Icon(Icons.copy, size: 12, color: foren.textDisabled),
+                    Icon(Icons.copy, size: 12, color: foren.codeBlockMuted),
                     const SizedBox(width: AppSpacing.xs),
                     Text(
                       'Copy',
-                      style: TextStyle(color: foren.textDisabled, fontSize: 10),
+                      style: TextStyle(
+                        color: foren.codeBlockMuted,
+                        fontSize: 10,
+                      ),
                     ),
                   ],
                 ),
@@ -335,13 +338,16 @@ class _CodeSnippetCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: AppSpacing.xs),
-          Text(
-            code,
-            style: TextStyle(
-              color: theme.colorScheme.onSurface,
-              fontSize: 12,
-              fontFamily: 'monospace',
-              height: 1.4,
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Text(
+              code,
+              style: TextStyle(
+                color: foren.codeBlockForeground,
+                fontSize: 12,
+                fontFamily: 'monospace',
+                height: 1.4,
+              ),
             ),
           ),
         ],

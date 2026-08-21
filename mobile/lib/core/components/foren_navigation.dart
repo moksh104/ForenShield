@@ -122,24 +122,35 @@ class ForenBottomNav extends StatelessWidget {
     final foren = theme.extension<ForenColors>()!;
     final isDark = theme.brightness == Brightness.dark;
 
-    return NavigationBar(
-      selectedIndex: currentIndex,
-      onDestinationSelected: onTap,
-      backgroundColor: theme.scaffoldBackgroundColor,
-      indicatorColor: Colors.transparent,
-      destinations: [
-        for (final d in forenNavDestinations)
-          NavigationDestination(
-            icon: Icon(d.icon, color: foren.textSecondary),
-            selectedIcon: Icon(
-              d.icon,
-              color: isDark
-                  ? foren.forFeature(d.feature).t300
-                  : foren.forFeature(d.feature).t700,
-            ),
-            label: d.label,
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(
+          top: BorderSide(
+            color: foren.borderSubtle,
+            width: ForenBorderWidth.hairline,
           ),
-      ],
+        ),
+      ),
+      child: NavigationBar(
+        selectedIndex: currentIndex,
+        onDestinationSelected: onTap,
+        backgroundColor: theme.scaffoldBackgroundColor,
+        surfaceTintColor: Colors.transparent,
+        indicatorColor: Colors.transparent,
+        destinations: [
+          for (final d in forenNavDestinations)
+            NavigationDestination(
+              icon: Icon(d.icon, color: foren.textSecondary),
+              selectedIcon: Icon(
+                d.icon,
+                color: isDark
+                    ? foren.forFeature(d.feature).t300
+                    : foren.forFeature(d.feature).t700,
+              ),
+              label: d.label,
+            ),
+        ],
+      ),
     );
   }
 }

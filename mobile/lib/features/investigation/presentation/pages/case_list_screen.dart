@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
 import '../../../../core/components/foren_navigation.dart';
+import '../../../../shared/widgets/foren_brand_header.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../providers/investigation_provider.dart';
 
@@ -90,104 +91,14 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                   ),
                   const SizedBox(width: AppSpacing.xs),
 
-                  // Brand Shield Logo Mark
-                  Container(
-                    width: 38,
-                    height: 38,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: colorScheme.surface,
-                      border: Border.all(
-                        color: primaryColor.withValues(alpha: 0.3),
-                        width: 1.5,
-                      ),
-                    ),
-                    child: Center(
-                      child: Container(
-                        width: 28,
-                        height: 28,
-                        decoration: const BoxDecoration(
-                          shape: BoxShape.circle,
-                          gradient: LinearGradient(
-                            colors: [AppColors.primary, Color(0xFF1D4ED8)],
-                            begin: Alignment.topLeft,
-                            end: Alignment.bottomRight,
-                          ),
-                        ),
-                        child: const Center(
-                          child: Stack(
-                            alignment: Alignment.center,
-                            children: [
-                              Icon(
-                                Icons.shield_rounded,
-                                size: 18,
-                                color: Colors.white,
-                              ),
-                              Text(
-                                'F',
-                                style: TextStyle(
-                                  color: AppColors.primary,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w900,
-                                  fontFamily: 'Outfit',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 10),
-
-                  // Brand Name + Tagline
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Text(
-                            'FOREN',
-                            style: TextStyle(
-                              color: textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              fontFamily: 'Outfit',
-                            ),
-                          ),
-                          Text(
-                            'SHIELD',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              letterSpacing: 1.2,
-                              fontFamily: 'Outfit',
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 1),
-                      Text(
-                        'LEARN · INVESTIGATE · DEFEND',
-                        style: TextStyle(
-                          color: textSecondary,
-                          fontSize: 7.5,
-                          fontWeight: FontWeight.w700,
-                          letterSpacing: 1.0,
-                        ),
-                      ),
-                    ],
-                  ),
+                  // Shared Brand Header
+                  const ForenShieldBrandHeader(),
 
                   const Spacer(),
 
                   // Search Button
                   GestureDetector(
-                    onTap: () {},
+                    onTap: () => _showSearchBottomSheet(context, ref),
                     child: SizedBox(
                       width: 36,
                       height: 36,
@@ -287,7 +198,14 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
 
                         // My Cases Button
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () {
+                            setState(() {
+                              // Toggle to show only user's cases by selecting 'Completed' tab
+                              _selectedTab = _selectedTab == 'Completed'
+                                  ? 'All Cases'
+                                  : 'Completed';
+                            });
+                          },
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 14,
@@ -387,7 +305,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
 
                         // Filter Button
                         GestureDetector(
-                          onTap: () {},
+                          onTap: () => _showFilterBottomSheet(context),
                           child: Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 12,
@@ -695,7 +613,6 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
     final primaryColor = colorScheme.primary;
     final textPrimary = colorScheme.onSurface;
     final textSecondary = colorScheme.onSurfaceVariant;
-    final foren = theme.extension<ForenColors>()!;
 
     final config = _getCaseConfig(c.title, c.difficulty);
 
@@ -703,9 +620,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: AppRadius.borderRadiusLg,
-        border: Border.all(
-          color: colorScheme.outlineVariant,
-        ),
+        border: Border.all(color: colorScheme.outlineVariant),
         boxShadow: [
           BoxShadow(
             color: colorScheme.shadow.withValues(alpha: 0.08),
@@ -1132,6 +1047,187 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
           const SizedBox(width: 6),
           Icon(Icons.chevron_right_rounded, size: 18, color: textSecondary),
         ],
+      ),
+    );
+  }
+
+  String _selectedTab = 'All Cases';
+
+  void _showSearchBottomSheet(BuildContext context, WidgetRef ref) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+    final state = ref.read(investigationProvider);
+    final cases = state.cases;
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) {
+        String query = '';
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            final filtered = cases
+                .where(
+                  (c) =>
+                      c.title.toLowerCase().contains(query.toLowerCase()) ||
+                      c.description.toLowerCase().contains(query.toLowerCase()),
+                )
+                .toList();
+
+            return DraggableScrollableSheet(
+              expand: false,
+              initialChildSize: 0.6,
+              maxChildSize: 0.9,
+              minChildSize: 0.3,
+              builder: (_, controller) => Padding(
+                padding: const EdgeInsets.all(AppSpacing.lg),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Center(
+                      child: Container(
+                        width: 40,
+                        height: 4,
+                        decoration: BoxDecoration(
+                          color: colorScheme.outlineVariant,
+                          borderRadius: BorderRadius.circular(2),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    TextField(
+                      autofocus: true,
+                      decoration: InputDecoration(
+                        hintText: 'Search cases...',
+                        prefixIcon: const Icon(Icons.search_rounded, size: 20),
+                        filled: true,
+                        fillColor: colorScheme.surfaceContainerHighest,
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(12),
+                          borderSide: BorderSide.none,
+                        ),
+                      ),
+                      onChanged: (v) => setModalState(() => query = v),
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    Text(
+                      '${filtered.length} results',
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.sm),
+                    Expanded(
+                      child: ListView.separated(
+                        controller: controller,
+                        itemCount: filtered.length,
+                        separatorBuilder: (context, index) =>
+                            const Divider(height: 1),
+                        itemBuilder: (_, i) {
+                          final c = filtered[i];
+                          return ListTile(
+                            title: Text(
+                              c.title,
+                              style: theme.textTheme.titleSmall,
+                            ),
+                            subtitle: Text(
+                              c.description,
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colorScheme.onSurfaceVariant,
+                              ),
+                            ),
+                            trailing: Icon(
+                              Icons.chevron_right_rounded,
+                              color: colorScheme.onSurfaceVariant,
+                            ),
+                            onTap: () {
+                              Navigator.pop(ctx);
+                              context.push(
+                                '${RouteConstants.investigation}/${c.id}',
+                              );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _showFilterBottomSheet(BuildContext context) {
+    final theme = Theme.of(context);
+    final colorScheme = theme.colorScheme;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colorScheme.surface,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+              Text(
+                'Filter Cases',
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Text(
+                'Difficulty',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  color: colorScheme.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.sm),
+              Wrap(
+                spacing: 8,
+                children: _tabs
+                    .map(
+                      (d) => FilterChip(
+                        label: Text(d),
+                        selected: _selectedTab == d,
+                        onSelected: (val) {
+                          Navigator.pop(ctx);
+                          setState(() => _selectedTab = d);
+                        },
+                      ),
+                    )
+                    .toList(),
+              ),
+              const SizedBox(height: AppSpacing.lg),
+            ],
+          ),
+        ),
       ),
     );
   }

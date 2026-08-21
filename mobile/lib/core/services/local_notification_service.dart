@@ -15,7 +15,9 @@ class LocalNotificationService {
   static Future<void> initialize({
     void Function(String? payload)? onNotificationTap,
   }) async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
     const darwinSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
       requestBadgePermission: true,
@@ -65,7 +67,8 @@ class LocalNotificationService {
 
     final androidImplementation = _localNotifications
         .resolvePlatformSpecificImplementation<
-            AndroidFlutterLocalNotificationsPlugin>();
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (androidImplementation != null) {
       await androidImplementation.createNotificationChannel(androidChannel);

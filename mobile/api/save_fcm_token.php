@@ -66,5 +66,6 @@ try {
     ]);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to save FCM token: ' . $e->getMessage()]);
+    error_log('[API Error] ' . $e->getMessage());
+    echo json_encode(['error' => 'An internal server error occurred.']);
 }

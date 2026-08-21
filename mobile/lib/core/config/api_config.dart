@@ -53,16 +53,16 @@ class ApiConfig {
 
     // 4. Local Development Platform Fallbacks
     if (kIsWeb) {
-      return 'http://localhost:8000/api/v1';
+      return 'http://localhost:8000';
     }
 
     if (Platform.isAndroid) {
       // 10.0.2.2 maps to host machine on Android emulator
-      return 'http://10.0.2.2:8000/api/v1';
+      return 'http://10.0.2.2:8000';
     }
 
     // iOS Simulator, macOS, Windows, Linux
-    return 'http://127.0.0.1:8000/api/v1';
+    return 'http://127.0.0.1:8000';
   }
 
   /// Resolves the API timeout.

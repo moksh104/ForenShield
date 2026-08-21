@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shimmer/shimmer.dart';
-import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/app_tokens.dart';
 
 /// Generic Skeleton loader widget utilizing the shimmer package.
 /// Supports card, text line, avatar, and custom shape skeleton loaders with dark theme support.
@@ -65,12 +65,18 @@ class SkeletonState extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+
+    // Use theme-appropriate neutral tokens instead of hardcoded dark colors
     final defaultBaseColor =
         baseColor ??
-        (isDark ? AppColors.surfaceHighlight : AppColors.borderSubtle);
+        (isDark
+            ? ForenNeutralDark.bgSurfaceRaised1
+            : ForenNeutralLight.bgSurfaceRaised1);
     final defaultHighlightColor =
         highlightColor ??
-        (isDark ? AppColors.surfaceElevated : AppColors.lightSurface);
+        (isDark
+            ? ForenNeutralDark.bgSurfaceRaised2
+            : ForenNeutralLight.bgSurfaceRaised2);
 
     return Shimmer.fromColors(
       baseColor: defaultBaseColor,

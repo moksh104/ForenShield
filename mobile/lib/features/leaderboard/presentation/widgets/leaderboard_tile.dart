@@ -35,7 +35,8 @@ class LeaderboardTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: isCurrentUser
             ? Border.all(
-                color: theme.colorScheme.primary.withValues(alpha: 0.3))
+                color: theme.colorScheme.primary.withValues(alpha: 0.3),
+              )
             : Border.all(color: foren.borderSubtle),
       ),
       child: Row(
@@ -48,7 +49,8 @@ class LeaderboardTile extends StatelessWidget {
           CircleAvatar(
             radius: 18,
             backgroundColor: foren.surfaceRaised2,
-            backgroundImage: entry.avatarUrl != null && entry.avatarUrl!.isNotEmpty
+            backgroundImage:
+                entry.avatarUrl != null && entry.avatarUrl!.isNotEmpty
                 ? NetworkImage(entry.avatarUrl!)
                 : null,
             child: entry.avatarUrl == null || entry.avatarUrl!.isEmpty
@@ -76,16 +78,15 @@ class LeaderboardTile extends StatelessWidget {
                   style: TextStyle(
                     color: theme.colorScheme.onSurface,
                     fontSize: 14,
-                    fontWeight: isCurrentUser ? FontWeight.w800 : FontWeight.w600,
+                    fontWeight: isCurrentUser
+                        ? FontWeight.w800
+                        : FontWeight.w600,
                   ),
                   overflow: TextOverflow.ellipsis,
                 ),
                 Text(
                   'Level $level · ${XpConfig.levelTitle(level)}',
-                  style: TextStyle(
-                    color: foren.textSecondary,
-                    fontSize: 11,
-                  ),
+                  style: TextStyle(color: foren.textSecondary, fontSize: 11),
                 ),
               ],
             ),

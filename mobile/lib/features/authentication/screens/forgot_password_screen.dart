@@ -21,7 +21,8 @@ class ForgotPasswordScreen extends ConsumerStatefulWidget {
   const ForgotPasswordScreen({super.key});
 
   @override
-  ConsumerState<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
+  ConsumerState<ForgotPasswordScreen> createState() =>
+      _ForgotPasswordScreenState();
 }
 
 class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
@@ -45,7 +46,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
     setState(() => _isLoading = true);
     final repository = ref.read(authRepositoryProvider);
 
-    final result = await repository.forgotPassword(email: _emailController.text.trim());
+    final result = await repository.forgotPassword(
+      email: _emailController.text.trim(),
+    );
 
     setState(() => _isLoading = false);
 
@@ -89,7 +92,9 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
     result.when(
       success: (response) async {
-        await ref.read(authStateProvider.notifier).authenticateWithResponse(response);
+        await ref
+            .read(authStateProvider.notifier)
+            .authenticateWithResponse(response);
         if (!mounted) return;
         context.go(RouteConstants.missionControl);
       },
@@ -172,52 +177,63 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
         key: const ValueKey('email_step'),
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const AuthLogo(compact: true).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
+          const AuthLogo(
+            compact: true,
+          ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
           const SizedBox(height: AppSpacing.xl),
           Align(
-            alignment: Alignment.centerLeft,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'RESET ACCESS CREDENTIALS',
-                  style: TextStyle(
-                    color: theme.colorScheme.onSurface,
-                    fontSize: 18,
-                    fontWeight: FontWeight.w800,
-                    fontFamily: 'monospace',
-                    letterSpacing: 0.5,
-                  ),
+                alignment: Alignment.centerLeft,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'RESET ACCESS CREDENTIALS',
+                      style: TextStyle(
+                        color: theme.colorScheme.onSurface,
+                        fontSize: 18,
+                        fontWeight: FontWeight.w800,
+                        fontFamily: 'monospace',
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xxs),
+                    Text(
+                      'Enter verified agent email to generate a security reset code',
+                      style: TextStyle(
+                        color: foren.textDisabled,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w400,
+                      ),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: AppSpacing.xxs),
-                Text(
-                  'Enter verified agent email to generate a security reset code',
-                  style: TextStyle(
-                    color: foren.textDisabled,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w400,
-                  ),
-                ),
-              ],
-            ),
-          ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0),
+              )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 100.ms)
+              .slideY(begin: 0.08, end: 0),
           const SizedBox(height: AppSpacing.lg),
           AuthTextField(
-            controller: _emailController,
-            label: 'Agent Email Address',
-            hintText: 'agent@forenshield.com',
-            keyboardType: TextInputType.emailAddress,
-            textInputAction: TextInputAction.done,
-            validator: FormValidators.email,
-            onFieldSubmitted: (_) => _handleSubmitEmail(),
-            prefixIcon: const Icon(Icons.email_outlined),
-          ).animate().fadeIn(duration: 400.ms, delay: 150.ms).slideY(begin: 0.08, end: 0),
+                controller: _emailController,
+                label: 'Agent Email Address',
+                hintText: 'agent@forenshield.com',
+                keyboardType: TextInputType.emailAddress,
+                textInputAction: TextInputAction.done,
+                validator: FormValidators.email,
+                onFieldSubmitted: (_) => _handleSubmitEmail(),
+                prefixIcon: const Icon(Icons.email_outlined),
+              )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 150.ms)
+              .slideY(begin: 0.08, end: 0),
           const SizedBox(height: AppSpacing.lg),
           AuthButton(
-            label: 'GENERATE RESET TOKEN',
-            isLoading: _isLoading,
-            onPressed: _isLoading ? null : _handleSubmitEmail,
-          ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.08, end: 0),
+                label: 'GENERATE RESET TOKEN',
+                isLoading: _isLoading,
+                onPressed: _isLoading ? null : _handleSubmitEmail,
+              )
+              .animate()
+              .fadeIn(duration: 400.ms, delay: 200.ms)
+              .slideY(begin: 0.08, end: 0),
         ],
       ),
     );
@@ -233,35 +249,40 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       key: const ValueKey('otp_step'),
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
-        const AuthLogo(compact: true).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
+        const AuthLogo(
+          compact: true,
+        ).animate().fadeIn(duration: 400.ms).slideY(begin: -0.1, end: 0),
         const SizedBox(height: AppSpacing.xl),
         Align(
-          alignment: Alignment.centerLeft,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'ENTER 2FA SECURITY CODE',
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w800,
-                  fontFamily: 'monospace',
-                  letterSpacing: 0.5,
-                ),
+              alignment: Alignment.centerLeft,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'ENTER 2FA SECURITY CODE',
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'monospace',
+                      letterSpacing: 0.5,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xxs),
+                  Text(
+                    '6-digit verification code sent to ${_emailController.text}',
+                    style: TextStyle(
+                      color: foren.textDisabled,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.xxs),
-              Text(
-                '6-digit verification code sent to ${_emailController.text}',
-                style: TextStyle(
-                  color: foren.textDisabled,
-                  fontSize: 13,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0),
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 100.ms)
+            .slideY(begin: 0.08, end: 0),
         const SizedBox(height: AppSpacing.xl),
 
         if (_errorMessage != null) ...[
@@ -289,10 +310,13 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
 
         const SizedBox(height: AppSpacing.xl),
         AuthButton(
-          label: 'VERIFY SECURITY TOKEN',
-          isLoading: _isLoading,
-          onPressed: _isLoading ? null : _verifyOtpAndProceed,
-        ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.08, end: 0),
+              label: 'VERIFY SECURITY TOKEN',
+              isLoading: _isLoading,
+              onPressed: _isLoading ? null : _verifyOtpAndProceed,
+            )
+            .animate()
+            .fadeIn(duration: 400.ms, delay: 200.ms)
+            .slideY(begin: 0.08, end: 0),
 
         const SizedBox(height: AppSpacing.md),
         TextButton(

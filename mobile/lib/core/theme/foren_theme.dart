@@ -1,11 +1,13 @@
 /// ForenShield Design System v1.0 — ThemeData
 ///
 /// Wires the Foundation tokens (app_tokens.dart, app_typography.dart)
-/// into Flutter's Material 3 ThemeData for both Dark (primary) and
-/// Light themes. Feature-accent colors are exposed via a custom
-/// ThemeExtension (ForenColors) since Material's ColorScheme only
-/// has slots for one primary/secondary/tertiary — not five
+/// into Flutter's Material 3 ThemeData for both Light (primary) and
+/// Dark (secondary) themes. Feature-accent colors are exposed via a
+/// custom ThemeExtension (ForenColors) since Material's ColorScheme
+/// only has slots for one primary/secondary/tertiary — not five
 /// independent feature identities.
+///
+/// Light mode is the primary ForenShield experience.
 library;
 
 import 'package:flutter/material.dart';
@@ -40,6 +42,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
   final Color borderDefault;
   final Color textSecondary;
   final Color textDisabled;
+  final Color codeBlockBackground;
+  final Color codeBlockForeground;
+  final Color codeBlockMuted;
 
   const ForenColors({
     required this.missionControl,
@@ -58,6 +63,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
     required this.borderDefault,
     required this.textSecondary,
     required this.textDisabled,
+    required this.codeBlockBackground,
+    required this.codeBlockForeground,
+    required this.codeBlockMuted,
   });
 
   ForenAccentRamp forFeature(ForenFeature feature) {
@@ -92,6 +100,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
     borderDefault: ForenNeutralDark.borderDefault,
     textSecondary: ForenNeutralDark.textSecondary,
     textDisabled: ForenNeutralDark.textDisabled,
+    codeBlockBackground: ForenNeutralDark.bgBase,
+    codeBlockForeground: ForenNeutralDark.textPrimary,
+    codeBlockMuted: ForenNeutralDark.textSecondary,
   );
 
   static const ForenColors light = ForenColors(
@@ -111,6 +122,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
     borderDefault: ForenNeutralLight.borderDefault,
     textSecondary: ForenNeutralLight.textSecondary,
     textDisabled: ForenNeutralLight.textDisabled,
+    codeBlockBackground: ForenNeutralDark.bgBase,
+    codeBlockForeground: ForenNeutralDark.textPrimary,
+    codeBlockMuted: ForenNeutralDark.textSecondary,
   );
 
   @override
@@ -131,6 +145,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
     Color? borderDefault,
     Color? textSecondary,
     Color? textDisabled,
+    Color? codeBlockBackground,
+    Color? codeBlockForeground,
+    Color? codeBlockMuted,
   }) {
     return ForenColors(
       missionControl: missionControl ?? this.missionControl,
@@ -149,6 +166,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
       borderDefault: borderDefault ?? this.borderDefault,
       textSecondary: textSecondary ?? this.textSecondary,
       textDisabled: textDisabled ?? this.textDisabled,
+      codeBlockBackground: codeBlockBackground ?? this.codeBlockBackground,
+      codeBlockForeground: codeBlockForeground ?? this.codeBlockForeground,
+      codeBlockMuted: codeBlockMuted ?? this.codeBlockMuted,
     );
   }
 
@@ -164,7 +184,7 @@ class ForenColors extends ThemeExtension<ForenColors> {
 class ForenTheme {
   ForenTheme._();
 
-  /// Dark theme — primary experience (SOC control-room feel).
+  /// Dark theme — secondary experience.
   static ThemeData get dark {
     final colorScheme = ColorScheme.dark(
       brightness: Brightness.dark,
@@ -193,7 +213,7 @@ class ForenTheme {
     );
   }
 
-  /// Light theme — full parity secondary experience.
+  /// Light theme — primary ForenShield experience.
   static ThemeData get light {
     final colorScheme = ColorScheme.light(
       brightness: Brightness.light,
@@ -372,6 +392,138 @@ class ForenTheme {
         indicatorColor: colorScheme.primary.withValues(alpha: 0.16),
         elevation: 0,
         labelTextStyle: WidgetStateProperty.all(textTheme.labelSmall),
+      ),
+
+      // ── Missing component themes (Phase 1) ──
+      snackBarTheme: SnackBarThemeData(
+        backgroundColor: extension.surfaceRaised3,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onSurface,
+        ),
+        actionTextColor: colorScheme.primary,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ForenRadius.cardSmall),
+        ),
+        behavior: SnackBarBehavior.floating,
+        elevation: ForenElevation.level2,
+      ),
+
+      bottomSheetTheme: BottomSheetThemeData(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.vertical(
+            top: Radius.circular(ForenRadius.dialog),
+          ),
+        ),
+        elevation: ForenElevation.level3,
+      ),
+
+      switchTheme: SwitchThemeData(
+        thumbColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.onPrimary;
+          }
+          return neutralTextSecondary;
+        }),
+        trackColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return extension.surfaceRaised2;
+        }),
+        trackOutlineColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return Colors.transparent;
+          }
+          return extension.borderDefault;
+        }),
+      ),
+
+      checkboxTheme: CheckboxThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return Colors.transparent;
+        }),
+        checkColor: WidgetStateProperty.all(colorScheme.onPrimary),
+        side: BorderSide(
+          color: extension.borderDefault,
+          width: ForenBorderWidth.defaultWidth,
+        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
+
+      radioTheme: RadioThemeData(
+        fillColor: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return colorScheme.primary;
+          }
+          return extension.borderDefault;
+        }),
+      ),
+
+      progressIndicatorTheme: ProgressIndicatorThemeData(
+        color: colorScheme.primary,
+        linearTrackColor: extension.surfaceRaised1,
+        circularTrackColor: extension.surfaceRaised1,
+      ),
+
+      tooltipTheme: TooltipThemeData(
+        decoration: BoxDecoration(
+          color: brightness == Brightness.dark
+              ? extension.surfaceRaised3
+              : colorScheme.onSurface,
+          borderRadius: BorderRadius.circular(ForenRadius.button),
+        ),
+        textStyle: textTheme.bodySmall?.copyWith(
+          color: brightness == Brightness.dark
+              ? colorScheme.onSurface
+              : colorScheme.surface,
+        ),
+      ),
+
+      popupMenuTheme: PopupMenuThemeData(
+        color: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: ForenElevation.level2,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ForenRadius.cardSmall),
+        ),
+        textStyle: textTheme.bodyMedium,
+      ),
+
+      iconTheme: IconThemeData(
+        color: colorScheme.onSurface,
+        size: ForenIconSize.defaultSize,
+      ),
+
+      listTileTheme: ListTileThemeData(
+        textColor: colorScheme.onSurface,
+        iconColor: neutralTextSecondary,
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: ForenSpace.lg,
+          vertical: ForenSpace.xs,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(ForenRadius.cardSmall),
+        ),
+      ),
+
+      tabBarTheme: TabBarThemeData(
+        labelColor: colorScheme.primary,
+        unselectedLabelColor: neutralTextSecondary,
+        indicatorColor: colorScheme.primary,
+        indicatorSize: TabBarIndicatorSize.tab,
+        labelStyle: textTheme.labelLarge,
+        unselectedLabelStyle: textTheme.labelLarge,
+      ),
+
+      drawerTheme: DrawerThemeData(
+        backgroundColor: colorScheme.surface,
+        surfaceTintColor: Colors.transparent,
+        elevation: ForenElevation.level2,
       ),
 
       pageTransitionsTheme: const PageTransitionsTheme(

@@ -212,9 +212,12 @@ class ForenButton extends StatelessWidget {
           fg = Colors.white;
           break;
         case ForenButtonVariant.secondary:
-          bg = AppColors.surfaceHighlight;
+          bg = forenThemeExtension.surfaceRaised1;
           fg = isDark ? ramp.t300 : ramp.t700;
-          border = Border.all(color: AppColors.borderDefault, width: 1.0);
+          border = Border.all(
+            color: forenThemeExtension.borderDefault,
+            width: 1.0,
+          );
           break;
         case ForenButtonVariant.outlined:
           bg = Colors.transparent;
@@ -232,30 +235,36 @@ class ForenButton extends StatelessWidget {
           break;
       }
     } else {
+      // Theme-aware fallback when no feature accent is specified.
+      final cs = theme.colorScheme;
+      final foren = forenThemeExtension;
       switch (variant) {
         case ForenButtonVariant.primary:
-          bg = AppColors.primary;
-          fg = Colors.white;
+          bg = cs.primary;
+          fg = cs.onPrimary;
           break;
         case ForenButtonVariant.secondary:
-          bg = AppColors.surfaceHighlight;
-          fg = AppColors.textPrimary;
-          border = Border.all(color: AppColors.borderDefault, width: 1.0);
+          bg = foren?.surfaceRaised1 ?? cs.surfaceContainerHighest;
+          fg = cs.onSurface;
+          border = Border.all(
+            color: foren?.borderDefault ?? cs.outline,
+            width: 1.0,
+          );
           break;
         case ForenButtonVariant.outlined:
           bg = Colors.transparent;
-          fg = AppColors.primary;
-          border = Border.all(color: AppColors.primary, width: 1.5);
+          fg = cs.primary;
+          border = Border.all(color: cs.primary, width: 1.5);
           break;
         case ForenButtonVariant.destructive:
         case ForenButtonVariant.danger:
-          bg = AppColors.error;
-          fg = Colors.white;
+          bg = cs.error;
+          fg = cs.onError;
           border = null;
           break;
         case ForenButtonVariant.ghost:
           bg = Colors.transparent;
-          fg = AppColors.textPrimary;
+          fg = cs.onSurface;
           border = null;
           break;
       }
@@ -455,21 +464,23 @@ class ForenIconButton extends StatelessWidget {
           ? ramp.t500
           : Colors.transparent;
     } else {
+      // Theme-aware fallback when no feature accent is specified.
+      final cs = theme.colorScheme;
       switch (variant) {
         case ForenButtonVariant.primary:
-          bg = AppColors.primary;
-          fg = Colors.white;
+          bg = cs.primary;
+          fg = cs.onPrimary;
           break;
         case ForenButtonVariant.destructive:
         case ForenButtonVariant.danger:
-          bg = AppColors.error;
-          fg = Colors.white;
+          bg = cs.error;
+          fg = cs.onError;
           break;
         case ForenButtonVariant.secondary:
         case ForenButtonVariant.outlined:
         case ForenButtonVariant.ghost:
           bg = Colors.transparent;
-          fg = AppColors.textPrimary;
+          fg = cs.onSurface;
           break;
       }
     }

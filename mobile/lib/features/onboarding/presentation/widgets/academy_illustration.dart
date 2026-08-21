@@ -144,7 +144,7 @@ class _AcademyIllustrationState extends State<AcademyIllustration>
             height: 104,
             child: CircularProgressIndicator(
               value: _ringProgress.value,
-              backgroundColor: AppColors.outline,
+              backgroundColor: Theme.of(context).colorScheme.outlineVariant,
               color: AppColors.primary,
               strokeWidth: 3.0,
             ),
@@ -204,7 +204,7 @@ class _LessonNode extends StatelessWidget {
         vertical: AppSpacing.xs,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: AppRadius.borderPill,
         border: Border.all(color: color.withValues(alpha: 0.45)),
       ),

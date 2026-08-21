@@ -31,17 +31,12 @@ class SettingsTile extends StatelessWidget {
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
 
     final titleStyle = TextStyle(
-      color: isDestructive
-          ? foren.critical.t300
-          : theme.colorScheme.onSurface,
+      color: isDestructive ? foren.critical.t300 : theme.colorScheme.onSurface,
       fontSize: 14,
       fontWeight: FontWeight.w600,
     );
 
-    final subtitleStyle = TextStyle(
-      color: foren.textSecondary,
-      fontSize: 12,
-    );
+    final subtitleStyle = TextStyle(color: foren.textSecondary, fontSize: 12);
 
     final effectiveIconColor = isDestructive
         ? foren.critical.t300
@@ -65,11 +60,7 @@ class SettingsTile extends StatelessWidget {
                     color: effectiveIconColor.withValues(alpha: 0.12),
                     shape: BoxShape.circle,
                   ),
-                  child: Icon(
-                    icon,
-                    color: effectiveIconColor,
-                    size: 20,
-                  ),
+                  child: Icon(icon, color: effectiveIconColor, size: 20),
                 ),
                 const SizedBox(width: AppSpacing.md),
                 Expanded(

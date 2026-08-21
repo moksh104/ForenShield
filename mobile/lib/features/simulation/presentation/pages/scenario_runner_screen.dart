@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/widgets/progress/lesson_progress_bar.dart';
@@ -43,15 +42,15 @@ class ScenarioRunnerScreen extends ConsumerWidget {
     final scenario = state.scenario;
     if (scenario == null) {
       return Scaffold(
-        backgroundColor: AppColors.bgBase,
+        backgroundColor: theme.scaffoldBackgroundColor,
         body: Center(child: CircularProgressIndicator(color: primaryColor)),
       );
     }
 
     return Scaffold(
-      backgroundColor: AppColors.bgBase,
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: AppColors.bgBase.withValues(alpha: 0.8),
+        backgroundColor: theme.colorScheme.surface,
         elevation: 0,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),

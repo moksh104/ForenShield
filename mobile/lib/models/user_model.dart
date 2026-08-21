@@ -42,24 +42,38 @@ class UserModel extends Equatable {
     return UserModel(
       id: (json['id'] ?? '').toString(),
       email: (json['email'] ?? '').toString(),
-      displayName: (json['displayName'] ?? json['full_name'] ?? json['name'] ?? '').toString(),
-      avatarUrl: json['avatarUrl']?.toString() ?? json['avatar_url']?.toString(),
+      displayName:
+          (json['displayName'] ?? json['full_name'] ?? json['name'] ?? '')
+              .toString(),
+      avatarUrl:
+          json['avatarUrl']?.toString() ?? json['avatar_url']?.toString(),
       totalXp: json['totalXp'] is int
           ? json['totalXp']
           : (json['xp'] is int
-              ? json['xp']
-              : int.tryParse(json['totalXp']?.toString() ?? json['xp']?.toString() ?? '0') ?? 0),
+                ? json['xp']
+                : int.tryParse(
+                        json['totalXp']?.toString() ??
+                            json['xp']?.toString() ??
+                            '0',
+                      ) ??
+                      0),
       rank: (json['rank'] ?? 'Trainee').toString(),
       currentStreak: json['currentStreak'] is int
           ? json['currentStreak']
           : (json['streak'] is int
-              ? json['streak']
-              : int.tryParse(json['currentStreak']?.toString() ?? json['streak']?.toString() ?? '0') ?? 0),
+                ? json['streak']
+                : int.tryParse(
+                        json['currentStreak']?.toString() ??
+                            json['streak']?.toString() ??
+                            '0',
+                      ) ??
+                      0),
       createdAt: json['createdAt'] != null
           ? (DateTime.tryParse(json['createdAt'].toString()) ?? DateTime.now())
           : (json['created_at'] != null
-              ? (DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now())
-              : DateTime.now()),
+                ? (DateTime.tryParse(json['created_at'].toString()) ??
+                      DateTime.now())
+                : DateTime.now()),
     );
   }
 

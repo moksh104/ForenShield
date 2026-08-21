@@ -10,10 +10,7 @@ import '../providers/notification_providers.dart';
 class NotificationBadgeIconButton extends ConsumerWidget {
   final Color? iconColor;
 
-  const NotificationBadgeIconButton({
-    super.key,
-    this.iconColor,
-  });
+  const NotificationBadgeIconButton({super.key, this.iconColor});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -44,10 +41,7 @@ class NotificationBadgeIconButton extends ConsumerWidget {
                 color: foren.critical.t500,
                 shape: BoxShape.circle,
               ),
-              constraints: const BoxConstraints(
-                minWidth: 16,
-                minHeight: 16,
-              ),
+              constraints: const BoxConstraints(minWidth: 16, minHeight: 16),
               child: Text(
                 unreadCount > 99 ? '99+' : '$unreadCount',
                 style: const TextStyle(

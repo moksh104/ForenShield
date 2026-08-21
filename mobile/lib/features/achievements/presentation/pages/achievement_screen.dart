@@ -2,13 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-import '../../data/models/achievement_model.dart';
-import '../../data/repositories/achievement_repository.dart';
 import '../../providers/achievement_providers.dart';
-import '../widgets/achievement_dialog.dart';
-import '../widgets/achievement_grid.dart';
+import '../widgets/achievement_card.dart';
+import 'dart:async';
 
-/// Achievement screen with filter (All / Unlocked / Locked) and grid display.
 class AchievementScreen extends ConsumerStatefulWidget {
   const AchievementScreen({super.key});
 
@@ -16,17 +13,150 @@ class AchievementScreen extends ConsumerStatefulWidget {
   ConsumerState<AchievementScreen> createState() => _AchievementScreenState();
 }
 
-class _AchievementScreenState extends ConsumerState<AchievementScreen> {
-  String _filter = 'all'; // all | unlocked | locked
+class _AchievementScreenState extends ConsumerState<AchievementScreen>
+    with SingleTickerProviderStateMixin {
+  late final TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
+  bool _isSearching = false;
+  String _searchQuery = '';
+  Timer? _debounce;
 
-  List<AchievementModel> _applyFilter(List<AchievementModel> all) {
-    switch (_filter) {
-      case 'unlocked':
-        return all.where((a) => a.unlocked).toList();
-      case 'locked':
-        return all.where((a) => !a.unlocked).toList();
-      default:
-        return all;
+  // Categories as defined in migrations
+  static const _categories = [
+    'all',
+    'mission',
+    'academy',
+    'investigation',
+    'reports',
+    'streak',
+    'xp',
+  ];
+  static const _tabLabels = [
+    'All',
+    'Missions',
+    'Academy',
+    'Investigations',
+    'Reports',
+    'Streak',
+    'XP',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _tabController = TabController(length: _categories.length, vsync: this);
+  }
+
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _searchController.dispose();
+    _debounce?.cancel();
+    super.dispose();
+  }
+
+  void _onSearchChanged(String query) {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (mounted) {
+        setState(() {
+          _searchQuery = query;
+        });
+      }
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+
+    return Scaffold(
+      backgroundColor: theme.colorScheme.surface,
+      appBar: AppBar(
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                decoration: InputDecoration(
+                  hintText: 'Search achievements...',
+                  border: InputBorder.none,
+                  hintStyle: TextStyle(
+                    color: theme.colorScheme.onSurface.withValues(alpha: 0.5),
+                  ),
+                ),
+                style: TextStyle(color: theme.colorScheme.onSurface),
+                onChanged: _onSearchChanged,
+              )
+            : const Text('Achievements'),
+        centerTitle: false,
+        actions: [
+          IconButton(
+            icon: Icon(_isSearching ? Icons.close : Icons.search),
+            onPressed: () {
+              setState(() {
+                if (_isSearching) {
+                  _searchController.clear();
+                  _searchQuery = '';
+                }
+                _isSearching = !_isSearching;
+              });
+            },
+          ),
+        ],
+        bottom: TabBar(
+          controller: _tabController,
+          indicatorColor: theme.colorScheme.primary,
+          labelColor: theme.colorScheme.primary,
+          unselectedLabelColor: foren.textSecondary,
+          isScrollable: true,
+          labelStyle: const TextStyle(
+            fontSize: 13,
+            fontWeight: FontWeight.w700,
+          ),
+          tabs: _tabLabels.map((l) => Tab(text: l)).toList(),
+        ),
+      ),
+      body: TabBarView(
+        controller: _tabController,
+        children: _categories.map((cat) {
+          return _AchievementTab(category: cat, searchQuery: _searchQuery);
+        }).toList(),
+      ),
+    );
+  }
+}
+
+class _AchievementTab extends ConsumerStatefulWidget {
+  final String category;
+  final String searchQuery;
+
+  const _AchievementTab({required this.category, required this.searchQuery});
+
+  @override
+  ConsumerState<_AchievementTab> createState() => _AchievementTabState();
+}
+
+class _AchievementTabState extends ConsumerState<_AchievementTab> {
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void initState() {
+    super.initState();
+    _scrollController.addListener(_onScroll);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+        _scrollController.position.maxScrollExtent - 200) {
+      final args = AchievementNotifierArgs(widget.category, widget.searchQuery);
+      ref.read(achievementProvider(args).notifier).loadMore();
     }
   }
 
@@ -34,264 +164,84 @@ class _AchievementScreenState extends ConsumerState<AchievementScreen> {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
-    final achievementsAsync = ref.watch(achievementsProvider);
 
-    return Scaffold(
-      backgroundColor: theme.colorScheme.surface,
-      appBar: AppBar(
-        title: const Text('Achievements'),
-        centerTitle: false,
-      ),
-      body: achievementsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.error_outline_rounded,
-                  size: 48, color: foren.critical.t300),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                'Failed to load achievements',
-                style: TextStyle(
-                  color: theme.colorScheme.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: AppSpacing.sm),
-              Text(
-                err.toString(),
-                textAlign: TextAlign.center,
-                style: TextStyle(color: foren.textSecondary, fontSize: 13),
-              ),
-              const SizedBox(height: AppSpacing.lg),
-              ElevatedButton.icon(
-                onPressed: () => ref.invalidate(achievementsProvider),
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Retry'),
-              ),
-            ],
-          ),
+    final args = AchievementNotifierArgs(widget.category, widget.searchQuery);
+    final achievementAsync = ref.watch(achievementProvider(args));
+
+    return achievementAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              Icons.error_outline_rounded,
+              size: 48,
+              color: foren.critical.t300,
+            ),
+            const SizedBox(height: AppSpacing.md),
+            const Text(
+              'Failed to load achievements',
+              style: TextStyle(fontWeight: FontWeight.bold),
+            ),
+            TextButton(
+              onPressed: () => ref.invalidate(achievementProvider(args)),
+              child: const Text('Retry'),
+            ),
+          ],
         ),
-        data: (AchievementResult result) {
-          final filtered = _applyFilter(result.achievements);
-
-          return RefreshIndicator(
-            onRefresh: () async {
-              ref.invalidate(achievementsProvider);
-            },
-            child: ListView(
-              padding: const EdgeInsets.all(AppSpacing.md),
+      ),
+      data: (entries) {
+        if (entries.isEmpty) {
+          return Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Stats Header
-                _StatsHeader(
-                  unlockedCount: result.unlockedCount,
-                  total: result.total,
-                  totalXp: result.totalXpEarned,
+                Icon(
+                  Icons.military_tech_rounded,
+                  size: 64,
+                  color: foren.textDisabled,
                 ),
                 const SizedBox(height: AppSpacing.md),
-
-                // Filter Chips
-                Row(
-                  children: [
-                    _FilterChip(
-                      label: 'All',
-                      isSelected: _filter == 'all',
-                      onTap: () => setState(() => _filter = 'all'),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    _FilterChip(
-                      label: 'Unlocked',
-                      isSelected: _filter == 'unlocked',
-                      onTap: () => setState(() => _filter = 'unlocked'),
-                    ),
-                    const SizedBox(width: AppSpacing.sm),
-                    _FilterChip(
-                      label: 'Locked',
-                      isSelected: _filter == 'locked',
-                      onTap: () => setState(() => _filter = 'locked'),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // Grid
-                if (filtered.isEmpty)
-                  Center(
-                    child: Padding(
-                      padding: const EdgeInsets.all(AppSpacing.xxl),
-                      child: Column(
-                        children: [
-                          Icon(Icons.emoji_events_rounded,
-                              size: 48, color: foren.textDisabled),
-                          const SizedBox(height: AppSpacing.sm),
-                          Text(
-                            _filter == 'unlocked'
-                                ? 'No achievements unlocked yet'
-                                : 'No locked achievements remaining',
-                            style: TextStyle(
-                              color: foren.textSecondary,
-                              fontSize: 14,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  )
-                else
-                  AchievementGrid(
-                    achievements: filtered,
-                    onAchievementTap: (achievement) {
-                      AchievementDialog.show(context, achievement);
-                    },
+                Text(
+                  'No achievements found',
+                  style: TextStyle(
+                    color: foren.textSecondary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
+                ),
               ],
             ),
           );
-        },
-      ),
-    );
-  }
-}
+        }
 
-class _StatsHeader extends StatelessWidget {
-  final int unlockedCount;
-  final int total;
-  final int totalXp;
+        return RefreshIndicator(
+          onRefresh: () async {
+            ref.invalidate(achievementProvider(args));
+          },
+          child: ListView.builder(
+            controller: _scrollController,
+            padding: const EdgeInsets.all(AppSpacing.md),
+            itemCount: entries.length + 1, // +1 for loading indicator
+            itemBuilder: (context, index) {
+              if (index >= entries.length) {
+                final notifier = ref.read(achievementProvider(args).notifier);
+                if (notifier.hasMore) {
+                  return const Padding(
+                    padding: EdgeInsets.all(AppSpacing.md),
+                    child: Center(child: CircularProgressIndicator()),
+                  );
+                }
+                return const SizedBox.shrink();
+              }
 
-  const _StatsHeader({
-    required this.unlockedCount,
-    required this.total,
-    required this.totalXp,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
-    final progress = total > 0 ? unlockedCount / total : 0.0;
-
-    return Container(
-      padding: const EdgeInsets.all(AppSpacing.lg),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            theme.colorScheme.primary.withValues(alpha: 0.12),
-            theme.colorScheme.primary.withValues(alpha: 0.04),
-          ],
-        ),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.colorScheme.primary.withValues(alpha: 0.3),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: [
-              Column(
-                children: [
-                  Text(
-                    '$unlockedCount / $total',
-                    style: TextStyle(
-                      color: theme.colorScheme.primary,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  Text(
-                    'Unlocked',
-                    style: TextStyle(
-                      color: foren.textSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-              Column(
-                children: [
-                  Text(
-                    '$totalXp',
-                    style: TextStyle(
-                      color: foren.success.t300,
-                      fontSize: 22,
-                      fontWeight: FontWeight.w900,
-                    ),
-                  ),
-                  Text(
-                    'XP Earned',
-                    style: TextStyle(
-                      color: foren.textSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+              final entry = entries[index];
+              return AchievementCard(achievement: entry);
+            },
           ),
-          const SizedBox(height: AppSpacing.md),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(6),
-            child: LinearProgressIndicator(
-              value: progress,
-              minHeight: 8,
-              backgroundColor: foren.surfaceRaised1,
-              valueColor: AlwaysStoppedAnimation(theme.colorScheme.primary),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _FilterChip extends StatelessWidget {
-  final String label;
-  final bool isSelected;
-  final VoidCallback onTap;
-
-  const _FilterChip({
-    required this.label,
-    required this.isSelected,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.colorScheme.primary.withValues(alpha: 0.15)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : foren.borderDefault,
-          ),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: isSelected
-                ? theme.colorScheme.primary
-                : foren.textSecondary,
-            fontSize: 13,
-            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-          ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

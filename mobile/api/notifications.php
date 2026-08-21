@@ -65,7 +65,8 @@ if ($method === 'PUT' || ($method === 'POST' && isset($_GET['action']) && $_GET[
         exit;
     } catch (Exception $e) {
         http_response_code(500);
-        echo json_encode(['error' => 'Failed to update notification: ' . $e->getMessage()]);
+        error_log('[API Error] ' . $e->getMessage());
+        echo json_encode(['error' => 'An internal server error occurred.']);
         exit;
     }
 }
@@ -113,5 +114,6 @@ try {
     ]);
 } catch (Exception $e) {
     http_response_code(500);
-    echo json_encode(['error' => 'Failed to fetch notifications: ' . $e->getMessage()]);
+    error_log('[API Error] ' . $e->getMessage());
+    echo json_encode(['error' => 'An internal server error occurred.']);
 }

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../../core/effects/glass_effect.dart';
+
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
@@ -52,13 +52,16 @@ class _CaseCardState extends State<CaseCard> {
         duration: const Duration(milliseconds: 180),
         curve: Curves.easeOutCubic,
         transform: Matrix4.translationValues(0, _isHovered ? -2 : 0, 0),
-        child: GlassEffect(
-          borderRadius: AppRadius.borderRadiusLg,
-          border: Border.all(
-            color: _isHovered
-                ? priorityColor.withValues(alpha: 0.6)
-                : foren.borderSubtle,
-            width: 1.0,
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.colorScheme.surface,
+            borderRadius: AppRadius.borderRadiusLg,
+            border: Border.all(
+              color: _isHovered
+                  ? priorityColor.withValues(alpha: 0.6)
+                  : foren.borderSubtle,
+              width: 1.0,
+            ),
           ),
           child: InkWell(
             onTap: widget.onTap,

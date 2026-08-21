@@ -36,7 +36,6 @@ class CourseCard extends StatelessWidget {
       0,
       (sum, m) => sum + m.lessons.length,
     );
-    final int displayLessons = lessonsCount > 0 ? lessonsCount : 12;
 
     final int hours = course.durationMinutes ~/ 60;
     final int mins = course.durationMinutes % 60;
@@ -155,38 +154,51 @@ class CourseCard extends StatelessWidget {
                       // Bottom Metadata Row: Percent Complete | Lessons | Time
                       Row(
                         children: [
-                          Text(
-                            '${(course.completionPercentage * 100).toInt()}% Complete',
-                            style: TextStyle(
-                              color: primaryColor,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w800,
+                          if (course.completionPercentage > 0)
+                            Text(
+                              '${(course.completionPercentage * 100).round()}% Complete',
+                              style: TextStyle(
+                                color: primaryColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            )
+                          else
+                            Text(
+                              'Not started',
+                              style: TextStyle(
+                                color: textSecondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
                           const Spacer(),
-                          Text(
-                            '$displayLessons Lessons',
-                            style: TextStyle(
-                              color: textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
+                          if (lessonsCount > 0)
+                            Text(
+                              ' Lessons',
+                              style: TextStyle(
+                                color: textSecondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
                             ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Icon(
-                            Icons.access_time_rounded,
-                            size: 13,
-                            color: textSecondary,
-                          ),
-                          const SizedBox(width: 3),
-                          Text(
-                            timeStr,
-                            style: TextStyle(
+                          if (course.durationMinutes > 0) ...[
+                            const SizedBox(width: AppSpacing.sm),
+                            Icon(
+                              Icons.access_time_rounded,
+                              size: 13,
                               color: textSecondary,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
                             ),
-                          ),
+                            const SizedBox(width: 3),
+                            Text(
+                              timeStr,
+                              style: TextStyle(
+                                color: textSecondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
                         ],
                       ),
                     ],
@@ -291,9 +303,9 @@ class CourseCard extends StatelessWidget {
     } else if (t.contains('network')) {
       return const _TopicConfig(
         iconType: _IconType.networkSecurity,
-        lightBg: Color(0xFFFAF5FF),
-        darkBg: Color(0xFF2E1A47),
-        iconColor: Color(0xFF6B21A8),
+        lightBg: Color(0xFFEFF6FF),
+        darkBg: Color(0xFF1E293B),
+        iconColor: Color(0xFF1E3A8A),
         badgeBg: Color(0xFFEFF6FF),
         badgeTextColor: Color(0xFF2563EB),
       );

@@ -1,5 +1,6 @@
 import '../../../../core/config/api_config.dart';
 import '../../../../core/network/api_client.dart';
+import '../../../../core/exceptions/app_exceptions.dart';
 import '../models/case_model.dart';
 import '../models/evidence_model.dart';
 import '../models/timeline_model.dart';
@@ -25,31 +26,23 @@ class InvestigationRemoteDataSource {
         searchQuery: searchQuery,
       );
     }
-    try {
-      final response = await _apiClient.get<List<dynamic>>(
-        '/investigation_cases.php',
-        queryParameters: {
-          if (statusFilter != null && statusFilter != 'All')
-            'status': statusFilter,
-          if (priorityFilter != null && priorityFilter != 'All')
-            'priority': priorityFilter,
-          if (searchQuery != null && searchQuery.isNotEmpty) 'q': searchQuery,
-          ...?sortBy == null ? null : {'sort': sortBy},
-        },
-      );
-      if (response.data != null) {
-        return response.data!
-            .map((e) => CaseModel.fromJson(e as Map<String, dynamic>))
-            .toList();
-      }
-    } catch (_) {
-      // API fallback
-    }
-    return _getFallbackCases(
-      statusFilter: statusFilter,
-      priorityFilter: priorityFilter,
-      searchQuery: searchQuery,
+    final response = await _apiClient.get<List<dynamic>>(
+      '/investigation_cases.php',
+      queryParameters: {
+        if (statusFilter != null && statusFilter != 'All')
+          'status': statusFilter,
+        if (priorityFilter != null && priorityFilter != 'All')
+          'priority': priorityFilter,
+        if (searchQuery != null && searchQuery.isNotEmpty) 'q': searchQuery,
+        ...?sortBy == null ? null : {'sort': sortBy},
+      },
     );
+    if (response.data != null) {
+      return response.data!
+          .map((e) => CaseModel.fromJson(e as Map<String, dynamic>))
+          .toList();
+    }
+    throw const ApiException('Invalid cases data received');
   }
 
   /// Fetches case details by ID.
@@ -58,19 +51,14 @@ class InvestigationRemoteDataSource {
       final all = _getFallbackCases();
       return all.firstWhere((c) => c.id == caseId, orElse: () => all.first);
     }
-    try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        '/investigation_case_detail.php',
-        queryParameters: {'id': caseId},
-      );
-      if (response.data != null) {
-        return CaseModel.fromJson(response.data!);
-      }
-    } catch (_) {
-      // API fallback
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/investigation_case_detail.php',
+      queryParameters: {'id': caseId},
+    );
+    if (response.data != null) {
+      return CaseModel.fromJson(response.data!);
     }
-    final all = _getFallbackCases();
-    return all.firstWhere((c) => c.id == caseId, orElse: () => all.first);
+    throw const ApiException('Invalid case details received');
   }
 
   /// Fetches single evidence item details.
@@ -83,23 +71,14 @@ class InvestigationRemoteDataSource {
       );
       return found as EvidenceModel;
     }
-    try {
-      final response = await _apiClient.get<Map<String, dynamic>>(
-        '/investigation_evidence.php',
-        queryParameters: {'id': evidenceId},
-      );
-      if (response.data != null) {
-        return EvidenceModel.fromJson(response.data!);
-      }
-    } catch (_) {
-      // Fallback
-    }
-    final caseDetail = await getCaseDetail('case_101');
-    final found = caseDetail.evidenceList.firstWhere(
-      (e) => e.id == evidenceId,
-      orElse: () => _fallbackEvidence.first,
+    final response = await _apiClient.get<Map<String, dynamic>>(
+      '/investigation_evidence.php',
+      queryParameters: {'id': evidenceId},
     );
-    return found as EvidenceModel;
+    if (response.data != null) {
+      return EvidenceModel.fromJson(response.data!);
+    }
+    throw const ApiException('Invalid evidence data received');
   }
 
   /// Submits verdict decision.
@@ -110,18 +89,14 @@ class InvestigationRemoteDataSource {
     if (ApiConfig.useMockApi) {
       return selectedVerdictIndex == 1 ? 100 : 40;
     }
-    try {
-      final response = await _apiClient.post<Map<String, dynamic>>(
-        '/investigation_verdict.php',
-        data: {'case_id': caseId, 'selected_verdict_index': selectedVerdictIndex},
-      );
-      if (response.data != null && response.data!['score'] != null) {
-        return response.data!['score'] as int;
-      }
-    } catch (_) {
-      // Fallback score
+    final response = await _apiClient.post<Map<String, dynamic>>(
+      '/investigation_verdict.php',
+      data: {'case_id': caseId, 'selected_verdict_index': selectedVerdictIndex},
+    );
+    if (response.data != null && response.data!['score'] != null) {
+      return response.data!['score'] as int;
     }
-    return selectedVerdictIndex == 1 ? 100 : 40;
+    throw const ApiException('Invalid verdict submission response');
   }
 
   static const List<EvidenceModel> _fallbackEvidence = [
@@ -136,6 +111,7 @@ class InvestigationRemoteDataSource {
         'Event ID': '20001',
         'User': 'SYSTEM / Administrator',
         'Computer': 'FINANCE-PC01',
+        'SHA-256': '44d88612fea8a8f36de82e1278abb02f',
       },
       isReviewed: true,
       timestamp: '2026-04-24 14:02 UTC',

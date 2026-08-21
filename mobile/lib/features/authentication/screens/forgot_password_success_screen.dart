@@ -61,7 +61,9 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
                             height: 68,
                             decoration: BoxDecoration(
                               color: successColor.withValues(alpha: 0.15),
-                              borderRadius: BorderRadius.circular(AppRadius.large),
+                              borderRadius: BorderRadius.circular(
+                                AppRadius.large,
+                              ),
                               border: Border.all(
                                 color: successColor.withValues(alpha: 0.5),
                               ),
@@ -79,7 +81,10 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
 
                       // Telemetry Badge
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 10,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: successColor.withValues(alpha: 0.12),
                           borderRadius: AppRadius.borderRadiusSm,
@@ -90,7 +95,11 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.check_circle_outline, size: 12, color: successColor),
+                            Icon(
+                              Icons.check_circle_outline,
+                              size: 12,
+                              color: successColor,
+                            ),
                             const SizedBox(width: 6),
                             Text(
                               'VERIFICATION COMPLETE · UPLINK SECURED',
@@ -110,39 +119,48 @@ class ForgotPasswordSuccessScreen extends StatelessWidget {
 
                       // Title
                       Text(
-                        'RESET TOKEN DISPATCHED',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontSize: 20,
-                          fontWeight: FontWeight.w800,
-                          fontFamily: 'monospace',
-                          letterSpacing: 0.5,
-                        ),
-                      ).animate().fadeIn(duration: 400.ms, delay: 150.ms).slideY(begin: 0.08, end: 0),
+                            'RESET TOKEN DISPATCHED',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: theme.colorScheme.onSurface,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'monospace',
+                              letterSpacing: 0.5,
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 400.ms, delay: 150.ms)
+                          .slideY(begin: 0.08, end: 0),
 
                       const SizedBox(height: AppSpacing.sm),
 
                       // Description
                       Text(
-                        'If an active agent account exists for the specified email address, password reset instructions have been dispatched.',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: foren.textDisabled,
-                          fontSize: 13,
-                          height: 1.5,
-                        ),
-                      ).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.08, end: 0),
+                            'If an active agent account exists for the specified email address, password reset instructions have been dispatched.',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: foren.textDisabled,
+                              fontSize: 13,
+                              height: 1.5,
+                            ),
+                          )
+                          .animate()
+                          .fadeIn(duration: 400.ms, delay: 200.ms)
+                          .slideY(begin: 0.08, end: 0),
 
                       const SizedBox(height: AppSpacing.xxl),
 
                       // Primary Button
                       AuthButton(
-                        label: 'RETURN TO AUTHENTICATION',
-                        onPressed: () {
-                          context.go(RouteConstants.login);
-                        },
-                      ).animate().fadeIn(duration: 400.ms, delay: 250.ms).slideY(begin: 0.08, end: 0),
+                            label: 'RETURN TO AUTHENTICATION',
+                            onPressed: () {
+                              context.go(RouteConstants.login);
+                            },
+                          )
+                          .animate()
+                          .fadeIn(duration: 400.ms, delay: 250.ms)
+                          .slideY(begin: 0.08, end: 0),
                     ],
                   ),
                 ),

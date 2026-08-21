@@ -1,8 +1,9 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/datasources/simulation_mock_data.dart';
 import '../domain/entities/simulation_scenario.dart';
 import '../domain/entities/terminal_line.dart';
+import '../providers/simulation_provider.dart';
+import '../data/datasources/simulation_mock_data.dart';
 
 class SimulationRunnerState {
   final SimulationScenario? scenario;
@@ -44,16 +45,32 @@ class SimulationRunnerState {
 
 class SimulationRunnerNotifier extends StateNotifier<SimulationRunnerState> {
   Timer? _timer;
+  final Ref _ref;
+  final String _scenarioId;
 
-  SimulationRunnerNotifier() : super(const SimulationRunnerState());
+  SimulationRunnerNotifier(this._ref, this._scenarioId)
+    : super(const SimulationRunnerState()) {
+    _initScenario();
+  }
 
-  void initScenario(String scenarioId) {
+  Future<void> _initScenario() async {
     _timer?.cancel();
 
-    final foundScenario = SimulationMockData.scenarios.firstWhere(
-      (s) => s.id == scenarioId,
-      orElse: () => SimulationMockData.scenarios.first,
-    );
+    SimulationScenario? foundScenario;
+
+    // Fetch from provider to get the real DB scenario
+    final scenariosAsync = _ref.read(simulationScenariosProvider);
+    if (scenariosAsync.hasValue && scenariosAsync.value != null) {
+      foundScenario = scenariosAsync.value!.firstWhere(
+        (s) => s.id == _scenarioId,
+        orElse: () => SimulationMockData.scenarios.first,
+      );
+    } else {
+      foundScenario = SimulationMockData.scenarios.firstWhere(
+        (s) => s.id == _scenarioId,
+        orElse: () => SimulationMockData.scenarios.first,
+      );
+    }
 
     final initialLines = foundScenario.initialTerminalHistory
         .map(
@@ -70,7 +87,7 @@ class SimulationRunnerNotifier extends StateNotifier<SimulationRunnerState> {
       terminalLines: initialLines,
       objectives: foundScenario.objectives,
       secondsElapsed: 0,
-      isCompleted: false,
+      isCompleted: foundScenario.isCompleted,
     );
 
     _startTimer();
@@ -177,6 +194,22 @@ Jul 26 13:58:05 BASTION-01 sshd[1289]: Failed password for root from 198.51.100.
       objectives: updatedObjectives,
       isCompleted: allDone,
     );
+
+    if (allDone && !state.scenario!.isCompleted) {
+      _notifyBackendCompletion();
+    }
+  }
+
+  Future<void> _notifyBackendCompletion() async {
+    try {
+      await _ref
+          .read(simulationRepositoryProvider)
+          .completeScenario(_scenarioId);
+      // Refresh scenarios list to update XP and completion checkmarks globally
+      _ref.invalidate(simulationScenariosProvider);
+    } catch (e) {
+      // Error handling can be added if needed
+    }
   }
 
   void completeLabManually() {
@@ -186,6 +219,9 @@ Jul 26 13:58:05 BASTION-01 sshd[1289]: Failed password for root from 198.51.100.
           .toList(),
       isCompleted: true,
     );
+    if (!state.scenario!.isCompleted) {
+      _notifyBackendCompletion();
+    }
   }
 
   @override
@@ -201,7 +237,5 @@ final simulationRunnerProvider =
       SimulationRunnerState,
       String
     >((ref, scenarioId) {
-      final notifier = SimulationRunnerNotifier();
-      notifier.initScenario(scenarioId);
-      return notifier;
+      return SimulationRunnerNotifier(ref, scenarioId);
     });

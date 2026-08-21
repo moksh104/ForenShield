@@ -8,8 +8,11 @@ import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
 import '../../../../core/components/foren_navigation.dart';
 import '../providers/mission_control_provider.dart';
+import '../../providers/cisa_kev_provider.dart';
 import '../../domain/entities/mission_control_entity.dart';
 import '../widgets/dashboard_header.dart';
+import '../widgets/kev_threat_card.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 /// Mission Control Home Screen matching exact white-theme design spec.
 class MissionControlScreen extends ConsumerStatefulWidget {
@@ -148,728 +151,671 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
     final colorScheme = theme.colorScheme;
+    final entity = data as MissionControlEntity;
 
     return ListView(
       physics: const AlwaysScrollableScrollPhysics(
         parent: BouncingScrollPhysics(),
       ),
       padding: EdgeInsets.zero,
-      children: [
-        // ── 1. Header (Logo left, Search + Notif right) ──
-        DashboardHeader(
-          userName: data.userName,
-          avatarUrl: data.userAvatarUrl,
-          rankTitle: data.rankTitle,
-          unreadNotifications: data.notifications
-              .where((DashboardNotification n) => n.isUnread)
-              .length,
-          onNotificationTap: () => context.push(RouteConstants.notifications),
-          onSearchTap: () {},
-          onProfileTap: () => context.push(RouteConstants.profile),
-        ),
-
-        const SizedBox(height: AppSpacing.md),
-
-        // ── 2. Hero Banner Card ──
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.lg),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: AppRadius.borderRadiusLg,
-              border: Border.all(
-                color: foren.borderSubtle,
-              ),
-              boxShadow: theme.brightness == Brightness.dark
-                  ? []
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.03),
-                        blurRadius: 10,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-            ),
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: [
-                // Left Text + Button Column
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      RichText(
-                        text: TextSpan(
-                          style: theme.textTheme.titleMedium?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontSize: 18,
-                            fontWeight: FontWeight.w800,
-                            fontFamily: 'Outfit',
-                            height: 1.25,
-                          ),
-                          children: [
-                            const TextSpan(
-                              text:
-                                  'Build skills.\nInvestigate threats.\nDefend the ',
-                            ),
-                            TextSpan(
-                              text: 'digital world.',
-                              style: TextStyle(color: colorScheme.primary),
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Container(
-                        width: 32,
-                        height: 2.5,
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary,
-                          borderRadius: BorderRadius.circular(2),
-                        ),
-                      ),
-                      const SizedBox(height: 10),
-                      Text(
-                        'Your journey to becoming a\ncyber defender starts here.',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: foren.textSecondary,
-                          fontSize: 12,
-                          height: 1.35,
-                        ),
-                      ),
-                      const SizedBox(height: 14),
-                      ElevatedButton(
-                        onPressed: () => context.push(RouteConstants.academy),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: colorScheme.primary,
-                          foregroundColor: colorScheme.onPrimary,
-                          elevation: 0,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 16,
-                            vertical: 10,
-                          ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: AppRadius.borderRadiusMd,
-                          ),
-                        ),
-                        child: const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Text(
-                              'Continue Learning',
-                              style: TextStyle(
-                                fontSize: 13,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                            SizedBox(width: 6),
-                            Icon(Icons.arrow_forward, size: 16),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
+      children:
+          [
+                // ── 1. Header ──
+                DashboardHeader(
+                  userName: entity.userName,
+                  avatarUrl: entity.userAvatarUrl,
+                  rankTitle: entity.rankTitle,
+                  unreadNotifications: entity.notifications
+                      .where((n) => n.isUnread)
+                      .length,
+                  onNotificationTap: () =>
+                      context.push(RouteConstants.notifications),
+                  onSearchTap: () {},
+                  onProfileTap: () => context.push(RouteConstants.profile),
                 ),
+                const SizedBox(height: AppSpacing.md),
 
-                const SizedBox(width: AppSpacing.sm),
-
-                // Right Vector Illustration
-                SizedBox(
-                  width: 140,
-                  height: 130,
-                  child: CustomPaint(
-                    painter: _WelcomeIllustrationPainter(
-                      primaryColor: colorScheme.primary,
-                      isDark: theme.brightness == Brightness.dark,
+                // ── 2. Hero Banner (User Identity + Operational State) ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: AppRadius.borderRadiusLg,
+                      border: Border.all(color: foren.borderSubtle),
+                      boxShadow: theme.brightness == Brightness.dark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.03),
+                                blurRadius: 10,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                    ),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Welcome back, ',
+                                style: theme.textTheme.titleMedium?.copyWith(
+                                  color: colorScheme.onSurface,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  fontFamily: 'Outfit',
+                                  height: 1.25,
+                                ),
+                              ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Container(
+                                width: 32,
+                                height: 2.5,
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(2),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Text(
+                                'Rank:  • Level \\nXP:  / ',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: foren.textSecondary,
+                                  fontSize: 12,
+                                  height: 1.35,
+                                ),
+                              ),
+                              const SizedBox(height: 14),
+                              ElevatedButton(
+                                onPressed: () =>
+                                    context.push(RouteConstants.academy),
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: colorScheme.primary,
+                                  foregroundColor: colorScheme.onPrimary,
+                                  elevation: 0,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 10,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: AppRadius.borderRadiusMd,
+                                  ),
+                                ),
+                                child: const Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Text(
+                                      'Continue Learning',
+                                      style: TextStyle(
+                                        fontSize: 13,
+                                        fontWeight: FontWeight.w700,
+                                      ),
+                                    ),
+                                    SizedBox(width: 6),
+                                    Icon(Icons.arrow_forward, size: 16),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        SizedBox(
+                          width: 140,
+                          height: 130,
+                          child: CustomPaint(
+                            painter: _WelcomeIllustrationPainter(
+                              primaryColor: colorScheme.primary,
+                              isDark: theme.brightness == Brightness.dark,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-              ],
-            ),
-          ),
-        ),
+                const SizedBox(height: AppSpacing.xl),
 
-        const SizedBox(height: AppSpacing.lg),
+                // ── 3. Threat / Case Summary ──
+                _buildKevSection(context),
+                const SizedBox(height: AppSpacing.xl),
 
-        // ── 3. Learning Progress Card ──
+                // ── 4. Progress / XP ──
+                Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: colorScheme.surface,
+                      borderRadius: AppRadius.borderRadiusLg,
+                      border: Border.all(color: foren.borderSubtle),
+                      boxShadow: theme.brightness == Brightness.dark
+                          ? []
+                          : [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.02),
+                                blurRadius: 8,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Learning Progress',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.sm),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 58,
+                              height: 58,
+                              child: Stack(
+                                alignment: Alignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 58,
+                                    height: 58,
+                                    child: CircularProgressIndicator(
+                                      value: entity.courseCompletionPercentage,
+                                      strokeWidth: 5.5,
+                                      backgroundColor: foren.surfaceRaised1,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                  Text(
+                                    '%',
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      color: colorScheme.onSurface,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w800,
+                                      fontFamily: 'Outfit',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 14),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    entity.currentCourseTitle.isNotEmpty
+                                        ? entity.currentCourseTitle
+                                        : 'No active course',
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      color: colorScheme.primary,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    entity.currentModuleTitle.isNotEmpty
+                                        ? entity.currentModuleTitle
+                                        : 'Start learning today.',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: foren.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 6),
+                                  ClipRRect(
+                                    borderRadius: BorderRadius.circular(3),
+                                    child: LinearProgressIndicator(
+                                      value: entity.courseCompletionPercentage,
+                                      minHeight: 4,
+                                      backgroundColor: foren.surfaceRaised1,
+                                      valueColor: AlwaysStoppedAnimation<Color>(
+                                        colorScheme.primary,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            GestureDetector(
+                              onTap: () =>
+                                  context.push(RouteConstants.profileStats),
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 10,
+                                  vertical: 12,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: colorScheme.primary.withValues(
+                                    alpha: 0.05,
+                                  ),
+                                  borderRadius: AppRadius.borderRadiusMd,
+                                  border: Border.all(
+                                    color: colorScheme.primary.withValues(
+                                      alpha: 0.15,
+                                    ),
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(
+                                      Icons.bar_chart_rounded,
+                                      size: 20,
+                                      color: colorScheme.primary,
+                                    ),
+                                    const SizedBox(height: AppSpacing.xs),
+                                    Text(
+                                      'Stats',
+                                      style: theme.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: colorScheme.primary,
+                                            fontSize: 10.5,
+                                            fontWeight: FontWeight.w700,
+                                          ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(height: AppSpacing.xl),
+
+                // ── 5. Active Work / Investigations ──
+                if (entity.activeCaseTitle.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Text(
+                      'Active Investigation',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Outfit',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: GestureDetector(
+                      onTap: () => context.push(RouteConstants.investigation),
+                      child: Container(
+                        padding: const EdgeInsets.all(AppSpacing.md),
+                        decoration: BoxDecoration(
+                          color: colorScheme.surface,
+                          borderRadius: AppRadius.borderRadiusLg,
+                          border: Border.all(color: foren.borderSubtle),
+                          boxShadow: theme.brightness == Brightness.dark
+                              ? []
+                              : [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.03),
+                                    blurRadius: 10,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                        ),
+                        child: Row(
+                          children: [
+                            Container(
+                              width: 48,
+                              height: 48,
+                              decoration: BoxDecoration(
+                                color: foren.warning.t500.withValues(
+                                  alpha: 0.1,
+                                ),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.search_rounded,
+                                color: foren.warning.t500,
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    entity.activeCaseTitle,
+                                    style: theme.textTheme.titleSmall?.copyWith(
+                                      color: colorScheme.onSurface,
+                                      fontSize: 14,
+                                      fontWeight: FontWeight.w700,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    ' •  evidence collected',
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: foren.textSecondary,
+                                      fontSize: 11,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.chevron_right_rounded,
+                              color: foren.textSecondary,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                ],
+
+                // ── 6. Recent Activity Section ──
+                if (entity.recentActivities.isNotEmpty) ...[
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Text(
+                      'Recent Activity',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        color: colorScheme.onSurface,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Outfit',
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.lg,
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        color: colorScheme.surface,
+                        borderRadius: AppRadius.borderRadiusLg,
+                        border: Border.all(color: foren.borderSubtle),
+                      ),
+                      child: Column(
+                        children: entity.recentActivities.take(3).map((
+                          activity,
+                        ) {
+                          final isLast =
+                              activity == entity.recentActivities.take(3).last;
+                          return Column(
+                            children: [
+                              _buildActivityRow(
+                                context,
+                                title: activity.title,
+                                subtitle: activity.subtitle,
+                                time: activity.timestamp,
+                                icon: Icons
+                                    .history, // Should ideally map activity.iconName
+                                iconBg: colorScheme.primary.withValues(
+                                  alpha: 0.1,
+                                ),
+                                iconColor: colorScheme.primary,
+                              ),
+                              if (!isLast)
+                                Divider(
+                                  height: 1,
+                                  thickness: 1,
+                                  color: foren.borderSubtle,
+                                ),
+                            ],
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xxl),
+                ],
+              ]
+              .animate(interval: 50.ms)
+              .fade(duration: 400.ms, curve: Curves.easeOutCubic)
+              .slideY(
+                begin: 0.05,
+                end: 0,
+                duration: 400.ms,
+                curve: Curves.easeOutCubic,
+              ),
+    );
+  }
+
+  // ── CISA KEV Section ─────────────────────────────────────────────────────
+
+  Widget _buildKevSection(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
+    final cs = theme.colorScheme;
+    final kevState = ref.watch(cisaKevProvider);
+    final kevNotifier = ref.read(cisaKevProvider.notifier);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        // Section header
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Container(
-            padding: const EdgeInsets.all(AppSpacing.md),
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: AppRadius.borderRadiusLg,
-              border: Border.all(
-                color: foren.borderSubtle,
+          child: Row(
+            children: [
+              Container(
+                width: 8,
+                height: 8,
+                decoration: BoxDecoration(
+                  color: foren.critical.t500,
+                  shape: BoxShape.circle,
+                ),
               ),
-              boxShadow: theme.brightness == Brightness.dark
-                  ? []
-                  : [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.02),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Learning Progress',
+              const SizedBox(width: 6),
+              Expanded(
+                child: Text(
+                  'Live Threat Intelligence',
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: colorScheme.onSurface,
-                    fontSize: 15,
+                    color: cs.onSurface,
+                    fontSize: 16,
                     fontWeight: FontWeight.w700,
                     fontFamily: 'Outfit',
                   ),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Row(
-                  children: [
-                    // Circular Ring (42%)
-                    SizedBox(
-                      width: 58,
-                      height: 58,
-                      child: Stack(
-                        alignment: Alignment.center,
-                        children: [
-                          SizedBox(
-                            width: 58,
-                            height: 58,
-                            child: CircularProgressIndicator(
-                              value: 0.42,
-                              strokeWidth: 5.5,
-                              backgroundColor: foren.surfaceRaised1,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                          Text(
-                            '42%',
-                            style: theme.textTheme.titleSmall?.copyWith(
-                              color: colorScheme.onSurface,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w800,
-                              fontFamily: 'Outfit',
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 14),
-
-                    // Center Details Column
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            'Intermediate',
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colorScheme.primary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                          const SizedBox(height: 2),
-                          Text(
-                            'Keep going! You\'re doing great.',
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: foren.textSecondary,
-                              fontSize: 11,
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(3),
-                            child: LinearProgressIndicator(
-                              value: 0.42,
-                              minHeight: 4,
-                              backgroundColor: foren.surfaceRaised1,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                colorScheme.primary,
-                              ),
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          RichText(
-                            text: TextSpan(
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: foren.textSecondary,
-                                fontSize: 11,
-                              ),
-                              children: [
-                                TextSpan(
-                                  text: '24 / 57 ',
-                                  style: TextStyle(
-                                    color: colorScheme.onSurface,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const TextSpan(text: 'modules completed'),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(width: 10),
-
-                    // View Stats Button Right
-                    GestureDetector(
-                      onTap: () => context.push(RouteConstants.profileStats),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 10,
-                          vertical: 12,
-                        ),
-                        decoration: BoxDecoration(
-                          color: colorScheme.primary.withValues(alpha: 0.05),
-                          borderRadius: AppRadius.borderRadiusMd,
-                          border: Border.all(
-                            color: colorScheme.primary.withValues(alpha: 0.15),
-                          ),
-                        ),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.bar_chart_rounded,
-                              size: 20,
-                              color: colorScheme.primary,
-                            ),
-                            const SizedBox(height: AppSpacing.xs),
-                            Text(
-                              'View Stats',
-                              style: theme.textTheme.labelSmall?.copyWith(
-                                color: colorScheme.primary,
-                                fontSize: 10.5,
-                                fontWeight: FontWeight.w700,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ],
+              ),
+              // Subtitle badge
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+                decoration: BoxDecoration(
+                  color: foren.critical.t500.withValues(alpha: 0.10),
+                  borderRadius: BorderRadius.circular(6),
                 ),
-              ],
+                child: Text(
+                  'CISA KEV',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: foren.critical.t500,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 10,
+                    letterSpacing: 0.5,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+          child: Text(
+            'Known exploited vulnerabilities from the official CISA catalog',
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: foren.textSecondary,
+              fontSize: 11,
             ),
           ),
         ),
 
-        const SizedBox(height: AppSpacing.xl),
-
-        // ── 4. Quick Access Section ──
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Quick Access',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Outfit',
-                ),
-              ),
-              GestureDetector(
-                onTap: () => context.push(RouteConstants.academy),
-                child: Text(
-                  'View all',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.primary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
         const SizedBox(height: AppSpacing.sm),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Row(
-            children: [
-              Expanded(
-                child: _buildQuickAccessCard(
-                  context,
-                  title: 'Learning Paths',
-                  subtitle: 'Explore curated cybersecurity courses',
-                  icon: Icons.menu_book_outlined,
-                  onTap: () => context.push(RouteConstants.academy),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _buildQuickAccessCard(
-                  context,
-                  title: 'Hands-on Labs',
-                  subtitle: 'Practice with real tools in a safe environment',
-                  icon: Icons.science_outlined,
-                  onTap: () => context.push(RouteConstants.simulation),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _buildQuickAccessCard(
-                  context,
-                  title: 'Investigations',
-                  subtitle: 'Solve real-world cases and collect evidence',
-                  icon: Icons.search_rounded,
-                  onTap: () => context.push(RouteConstants.investigation),
-                ),
-              ),
-              const SizedBox(width: AppSpacing.sm),
-              Expanded(
-                child: _buildQuickAccessCard(
-                  context,
-                  title: 'Challenges',
-                  subtitle: 'Test your skills and earn badges',
-                  icon: Icons.emoji_events_outlined,
-                  onTap: () => context.push(RouteConstants.achievementsWall),
-                ),
-              ),
-            ],
-          ),
-        ),
 
-        const SizedBox(height: AppSpacing.xl),
-
-        // ── 5. Continue Learning Section ──
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Continue Learning',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  color: colorScheme.onSurface,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Outfit',
-                ),
-              ),
-              GestureDetector(
-                onTap: () => context.push(RouteConstants.academy),
-                child: Text(
-                  'View all',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: colorScheme.primary,
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-            ],
+        // ── Content by status ───────────────────────────────────────────
+        switch (kevState.status) {
+          CisaKevStatus.initial || CisaKevStatus.loading => const Padding(
+            padding: EdgeInsets.symmetric(
+              horizontal: AppSpacing.lg,
+              vertical: AppSpacing.md,
+            ),
+            child: Center(child: CircularProgressIndicator(strokeWidth: 2.5)),
           ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: GestureDetector(
-            onTap: () => context.push(RouteConstants.academy),
+
+          CisaKevStatus.error when !kevState.hasData => Padding(
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Container(
               padding: const EdgeInsets.all(AppSpacing.md),
               decoration: BoxDecoration(
-                color: colorScheme.surface,
+                color: cs.surface,
                 borderRadius: AppRadius.borderRadiusLg,
-                border: Border.all(
-                  color: foren.borderSubtle,
-                ),
-                boxShadow: theme.brightness == Brightness.dark
-                    ? []
-                    : [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.03),
-                          blurRadius: 10,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
+                border: Border.all(color: foren.borderSubtle),
               ),
               child: Row(
                 children: [
-                  // Dark Thumbnail
-                  Container(
-                    width: 86,
-                    height: 80,
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF0F172A),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: Stack(
-                      alignment: Alignment.center,
-                      children: [
-                        CustomPaint(
-                          size: const Size(86, 80),
-                          painter: _ThumbnailPainter(),
-                        ),
-                        Icon(
-                          Icons.fingerprint,
-                          size: 32,
-                          color: colorScheme.primary.withValues(alpha: 0.8),
-                        ),
-                        Positioned(
-                          bottom: 8,
-                          left: 8,
-                          child: Icon(
-                            Icons.search,
-                            size: 18,
-                            color: colorScheme.onPrimary.withValues(alpha: 0.7),
-                          ),
-                        ),
-                      ],
-                    ),
+                  Icon(
+                    Icons.wifi_off_rounded,
+                    color: foren.textDisabled,
+                    size: 22,
                   ),
                   const SizedBox(width: AppSpacing.md),
-                  // Content
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Pill
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 3,
-                          ),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary.withValues(alpha: 0.08),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
-                          child: Text(
-                            'Learning Path',
-                            style: theme.textTheme.labelSmall?.copyWith(
-                              color: colorScheme.primary,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w700,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
                         Text(
-                          data.currentCourseTitle.isNotEmpty
-                              ? data.currentCourseTitle
-                              : 'Digital Forensics Fundamentals',
+                          'No live threat data available.',
                           style: theme.textTheme.titleSmall?.copyWith(
-                            color: colorScheme.onSurface,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w700,
-                            fontFamily: 'Outfit',
+                            color: cs.onSurface,
+                            fontWeight: FontWeight.w600,
+                            fontSize: 13,
                           ),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
                         ),
-                        const SizedBox(height: AppSpacing.xs),
+                        const SizedBox(height: 2),
                         Text(
-                          'Understand the core concepts of digital forensics and evidence handling.',
+                          kevState.errorMessage ??
+                              'Unable to load live threat intelligence.',
                           style: theme.textTheme.bodySmall?.copyWith(
                             color: foren.textSecondary,
                             fontSize: 11,
-                            height: 1.25,
                           ),
-                          maxLines: 2,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                        const SizedBox(height: AppSpacing.sm),
-                        // Progress Bar
-                        ClipRRect(
-                          borderRadius: BorderRadius.circular(3),
-                          child: LinearProgressIndicator(
-                            value: 0.60,
-                            minHeight: 4,
-                            backgroundColor: foren.surfaceRaised1,
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                              colorScheme.primary,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 6),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              '60% complete',
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: foren.textSecondary,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(
-                                  'Continue',
-                                  style: theme.textTheme.labelMedium?.copyWith(
-                                    color: colorScheme.primary,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                                const SizedBox(width: AppSpacing.xs),
-                                Icon(
-                                  Icons.arrow_forward_rounded,
-                                  size: 14,
-                                  color: colorScheme.primary,
-                                ),
-                              ],
-                            ),
-                          ],
                         ),
                       ],
                     ),
                   ),
-                ],
-              ),
-            ),
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.xl),
-
-        // ── 6. Recent Activity Section ──
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Text(
-            'Recent Activity',
-            style: theme.textTheme.titleMedium?.copyWith(
-              color: colorScheme.onSurface,
-              fontSize: 16,
-              fontWeight: FontWeight.w700,
-              fontFamily: 'Outfit',
-            ),
-          ),
-        ),
-        const SizedBox(height: AppSpacing.sm),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-          child: Container(
-            decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: AppRadius.borderRadiusLg,
-              border: Border.all(
-                color: foren.borderSubtle,
-              ),
-            ),
-            child: Column(
-              children: [
-                _buildActivityRow(
-                  context,
-                  title: 'Analyzed USB Forensics Lab',
-                  subtitle: 'You completed the lab',
-                  time: '2h ago',
-                  icon: Icons.science_outlined,
-                  iconBg: const Color(0xFFEFF6FF),
-                  iconColor: colorScheme.primary,
-                  onTap: () => context.push(RouteConstants.simulation),
-                ),
-                Divider(
-                  height: 1,
-                  thickness: 1,
-                  color: foren.borderSubtle,
-                ),
-                _buildActivityRow(
-                  context,
-                  title: 'Phishing Investigation Case #03',
-                  subtitle: 'Case completed',
-                  time: '1d ago',
-                  icon: Icons.check_circle_rounded,
-                  iconBg: const Color(0xFFF0FDF4),
-                  iconColor: const Color(0xFF16A34A),
-                  onTap: () => context.push(RouteConstants.investigation),
-                ),
-              ],
-            ),
-          ),
-        ),
-
-        const SizedBox(height: AppSpacing.xxl),
-      ],
-    );
-  }
-
-  // ── Quick Access Card Builder ──
-  Widget _buildQuickAccessCard(
-    BuildContext context, {
-    required String title,
-    required String subtitle,
-    required IconData icon,
-    required VoidCallback onTap,
-  }) {
-    final theme = Theme.of(context);
-    final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
-    final colorScheme = theme.colorScheme;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 12),
-        height: 120,
-        decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: AppRadius.borderRadiusLg,
-          border: Border.all(
-            color: foren.borderSubtle,
-          ),
-          boxShadow: theme.brightness == Brightness.dark
-              ? []
-              : [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.02),
-                    blurRadius: 6,
-                    offset: const Offset(0, 2),
+                  IconButton(
+                    onPressed: () => kevNotifier.refresh(),
+                    icon: Icon(
+                      Icons.refresh_rounded,
+                      color: cs.primary,
+                      size: 20,
+                    ),
+                    tooltip: 'Retry',
                   ),
                 ],
-        ),
-        child: Column(
-          children: [
-            Container(
-              width: 38,
-              height: 38,
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withValues(alpha: 0.08),
-                shape: BoxShape.circle,
               ),
-              child: Center(child: Icon(icon, size: 20, color: colorScheme.primary)),
             ),
-            const SizedBox(height: AppSpacing.sm),
-            Text(
-              title,
-              style: theme.textTheme.titleSmall?.copyWith(
-                color: colorScheme.onSurface,
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                fontFamily: 'Outfit',
+          ),
+
+          // Success or refreshing (with or without stale-cache error banner)
+          _ => Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Stale cache / error banner (shown only when has data + error)
+              if (kevState.status == CisaKevStatus.error && kevState.hasData)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.lg,
+                    0,
+                    AppSpacing.lg,
+                    AppSpacing.sm,
+                  ),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: foren.warning.t500.withValues(alpha: 0.08),
+                      borderRadius: AppRadius.borderRadiusMd,
+                      border: Border.all(
+                        color: foren.warning.t500.withValues(alpha: 0.25),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Icon(
+                          Icons.warning_amber_rounded,
+                          size: 14,
+                          color: foren.warning.t500,
+                        ),
+                        const SizedBox(width: 6),
+                        Expanded(
+                          child: Text(
+                            kevState.errorMessage ??
+                                'Unable to load live threat intelligence. Showing cached data.',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: foren.warning.t500,
+                              fontSize: 10.5,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+
+              // Horizontal scrolling KEV cards
+              SizedBox(
+                height: 210,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.lg,
+                  ),
+                  itemCount: kevState.entries.length,
+                  separatorBuilder: (context, _) =>
+                      const SizedBox(width: AppSpacing.sm),
+                  itemBuilder: (context, index) {
+                    return KevThreatCard(entry: kevState.entries[index]);
+                  },
+                ),
               ),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 3),
-            Text(
-              subtitle,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: foren.textSecondary, 
-                fontSize: 9, 
-                height: 1.2
-              ),
-              textAlign: TextAlign.center,
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
-      ),
+            ],
+          ),
+        },
+      ],
     );
   }
 
@@ -887,7 +833,9 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
     final theme = Theme.of(context);
     final foren = theme.extension<ForenColors>() ?? ForenColors.dark;
     final colorScheme = theme.colorScheme;
-    final effectiveIconBg = theme.brightness == Brightness.dark ? iconColor.withValues(alpha: 0.15) : iconBg;
+    final effectiveIconBg = theme.brightness == Brightness.dark
+        ? iconColor.withValues(alpha: 0.15)
+        : iconBg;
 
     return InkWell(
       onTap: onTap,
@@ -924,16 +872,26 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                   Text(
                     subtitle,
                     style: theme.textTheme.bodySmall?.copyWith(
-                      color: foren.textSecondary, 
-                      fontSize: 11
+                      color: foren.textSecondary,
+                      fontSize: 11,
                     ),
                   ),
                 ],
               ),
             ),
-            Text(time, style: theme.textTheme.bodySmall?.copyWith(color: foren.textSecondary, fontSize: 11)),
+            Text(
+              time,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: foren.textSecondary,
+                fontSize: 11,
+              ),
+            ),
             const SizedBox(width: AppSpacing.xs),
-            Icon(Icons.chevron_right_rounded, size: 16, color: foren.textSecondary),
+            Icon(
+              Icons.chevron_right_rounded,
+              size: 16,
+              color: foren.textSecondary,
+            ),
           ],
         ),
       ),
@@ -1045,29 +1003,6 @@ class _WelcomeIllustrationPainter extends CustomPainter {
     // Small Dots
     canvas.drawCircle(const Offset(65, 10), 1.5, subtlePaint);
     canvas.drawCircle(const Offset(120, 12), 1.5, subtlePaint);
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}
-
-// ── Custom Painter for Dark Thumbnail Pattern ──
-class _ThumbnailPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = const Color(0xFF1E293B)
-      ..style = PaintingStyle.stroke
-      ..strokeWidth = 0.5;
-
-    for (var i = 0; i < 6; i++) {
-      final y = size.height * i / 5;
-      canvas.drawLine(Offset(0, y), Offset(size.width, y), paint);
-    }
-    for (var i = 0; i < 6; i++) {
-      final x = size.width * i / 5;
-      canvas.drawLine(Offset(x, 0), Offset(x, size.height), paint);
-    }
   }
 
   @override

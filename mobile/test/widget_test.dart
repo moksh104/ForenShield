@@ -5,6 +5,7 @@ import 'package:forenshield/main.dart';
 import 'package:forenshield/features/splash/presentation/pages/splash_screen.dart';
 import 'package:forenshield/core/storage/storage_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 void main() {
   setUpAll(() async {
@@ -12,6 +13,7 @@ void main() {
     // setMockInitialValues installs the in-memory shim so SharedPreferences
     // (and StorageService which wraps it) can be constructed without crashing.
     SharedPreferences.setMockInitialValues({});
+    FlutterSecureStorage.setMockInitialValues({});
     await StorageService.init();
   });
 
@@ -39,14 +41,7 @@ void main() {
     expect(find.byType(SplashScreen), findsOneWidget);
 
     // Drain all pending timers created by splash animations.
-    // 1. LoadingBar start delay (1500ms)
-    await tester.pump(const Duration(milliseconds: 1600));
-    // 2. LoadingBar AnimationController progress (3000ms)
-    await tester.pump(const Duration(milliseconds: 3100));
-    // 3. Navigation delay after completion (500ms) — splash calls context.go()
-    await tester.pump(const Duration(milliseconds: 600));
-    // 4. Settle frame
-    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pumpAndSettle(const Duration(milliseconds: 100));
 
     // After all timers, the router has navigated away from splash.
     expect(find.byType(SplashScreen), findsNothing);

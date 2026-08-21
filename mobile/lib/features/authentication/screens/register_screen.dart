@@ -70,11 +70,13 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
       _errorMessage = null;
     });
 
-    final result = await ref.read(authStateProvider.notifier).register(
-      _emailController.text.trim(),
-      _passwordController.text,
-      _nameController.text.trim(),
-    );
+    final result = await ref
+        .read(authStateProvider.notifier)
+        .register(
+          _emailController.text.trim(),
+          _passwordController.text,
+          _nameController.text.trim(),
+        );
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -134,37 +136,43 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         // Logo
-                        const AuthLogo(compact: true).animate().fadeIn(duration: 400.ms, delay: 50.ms).slideY(begin: -0.1, end: 0),
+                        const AuthLogo(compact: true)
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 50.ms)
+                            .slideY(begin: -0.1, end: 0),
                         const SizedBox(height: AppSpacing.xl),
 
                         // Title
                         Align(
-                          alignment: Alignment.centerLeft,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'CREATE AGENT PROFILE',
-                                style: TextStyle(
-                                  color: theme.colorScheme.onSurface,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: 'monospace',
-                                  letterSpacing: 0.5,
-                                ),
+                              alignment: Alignment.centerLeft,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    'CREATE AGENT PROFILE',
+                                    style: TextStyle(
+                                      color: theme.colorScheme.onSurface,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w800,
+                                      fontFamily: 'monospace',
+                                      letterSpacing: 0.5,
+                                    ),
+                                  ),
+                                  const SizedBox(height: AppSpacing.xxs),
+                                  Text(
+                                    'Enlist in the enterprise cyber defense network',
+                                    style: TextStyle(
+                                      color: foren.textDisabled,
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.w400,
+                                    ),
+                                  ),
+                                ],
                               ),
-                              const SizedBox(height: AppSpacing.xxs),
-                              Text(
-                                'Enlist in the enterprise cyber defense network',
-                                style: TextStyle(
-                                  color: foren.textDisabled,
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.08, end: 0),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 100.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.lg),
 
                         // Error Banner Transition
@@ -173,13 +181,19 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                           child: _errorMessage != null
                               ? Container(
                                   key: ValueKey(_errorMessage),
-                                  margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                                  margin: const EdgeInsets.only(
+                                    bottom: AppSpacing.md,
+                                  ),
                                   padding: const EdgeInsets.all(AppSpacing.sm),
                                   decoration: BoxDecoration(
-                                    color: foren.critical.t500.withValues(alpha: 0.15),
+                                    color: foren.critical.t500.withValues(
+                                      alpha: 0.15,
+                                    ),
                                     borderRadius: AppRadius.borderRadiusMd,
                                     border: Border.all(
-                                      color: foren.critical.t500.withValues(alpha: 0.5),
+                                      color: foren.critical.t500.withValues(
+                                        alpha: 0.5,
+                                      ),
                                     ),
                                   ),
                                   child: Row(
@@ -208,58 +222,71 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         // Full Name
                         AuthTextField(
-                          controller: _nameController,
-                          label: 'Full Name / Agent Alias',
-                          hintText: 'Agent Alex Mercer',
-                          focusNode: _nameFocus,
-                          keyboardType: TextInputType.name,
-                          textInputAction: TextInputAction.next,
-                          validator: FormValidators.username,
-                          onFieldSubmitted: (_) =>
-                              FocusScope.of(context).requestFocus(_emailFocus),
-                          prefixIcon: const Icon(Icons.person_outline),
-                        ).animate().fadeIn(duration: 400.ms, delay: 140.ms).slideY(begin: 0.08, end: 0),
+                              controller: _nameController,
+                              label: 'Full Name / Agent Alias',
+                              hintText: 'Agent Alex Mercer',
+                              focusNode: _nameFocus,
+                              keyboardType: TextInputType.name,
+                              textInputAction: TextInputAction.next,
+                              validator: FormValidators.username,
+                              onFieldSubmitted: (_) => FocusScope.of(
+                                context,
+                              ).requestFocus(_emailFocus),
+                              prefixIcon: const Icon(Icons.person_outline),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 140.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.md),
 
                         // Email
                         AuthTextField(
-                          controller: _emailController,
-                          label: 'Official Email',
-                          hintText: 'agent@forenshield.com',
-                          focusNode: _emailFocus,
-                          keyboardType: TextInputType.emailAddress,
-                          textInputAction: TextInputAction.next,
-                          validator: FormValidators.email,
-                          onFieldSubmitted: (_) =>
-                              FocusScope.of(context).requestFocus(_passwordFocus),
-                          prefixIcon: const Icon(Icons.email_outlined),
-                        ).animate().fadeIn(duration: 400.ms, delay: 180.ms).slideY(begin: 0.08, end: 0),
+                              controller: _emailController,
+                              label: 'Official Email',
+                              hintText: 'agent@forenshield.com',
+                              focusNode: _emailFocus,
+                              keyboardType: TextInputType.emailAddress,
+                              textInputAction: TextInputAction.next,
+                              validator: FormValidators.email,
+                              onFieldSubmitted: (_) => FocusScope.of(
+                                context,
+                              ).requestFocus(_passwordFocus),
+                              prefixIcon: const Icon(Icons.email_outlined),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 180.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.md),
 
                         // Password
                         AuthTextField(
-                          controller: _passwordController,
-                          label: 'Access Password',
-                          hintText: '••••••••',
-                          focusNode: _passwordFocus,
-                          obscureText: _obscurePassword,
-                          textInputAction: TextInputAction.next,
-                          validator: FormValidators.password,
-                          onFieldSubmitted: (_) => FocusScope.of(context)
-                              .requestFocus(_confirmPasswordFocus),
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                            ),
-                            onPressed: () {
-                              setState(
-                                  () => _obscurePassword = !_obscurePassword);
-                            },
-                          ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 220.ms).slideY(begin: 0.08, end: 0),
+                              controller: _passwordController,
+                              label: 'Access Password',
+                              hintText: '••••••••',
+                              focusNode: _passwordFocus,
+                              obscureText: _obscurePassword,
+                              textInputAction: TextInputAction.next,
+                              validator: FormValidators.password,
+                              onFieldSubmitted: (_) => FocusScope.of(
+                                context,
+                              ).requestFocus(_confirmPasswordFocus),
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscurePassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                onPressed: () {
+                                  setState(
+                                    () => _obscurePassword = !_obscurePassword,
+                                  );
+                                },
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 220.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: 6),
 
                         // Password Strength Bar
@@ -277,8 +304,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                       pwdStrength > 0.7
                                           ? foren.success.t500
                                           : (pwdStrength > 0.4
-                                              ? foren.warning.t500
-                                              : foren.critical.t500),
+                                                ? foren.warning.t500
+                                                : foren.critical.t500),
                                     ),
                                   ),
                                 ),
@@ -292,8 +319,8 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
                                   color: pwdStrength > 0.7
                                       ? foren.success.t500
                                       : (pwdStrength > 0.4
-                                          ? foren.warning.t500
-                                          : foren.critical.t500),
+                                            ? foren.warning.t500
+                                            : foren.critical.t500),
                                   fontSize: 9,
                                   fontWeight: FontWeight.w700,
                                   fontFamily: 'monospace',
@@ -306,38 +333,47 @@ class _RegisterScreenState extends ConsumerState<RegisterScreen> {
 
                         // Confirm Password
                         AuthTextField(
-                          controller: _confirmPasswordController,
-                          label: 'Confirm Password',
-                          hintText: '••••••••',
-                          focusNode: _confirmPasswordFocus,
-                          obscureText: _obscureConfirmPassword,
-                          textInputAction: TextInputAction.done,
-                          validator: (value) => FormValidators.confirmPassword(
-                            value,
-                            _passwordController.text,
-                          ),
-                          onFieldSubmitted: (_) => _handleRegister(),
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _obscureConfirmPassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                            ),
-                            onPressed: () {
-                              setState(() => _obscureConfirmPassword =
-                                  !_obscureConfirmPassword);
-                            },
-                          ),
-                        ).animate().fadeIn(duration: 400.ms, delay: 260.ms).slideY(begin: 0.08, end: 0),
+                              controller: _confirmPasswordController,
+                              label: 'Confirm Password',
+                              hintText: '••••••••',
+                              focusNode: _confirmPasswordFocus,
+                              obscureText: _obscureConfirmPassword,
+                              textInputAction: TextInputAction.done,
+                              validator: (value) =>
+                                  FormValidators.confirmPassword(
+                                    value,
+                                    _passwordController.text,
+                                  ),
+                              onFieldSubmitted: (_) => _handleRegister(),
+                              prefixIcon: const Icon(Icons.lock_outline),
+                              suffixIcon: IconButton(
+                                icon: Icon(
+                                  _obscureConfirmPassword
+                                      ? Icons.visibility_off_outlined
+                                      : Icons.visibility_outlined,
+                                ),
+                                onPressed: () {
+                                  setState(
+                                    () => _obscureConfirmPassword =
+                                        !_obscureConfirmPassword,
+                                  );
+                                },
+                              ),
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 260.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.lg),
 
                         // Register button
                         AuthButton(
-                          label: 'ENLIST & INITIALIZE',
-                          isLoading: _isLoading,
-                          onPressed: _isLoading ? null : _handleRegister,
-                        ).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.08, end: 0),
+                              label: 'ENLIST & INITIALIZE',
+                              isLoading: _isLoading,
+                              onPressed: _isLoading ? null : _handleRegister,
+                            )
+                            .animate()
+                            .fadeIn(duration: 400.ms, delay: 300.ms)
+                            .slideY(begin: 0.08, end: 0),
                         const SizedBox(height: AppSpacing.lg),
 
                         // Already have an account

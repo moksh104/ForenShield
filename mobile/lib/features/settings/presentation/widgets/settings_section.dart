@@ -31,11 +31,7 @@ class SettingsSection extends StatelessWidget {
           child: Row(
             children: [
               if (headerIcon != null) ...[
-                Icon(
-                  headerIcon,
-                  size: 16,
-                  color: theme.colorScheme.primary,
-                ),
+                Icon(headerIcon, size: 16, color: theme.colorScheme.primary),
                 const SizedBox(width: 6),
               ],
               Text(

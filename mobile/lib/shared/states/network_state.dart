@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_radius.dart';
 import '../../core/theme/app_spacing.dart';
+import '../../core/theme/foren_theme.dart';
 
 /// Reusable generic NetworkState widget.
 /// Used for offline internet connection warnings or server unreachable states.
@@ -24,15 +25,20 @@ class NetworkState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final foren = theme.extension<ForenColors>();
+    final cs = theme.colorScheme;
+    final warningColor = foren?.warning.t500 ?? AppColors.warning;
+
     return Center(
       child: Padding(
         padding: AppSpacing.pagePadding,
         child: Container(
           padding: const EdgeInsets.all(AppSpacing.xl),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: cs.surface,
             borderRadius: AppRadius.cardRadius,
-            border: Border.all(color: AppColors.warning.withValues(alpha: 0.4)),
+            border: Border.all(color: warningColor.withValues(alpha: 0.4)),
           ),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -42,16 +48,16 @@ class NetworkState extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 decoration: BoxDecoration(
-                  color: AppColors.warning.withValues(alpha: 0.14),
+                  color: warningColor.withValues(alpha: 0.14),
                   shape: BoxShape.circle,
                 ),
-                child: Icon(icon, size: 48, color: AppColors.warning),
+                child: Icon(icon, size: 48, color: warningColor),
               ),
               const SizedBox(height: AppSpacing.md),
               Text(
                 title,
-                style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                  color: AppColors.textPrimary,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  color: cs.onSurface,
                   fontWeight: FontWeight.bold,
                 ),
                 textAlign: TextAlign.center,
@@ -59,8 +65,8 @@ class NetworkState extends StatelessWidget {
               const SizedBox(height: AppSpacing.xs),
               Text(
                 message,
-                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: AppColors.textSecondary,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: foren?.textSecondary ?? cs.onSurfaceVariant,
                 ),
                 textAlign: TextAlign.center,
               ),
@@ -71,8 +77,9 @@ class NetworkState extends StatelessWidget {
                   icon: const Icon(Icons.wifi_find_rounded, size: 18),
                   label: Text(reconnectLabel),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.warning,
-                    foregroundColor: Colors.black,
+                    backgroundColor: warningColor,
+                    // Dark text on amber/yellow for readability in both modes.
+                    foregroundColor: const Color(0xFF1A1300),
                     padding: AppSpacing.buttonPadding,
                     shape: RoundedRectangleBorder(
                       borderRadius: AppRadius.buttonRadius,

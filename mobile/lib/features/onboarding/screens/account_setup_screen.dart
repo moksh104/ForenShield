@@ -1193,7 +1193,17 @@ class _Step3Customize extends StatelessWidget {
                   ),
                 ),
                 TextButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text(
+                          'Got it! You can change these later in Settings.',
+                        ),
+                        behavior: SnackBarBehavior.floating,
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  },
                   style: TextButton.styleFrom(
                     padding: EdgeInsets.zero,
                     minimumSize: const Size(40, 30),
@@ -1297,25 +1307,10 @@ class _Step4Complete extends StatelessWidget {
                           ],
                         ),
                         child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.shield_rounded,
-                                size: 28,
-                                color: primaryColor,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'FORENSHIELD',
-                                style: TextStyle(
-                                  color: primaryColor,
-                                  fontSize: 8,
-                                  fontWeight: FontWeight.w800,
-                                  letterSpacing: 1,
-                                ),
-                              ),
-                            ],
+                          child: Image.asset(
+                            'assets/logos/app_logo.png',
+                            width: 48,
+                            height: 48,
                           ),
                         ),
                       ),

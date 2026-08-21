@@ -29,7 +29,10 @@ class NotificationModel extends Equatable {
       title: json['title'] ?? '',
       message: json['message'] ?? '',
       type: json['type'] ?? 'alert',
-      isRead: json['is_read'] == true || json['is_read'] == 1 || json['is_read'] == '1',
+      isRead:
+          json['is_read'] == true ||
+          json['is_read'] == 1 ||
+          json['is_read'] == '1',
       createdAt: json['created_at'] != null
           ? DateTime.tryParse(json['created_at'].toString()) ?? DateTime.now()
           : DateTime.now(),
@@ -69,5 +72,13 @@ class NotificationModel extends Equatable {
   }
 
   @override
-  List<Object?> get props => [id, userId, title, message, type, isRead, createdAt];
+  List<Object?> get props => [
+    id,
+    userId,
+    title,
+    message,
+    type,
+    isRead,
+    createdAt,
+  ];
 }

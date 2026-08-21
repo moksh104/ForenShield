@@ -10,7 +10,7 @@ class AuthRemoteDataSource {
   final AuthService _authService;
 
   AuthRemoteDataSource(ApiClient apiClient)
-      : _authService = ApiAuthService(apiClient);
+    : _authService = ApiAuthService(apiClient);
 
   /// Authenticates a user with [email] and [password].
   Future<AuthResponseModel> login({

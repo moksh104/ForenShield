@@ -59,6 +59,38 @@ try {
     // Ignore trigger check failure
 }
 
+require_once __DIR__ . '/rank_service.php';
+
+ensureLeaderboardEntry($db, $userId, $user['full_name']);
+
+$stmtStats = $db->prepare('SELECT * FROM leaderboard_stats WHERE user_id = :user_id');
+$stmtStats->execute(['user_id' => $userId]);
+$stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
+
+$totalXp = (int)($stats['total_xp'] ?? 0);
+$level = getLevelForXp($totalXp);
+$nextLevelXp = $level * 500;
+
+$rankTitle = 'Trainee';
+if ($level >= 5) $rankTitle = 'Senior Analyst';
+elseif ($level == 4) $rankTitle = 'Specialist';
+elseif ($level == 3) $rankTitle = 'Investigator';
+elseif ($level == 2) $rankTitle = 'Analyst';
+
+// Fetch XP history
+$stmtXp = $db->prepare('SELECT id, action as title, source_module as source, xp_earned as xp_amount, created_at as timestamp FROM xp_transactions WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 5');
+$stmtXp->execute(['user_id' => $userId]);
+$xpHistory = $stmtXp->fetchAll(PDO::FETCH_ASSOC) ?: [];
+
+// Fetch achievements
+$stmtAch = $db->prepare('SELECT a.code as id, a.title, a.description, a.icon as icon_name, a.xp_reward, ua.unlocked_at as unlocked_date FROM user_achievements ua JOIN achievements a ON ua.achievement_id = a.id WHERE ua.user_id = :user_id');
+$stmtAch->execute(['user_id' => $userId]);
+$badgesRaw = $stmtAch->fetchAll(PDO::FETCH_ASSOC) ?: [];
+$badges = array_map(function($b) {
+    $b['is_unlocked'] = true;
+    return $b;
+}, $badgesRaw);
+
 $response = [
     'id' => (string)$user['id'],
     'full_name' => $user['full_name'],
@@ -66,48 +98,21 @@ $response = [
     'phone' => $user['phone'] ?? '',
     'role' => 'Forensic Specialist',
     'avatar_url' => $user['avatar_url'] ?? '',
-    'xp_points' => 1450,
-    'rank_title' => 'Analyst II',
+    'xp_points' => $totalXp,
+    'rank_title' => $rankTitle,
     'member_since' => date('M Y', strtotime($user['created_at'])),
     'account_status' => 'Active / Verified',
-    'level' => 5,
-    'next_level_xp' => 2000,
+    'level' => $level,
+    'next_level_xp' => $nextLevelXp,
     'stats' => [
-        'total_learning_hours' => 24.5,
-        'cases_solved' => 12,
-        'courses_completed' => 4,
-        'current_streak_days' => 7,
-        'security_score' => 88
+        'total_learning_hours' => 0.0, // Replace with actual if tracked
+        'cases_solved' => (int)($stats['investigations_completed'] ?? 0),
+        'courses_completed' => (int)($stats['courses_completed'] ?? 0),
+        'current_streak_days' => (int)($stats['current_streak'] ?? 0),
+        'security_score' => 100 // Default or calculate
     ],
-    'badges' => [
-        [
-            'id' => 'b1',
-            'title' => 'First Responder',
-            'description' => 'Completed your first live simulation drill',
-            'icon_name' => 'shield',
-            'unlocked_date' => '2026-06-10',
-            'xp_reward' => 100,
-            'is_unlocked' => true
-        ],
-        [
-            'id' => 'b2',
-            'title' => 'Memory Master',
-            'description' => 'Solved 10 RAM memory forensics cases',
-            'icon_name' => 'psychology',
-            'unlocked_date' => '2026-07-02',
-            'xp_reward' => 300,
-            'is_unlocked' => true
-        ]
-    ],
-    'xp_history' => [
-        [
-            'id' => 'xp1',
-            'title' => 'Completed Lesson: Volatility 3 Analysis',
-            'source' => 'Cyber Academy',
-            'xp_amount' => 50,
-            'timestamp' => '2h ago'
-        ]
-    ]
+    'badges' => $badges,
+    'xp_history' => $xpHistory
 ];
 
 echo json_encode($response);

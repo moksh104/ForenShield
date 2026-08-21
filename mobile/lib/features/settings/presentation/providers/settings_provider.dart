@@ -77,6 +77,81 @@ class SettingsNotifier extends StateNotifier<SettingsModel> {
     state = state.copyWith(analyticsEnabled: val);
   }
 
+  Future<void> toggleCrashReports(bool val) async {
+    await _repository.saveCrashReports(val);
+    state = state.copyWith(crashReports: val);
+  }
+
+  Future<void> toggleUsageStatistics(bool val) async {
+    await _repository.saveUsageStatistics(val);
+    state = state.copyWith(usageStatistics: val);
+  }
+
+  Future<void> togglePersonalizedRecommendations(bool val) async {
+    await _repository.savePersonalizedRecommendations(val);
+    state = state.copyWith(personalizedRecommendations: val);
+  }
+
+  Future<void> toggleDataSharing(bool val) async {
+    await _repository.saveDataSharing(val);
+    state = state.copyWith(dataSharing: val);
+  }
+
+  Future<void> toggleLocationAccess(bool val) async {
+    await _repository.saveLocationAccess(val);
+    state = state.copyWith(locationAccess: val);
+  }
+
+  Future<void> toggleCameraPermission(bool val) async {
+    await _repository.saveCameraPermission(val);
+    state = state.copyWith(cameraPermission: val);
+  }
+
+  Future<void> toggleMicrophonePermission(bool val) async {
+    await _repository.saveMicrophonePermission(val);
+    state = state.copyWith(microphonePermission: val);
+  }
+
+  Future<void> toggleNotificationPermission(bool val) async {
+    await _repository.saveNotificationPermission(val);
+    state = state.copyWith(notificationPermission: val);
+  }
+
+  Future<void> toggleMissionAlerts(bool val) async {
+    await _repository.saveMissionAlerts(val);
+    state = state.copyWith(missionAlerts: val);
+  }
+
+  Future<void> toggleCyberAcademyAlerts(bool val) async {
+    await _repository.saveCyberAcademyAlerts(val);
+    state = state.copyWith(cyberAcademyAlerts: val);
+  }
+
+  Future<void> toggleThreatIntelligenceAlerts(bool val) async {
+    await _repository.saveThreatIntelligenceAlerts(val);
+    state = state.copyWith(threatIntelligenceAlerts: val);
+  }
+
+  Future<void> toggleReportsAlerts(bool val) async {
+    await _repository.saveReportsAlerts(val);
+    state = state.copyWith(reportsAlerts: val);
+  }
+
+  Future<void> toggleAchievementsAlerts(bool val) async {
+    await _repository.saveAchievementsAlerts(val);
+    state = state.copyWith(achievementsAlerts: val);
+  }
+
+  Future<void> toggleSecurityAlerts(bool val) async {
+    await _repository.saveSecurityAlerts(val);
+    state = state.copyWith(securityAlerts: val);
+  }
+
+  Future<void> toggleSystemNotifications(bool val) async {
+    await _repository.saveSystemNotifications(val);
+    state = state.copyWith(systemNotifications: val);
+  }
+
   Future<void> toggleDataCollection(bool val) async {
     await _repository.saveDataCollectionEnabled(val);
     state = state.copyWith(dataCollectionEnabled: val);
@@ -97,15 +172,25 @@ class SettingsNotifier extends StateNotifier<SettingsModel> {
     state = state.copyWith(developerMode: val);
   }
 
-  Future<int> clearCache() async {
+  Future<void> resetSettings() async {
+    await _repository.clearAllSettings();
+    state = const SettingsModel(); // restores default instantiation
+  }
+
+  Future<double> getCacheSize() async {
+    return await _repository.getCacheSize();
+  }
+
+  Future<double> clearCache() async {
     return await _repository.clearAppCache();
   }
 }
 
-final settingsProvider =
-    StateNotifierProvider<SettingsNotifier, SettingsModel>((ref) {
-  return SettingsNotifier();
-});
+final settingsProvider = StateNotifierProvider<SettingsNotifier, SettingsModel>(
+  (ref) {
+    return SettingsNotifier();
+  },
+);
 
 final themeModeProvider = Provider<ThemeMode>((ref) {
   return ref.watch(settingsProvider).themeMode;
