@@ -1,6 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:forenshield/features/simulation/data/models/simulation_action_result_model.dart';
-import 'package:forenshield/features/simulation/domain/entities/investigation_handoff.dart';
 import 'package:forenshield/features/simulation/domain/entities/simulation_attempt.dart';
 import 'package:forenshield/features/simulation/domain/entities/simulation_node.dart';
 import 'package:forenshield/features/simulation/domain/entities/simulation_scenario.dart';
