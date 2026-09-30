@@ -2,11 +2,14 @@
 
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/report_generator.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
 
-// Extract & Validate JWT if header present
+header('Content-Type: application/json');
+
+// 1. Authenticate via JWT (Step 11 & 12)
 $authorization = '';
 $headers = getallheaders();
 if (isset($headers['Authorization'])) {
@@ -15,74 +18,122 @@ if (isset($headers['Authorization'])) {
     $authorization = $headers['authorization'];
 }
 
-if ($authorization && preg_match('/Bearer\s+(\S+)/', $authorization, $matches)) {
-    try {
-        $decoded = JWT::decode($matches[1], new Key(JWT_SECRET, 'HS256'));
-        $userId = $decoded->sub ?? null;
-        if ($userId) {
-            $db = getDb();
-            $check = $db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type = 'report'");
-            $check->execute(['user_id' => $userId]);
-            if ((int)$check->fetchColumn() === 0) {
-                $stmt = $db->prepare("INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id, '📄 Weekly Report Generated', 'NovaCorp Ransomware Intrusion Incident Report #FSC-0091 is finalized.', 'report', FALSE)");
-                $stmt->execute(['user_id' => $userId]);
-            }
+if (!$authorization || !preg_match('/Bearer\s+(\S+)/', $authorization, $matches)) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Unauthorized. Bearer token required.']);
+    exit;
+}
+
+try {
+    $decoded = JWT::decode($matches[1], new Key(JWT_SECRET, 'HS256'));
+    $userId = (int)($decoded->sub ?? 0);
+    if ($userId <= 0) {
+        http_response_code(401);
+        echo json_encode(['error' => 'Invalid JWT subject claim.']);
+        exit;
+    }
+} catch (Exception $e) {
+    http_response_code(401);
+    echo json_encode(['error' => 'Token validation failed: ' . $e->getMessage()]);
+    exit;
+}
+
+$db = getDb();
+$method = $_SERVER['REQUEST_METHOD'];
+
+// Handle GET: List or Single Detail
+if ($method === 'GET') {
+    $reportId = $_GET['id'] ?? null;
+
+    if (!empty($reportId)) {
+        // Single Report Detail (Step 9, 11, 12)
+        $stmt = $db->prepare("SELECT * FROM reports WHERE id = :id");
+        $stmt->execute(['id' => $reportId]);
+        $report = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        if (!$report) {
+            http_response_code(404);
+            echo json_encode(['error' => 'Incident report not found.']);
+            exit;
         }
+
+        // Enforce Server-Side Ownership: User can only access their own reports (Step 12)
+        if ((int)$report['user_id'] !== $userId) {
+            http_response_code(403);
+            echo json_encode(['error' => 'Forbidden. You do not have permission to view this report.']);
+            exit;
+        }
+
+        echo json_encode(ReportGenerator::formatReportRow($report));
+        exit;
+    }
+
+    // List Authenticated User's Reports (Step 8, 11)
+    $category = $_GET['category'] ?? null;
+    $search = $_GET['search'] ?? null;
+
+    $query = "SELECT * FROM reports WHERE user_id = :user_id";
+    $params = ['user_id' => $userId];
+
+    if (!empty($category) && $category !== 'All') {
+        $query .= " AND category = :category";
+        $params['category'] = $category;
+    }
+
+    if (!empty($search)) {
+        $query .= " AND (title ILIKE :search OR case_number ILIKE :search OR summary ILIKE :search)";
+        $params['search'] = "%{$search}%";
+    }
+
+    $query .= " ORDER BY created_at DESC";
+
+    $stmt = $db->prepare($query);
+    $stmt->execute($params);
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    $formatted = array_map(function ($row) {
+        return ReportGenerator::formatReportRow($row);
+    }, $rows);
+
+    echo json_encode($formatted);
+    exit;
+}
+
+// Handle POST: Generate Report for Completed Investigation (Step 5, 11, 13)
+if ($method === 'POST') {
+    $rawInput = file_get_contents('php://input');
+    $data = json_decode($rawInput, true) ?? [];
+    $caseId = $data['case_id'] ?? ($_POST['case_id'] ?? null);
+
+    if (empty($caseId)) {
+        http_response_code(400);
+        echo json_encode(['error' => 'Missing required parameter: case_id']);
+        exit;
+    }
+
+    try {
+        $report = ReportGenerator::generate($userId, $caseId);
+        http_response_code(200);
+        echo json_encode([
+            'success' => true,
+            'message' => 'Incident report generated successfully.',
+            'report' => $report
+        ]);
+        exit;
+    } catch (InvalidArgumentException $e) {
+        http_response_code(404);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
+    } catch (RuntimeException $e) {
+        http_response_code(400);
+        echo json_encode(['error' => $e->getMessage()]);
+        exit;
     } catch (Exception $e) {
-        // Ignore JWT exception on optional check
+        http_response_code(500);
+        echo json_encode(['error' => 'Failed to generate incident report: ' . $e->getMessage()]);
+        exit;
     }
 }
 
-$reports = [
-    [
-        'id' => 'rep_001',
-        'case_number' => '#FSC-0091',
-        'title' => 'NovaCorp Ransomware Intrusion Incident Report',
-        'category' => 'Incidents & Forensics',
-        'severity' => 'Critical',
-        'status' => 'FINALIZED',
-        'generated_at' => '2026-04-24 16:45 UTC',
-        'analyst' => 'Lead Forensic Specialist',
-        'summary' => 'Forensic examination of host FS-HOST-09 confirmed a LockBit 3.0 ransomware beacon initial entry via compromised RDP credentials.',
-        'findings' => [
-            'Initial access vector identified as brute-forced RDP (Port 3389).',
-            'Malicious DLL side-loading observed via legitimate binary.',
-            'C2 communication established to IP 192.0.2.45.'
-        ],
-        'remediation_actions' => [
-            'Isolate host FS-HOST-09 from internal network VLAN.',
-            'Revoke compromised RDP user credentials and enforce 2FA.',
-            'Deploy YARA rules across all domain controllers.'
-        ],
-        'artifacts' => [
-            'memory_dump_fshost09.raw',
-            'security_event_log.evtx',
-            'c2_beacon_trace.pcap'
-        ]
-    ],
-    [
-        'id' => 'rep_002',
-        'case_number' => '#FSC-0084',
-        'title' => 'Finance Sector Spear Phishing Campaign',
-        'category' => 'Threat Intelligence',
-        'severity' => 'High',
-        'status' => 'IN REVIEW',
-        'generated_at' => '2026-04-22 11:20 UTC',
-        'analyst' => 'Senior SOC Analyst',
-        'summary' => 'Targeted spear-phishing emails containing malicious PDF attachments impersonating tax invoices.',
-        'findings' => [
-            'Emails originated from spoofed domain fin-support-update.com.',
-            'Payload attempts credential harvesting via embedded link.'
-        ],
-        'remediation_actions' => [
-            'Block domain fin-support-update.com on perimeter gateway.',
-            'Purge matching email messages from exchange mailboxes.'
-        ],
-        'artifacts' => [
-            'phishing_sample_tax.eml',
-            'credential_harvest_url.txt'
-        ]
-    ]
-];
-
-echo json_encode($reports);
+http_response_code(405);
+echo json_encode(['error' => 'Method not allowed.']);
