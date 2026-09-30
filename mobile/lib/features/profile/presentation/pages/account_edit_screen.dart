@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import '../../../../core/extensions/build_context_extension.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../../../core/validators/form_validators.dart';
 import '../providers/profile_provider.dart';
 
@@ -140,13 +142,7 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
                     Navigator.pop(ctx);
                     await ref.read(profileProvider.notifier).removeAvatar();
                     if (!mounted) return;
-                    ScaffoldMessenger.of(context).clearSnackBars();
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Profile picture removed'),
-                        backgroundColor: foren.info.t500,
-                      ),
-                    );
+                    context.showInfoSnackBar('Profile picture removed.');
                   },
                 ),
             ],
@@ -169,15 +165,7 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
 
       await ref.read(profileProvider.notifier).updateAvatar(image.path);
       if (!mounted) return;
-
-      final foren = Theme.of(context).extension<ForenColors>()!;
-      ScaffoldMessenger.of(context).clearSnackBars();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Profile picture updated'),
-          backgroundColor: foren.success.t500,
-        ),
-      );
+      context.showSuccessSnackBar('Profile picture updated.');
     } catch (_) {}
   }
 
@@ -196,24 +184,14 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
     if (!mounted) return;
     setState(() => _isSavingProfile = false);
 
-    final foren = Theme.of(context).extension<ForenColors>()!;
-
     result.when(
       success: (updated) {
         ref.read(profileProvider.notifier).loadProfile();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Profile details updated & persisted!'),
-            backgroundColor: foren.success.t500,
-          ),
-        );
+        context.showSuccessSnackBar('Profile updated.');
       },
       failure: (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: foren.critical.t500,
-          ),
+        context.showErrorSnackBar(
+          AppErrorMessages.from(e, context: AppErrorContext.profileSave),
         );
       },
     );
@@ -232,25 +210,15 @@ class _AccountEditScreenState extends ConsumerState<AccountEditScreen> {
     if (!mounted) return;
     setState(() => _isSavingPassword = false);
 
-    final foren = Theme.of(context).extension<ForenColors>()!;
-
     result.when(
       success: (_) {
         _currentPasswordController.clear();
         _newPasswordController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Password changed successfully!'),
-            backgroundColor: foren.success.t500,
-          ),
-        );
+        context.showSuccessSnackBar('Password changed successfully.');
       },
       failure: (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: foren.critical.t500,
-          ),
+        context.showErrorSnackBar(
+          AppErrorMessages.from(e, context: AppErrorContext.passwordChange),
         );
       },
     );

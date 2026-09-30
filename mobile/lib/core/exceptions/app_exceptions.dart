@@ -42,13 +42,28 @@ class TimeoutException extends AppException {
 }
 
 /// 401 Unauthorized exception.
+///
+/// [message] is populated from the server's JSON error body.
+/// When triggered by a failed login, the server returns something like
+/// "Invalid email or password." — this is surfaced directly to the user.
+/// When triggered by an expired token mid-session, the generic fallback
+/// "Session expired. Please log in again." is shown instead.
 class UnauthorizedException extends AppException {
   const UnauthorizedException([
     String message = 'Session expired. Please log in again.',
   ]) : super(message, 401);
 
   @override
-  String get userMessage => 'Session expired. Please log in again.';
+  String get userMessage {
+    // If the server provided a meaningful message, surface it directly.
+    // The default value 'Session expired. Please log in again.' is kept
+    // as the fallback for mid-session token expiry (e.g. from AuthInterceptor).
+    if (message.isNotEmpty &&
+        message != 'Session expired. Please log in again.') {
+      return message;
+    }
+    return 'Session expired. Please log in again.';
+  }
 }
 
 /// 403 Forbidden exception.

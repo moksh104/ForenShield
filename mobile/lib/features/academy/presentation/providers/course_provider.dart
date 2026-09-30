@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../data/datasources/course_remote_data_source.dart';
 import '../../data/repositories/course_repository_impl.dart';
 import '../../domain/entities/course_entity.dart';
@@ -100,7 +101,10 @@ class CourseNotifier extends StateNotifier<CourseState> {
       failure: (exception) {
         state = state.copyWith(
           status: CourseStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.academy,
+          ),
         );
       },
     );
@@ -125,7 +129,10 @@ class CourseNotifier extends StateNotifier<CourseState> {
       failure: (exception) {
         state = state.copyWith(
           status: CourseStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.academy,
+          ),
         );
       },
     );

@@ -79,11 +79,17 @@ class RetryInterceptor extends Interceptor {
   }
 
   bool _shouldRetry(DioException err) {
+    final statusCode = err.response?.statusCode;
+    // Explicitly never retry 4xx client errors (400, 401, 403, 404, 422, etc.)
+    if (statusCode != null && statusCode >= 400 && statusCode < 500) {
+      return false;
+    }
+
     return err.type == DioExceptionType.connectionTimeout ||
         err.type == DioExceptionType.sendTimeout ||
         err.type == DioExceptionType.receiveTimeout ||
         err.type == DioExceptionType.connectionError ||
-        _isServerError(err.response?.statusCode);
+        _isServerError(statusCode);
   }
 
   bool _isServerError(int? statusCode) {

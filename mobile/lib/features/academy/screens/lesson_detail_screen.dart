@@ -1,6 +1,8 @@
-import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import '../../../../core/theme/app_spacing.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/utils/app_error_messages.dart';
 import '../providers/lesson_providers.dart';
 import '../utils/academy_utils.dart';
 
@@ -17,17 +19,34 @@ class LessonDetailScreen extends ConsumerWidget {
     final lessonAsync = ref.watch(lessonDetailProvider(lessonId));
     final theme = Theme.of(context);
 
+    final isDark = theme.brightness == Brightness.dark;
+
     return Scaffold(
       backgroundColor: theme.colorScheme.surface,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         leading: BackButton(color: theme.colorScheme.onSurface),
       ),
       body: lessonAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text(err.toString())),
+        error: (err, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Text(
+              AppErrorMessages.from(err, context: AppErrorContext.academy),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+        ),
         data: (result) {
           return result.when(
             success: (lesson) => SingleChildScrollView(

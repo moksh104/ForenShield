@@ -6,9 +6,11 @@ import 'package:go_router/go_router.dart';
 import '../../../core/effects/glass_effect.dart';
 import '../../../core/effects/particle_background.dart';
 import '../../../core/exceptions/app_exceptions.dart';
+import '../../../core/extensions/build_context_extension.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/foren_theme.dart';
+import '../../../core/utils/app_error_messages.dart';
 import '../../../routes/route_constants.dart';
 import '../presentation/widgets/auth_button.dart';
 import '../presentation/widgets/auth_logo.dart';
@@ -103,9 +105,16 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
       },
       failure: (exception) {
         setState(() {
-          _errorMessage = exception is AppException
-              ? exception.userMessage
-              : exception.toString();
+          if (exception is UnauthorizedException) {
+            // OTP token expired or invalid session
+            _errorMessage =
+                'That code doesn\'t look right. Please check it and try again.';
+          } else {
+            _errorMessage = AppErrorMessages.from(
+              exception,
+              context: AppErrorContext.otp,
+            );
+          }
         });
       },
     );
@@ -114,11 +123,7 @@ class _OtpScreenState extends ConsumerState<OtpScreen> {
   void _handleResend() {
     if (!_canResend) return;
     _startResendTimer();
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('A new 6-digit verification code has been sent.'),
-      ),
-    );
+    context.showInfoSnackBar('A new verification code has been sent.');
   }
 
   @override

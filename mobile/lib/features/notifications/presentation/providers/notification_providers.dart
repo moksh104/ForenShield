@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/api_config.dart';
 import '../../../../core/providers/core_providers.dart';
 import '../../../../core/services/notification_service.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../../../core/utils/result.dart';
 import '../../data/models/notification_model.dart';
 import '../../data/datasource/notification_remote_data_source.dart';
@@ -82,7 +83,10 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       );
     } else {
       final ex = (result as Failure).exception;
-      state = state.copyWith(isLoading: false, error: ex.toString());
+      state = state.copyWith(
+        isLoading: false,
+        error: AppErrorMessages.from(ex),
+      );
     }
   }
 

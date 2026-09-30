@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/app_colors.dart';
@@ -41,6 +42,9 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
             backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
               backgroundColor: theme.scaffoldBackgroundColor,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              surfaceTintColor: Colors.transparent,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                 color: theme.colorScheme.onSurface,
@@ -58,6 +62,9 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
             backgroundColor: theme.scaffoldBackgroundColor,
             appBar: AppBar(
               backgroundColor: theme.scaffoldBackgroundColor,
+              elevation: 0,
+              scrolledUnderElevation: 0,
+              surfaceTintColor: Colors.transparent,
               leading: IconButton(
                 icon: const Icon(Icons.arrow_back_ios_new, size: 18),
                 color: theme.colorScheme.onSurface,
@@ -82,48 +89,61 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
             .expand((module) => module.lessons)
             .map((lesson) => lesson.id)
             .firstWhere((id) => id.isNotEmpty, orElse: () => '');
+        final isDark = theme.brightness == Brightness.dark;
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Expanded(
-                  child: CustomScrollView(
-                    physics: const BouncingScrollPhysics(),
-                    slivers: [
-                      // App Bar & Banner Header
-                      SliverAppBar(
-                        expandedHeight: 180,
-                        pinned: true,
-                        backgroundColor: theme.colorScheme.surface,
-                        flexibleSpace: FlexibleSpaceBar(
-                          background: Container(
-                            decoration: BoxDecoration(
-                              gradient: LinearGradient(
-                                colors: [
-                                  AppColors.bgBase,
-                                  theme.colorScheme.surface,
-                                ],
-                                begin: Alignment.topCenter,
-                                end: Alignment.bottomCenter,
-                              ),
+          body: Column(
+            children: [
+              Expanded(
+                child: CustomScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  slivers: [
+                    // App Bar & Banner Header
+                    SliverAppBar(
+                      expandedHeight: 180,
+                      pinned: true,
+                      elevation: 0,
+                      scrolledUnderElevation: 0,
+                      surfaceTintColor: Colors.transparent,
+                      backgroundColor: theme.colorScheme.surface,
+                      systemOverlayStyle: isDark
+                          ? SystemUiOverlayStyle.light
+                          : SystemUiOverlayStyle.dark,
+                      flexibleSpace: FlexibleSpaceBar(
+                        background: Container(
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: isDark
+                                  ? [
+                                      academyColor.withValues(alpha: 0.25),
+                                      theme.colorScheme.surface,
+                                    ]
+                                  : [
+                                      academyColor.withValues(alpha: 0.08),
+                                      theme.colorScheme.surface,
+                                    ],
+                              begin: Alignment.topCenter,
+                              end: Alignment.bottomCenter,
                             ),
-                            child: Center(
-                              child: Icon(
-                                Icons.school_outlined,
-                                size: 64,
-                                color: academyColor.withValues(alpha: 0.3),
+                          ),
+                          child: Center(
+                            child: Icon(
+                              Icons.school_outlined,
+                              size: 64,
+                              color: academyColor.withValues(
+                                alpha: isDark ? 0.45 : 0.75,
                               ),
                             ),
                           ),
                         ),
-                        leading: IconButton(
-                          icon: const Icon(Icons.arrow_back_ios_new, size: 18),
-                          color: theme.colorScheme.onSurface,
-                          onPressed: () => context.pop(),
-                        ),
                       ),
+                      leading: IconButton(
+                        icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+                        color: theme.colorScheme.onSurface,
+                        onPressed: () => context.pop(),
+                      ),
+                    ),
 
                       // Metadata Content
                       SliverToBoxAdapter(
@@ -298,35 +318,38 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                 ),
 
                 // Bottom Start / Continue CTA Bar
-                Container(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: theme.colorScheme.surface,
-                    border: Border(top: BorderSide(color: foren.borderSubtle)),
-                  ),
-                  child: SizedBox(
-                    width: double.infinity,
-                    height: 48,
-                    child: ElevatedButton(
-                      onPressed: firstLessonId.isEmpty
-                          ? null
-                          : () => context.push(
-                              '${RouteConstants.lessonPlayer}/$firstLessonId',
-                            ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: academyColor,
-                        foregroundColor: theme.scaffoldBackgroundColor,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderRadiusMd,
+                SafeArea(
+                  top: false,
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSpacing.md),
+                    decoration: BoxDecoration(
+                      color: theme.colorScheme.surface,
+                      border: Border(top: BorderSide(color: foren.borderSubtle)),
+                    ),
+                    child: SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton(
+                        onPressed: firstLessonId.isEmpty
+                            ? null
+                            : () => context.push(
+                                '${RouteConstants.lessonPlayer}/$firstLessonId',
+                              ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: academyColor,
+                          foregroundColor: theme.scaffoldBackgroundColor,
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: AppRadius.borderRadiusMd,
+                          ),
                         ),
-                      ),
-                      child: Text(
-                        course.completionPercentage > 0
-                            ? 'Continue Learning'
-                            : 'Start Course',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
+                        child: Text(
+                          course.completionPercentage > 0
+                              ? 'Continue Learning'
+                              : 'Start Course',
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w700,
+                          ),
                         ),
                       ),
                     ),
@@ -334,8 +357,7 @@ class _CourseDetailScreenState extends ConsumerState<CourseDetailScreen> {
                 ),
               ],
             ),
-          ),
-        );
+          );
       },
     );
   }

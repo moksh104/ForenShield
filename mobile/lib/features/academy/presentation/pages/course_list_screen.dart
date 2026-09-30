@@ -263,8 +263,8 @@ class CourseListScreen extends ConsumerWidget {
 
       case CourseStatus.empty:
         return EmptyState(
-          title: 'No Courses Found',
-          message: 'Try adjusting your filters or search query.',
+          title: 'No Courses Available',
+          message: 'No courses available right now.',
           icon: Icons.search_off_outlined,
           actionLabel: 'Clear Filters',
           onAction: () {

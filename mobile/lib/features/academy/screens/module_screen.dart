@@ -1,6 +1,7 @@
 import 'package:forenshield/core/theme/app_spacing.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../../core/utils/app_error_messages.dart';
 import '../providers/lesson_providers.dart';
 import '../utils/academy_utils.dart';
 
@@ -21,7 +22,18 @@ class ModuleScreen extends ConsumerWidget {
       backgroundColor: theme.colorScheme.surface,
       body: courseAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
-        error: (err, _) => Center(child: Text(err.toString())),
+        error: (err, _) => Center(
+          child: Padding(
+            padding: const EdgeInsets.all(AppSpacing.xl),
+            child: Text(
+              AppErrorMessages.from(err, context: AppErrorContext.academy),
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: theme.colorScheme.onSurface.withValues(alpha: 0.7),
+              ),
+            ),
+          ),
+        ),
         data: (result) {
           return result.when(
             success: (course) => SafeArea(

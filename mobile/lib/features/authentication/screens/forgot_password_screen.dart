@@ -7,6 +7,7 @@ import '../../../core/effects/particle_background.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/foren_theme.dart';
+import '../../../core/utils/app_error_messages.dart';
 import '../../../core/validators/form_validators.dart';
 import '../../../routes/route_constants.dart';
 import '../presentation/widgets/auth_button.dart';
@@ -60,13 +61,17 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
           });
         } else {
           setState(() {
-            _errorMessage = 'Failed to generate reset code. Please try again.';
+            _errorMessage =
+                'We couldn\'t send a recovery code right now. Please try again.';
           });
         }
       },
       failure: (exception) {
         setState(() {
-          _errorMessage = exception.toString();
+          _errorMessage = AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.forgotPassword,
+          );
         });
       },
     );
@@ -100,7 +105,10 @@ class _ForgotPasswordScreenState extends ConsumerState<ForgotPasswordScreen> {
       },
       failure: (exception) {
         setState(() {
-          _errorMessage = exception.toString();
+          _errorMessage = AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.otp,
+          );
         });
       },
     );

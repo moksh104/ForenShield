@@ -104,8 +104,14 @@ class AuthStateNotifier extends AsyncNotifier<UserModel?> {
       await _storage.saveAccessToken(response.accessToken);
       await _storage.saveRefreshToken(response.refreshToken);
 
-      // Save FCM Registration Token to backend
-      await NotificationService.saveToken(response.user.id);
+      // Save FCM Registration Token to backend (non-blocking)
+      try {
+        await NotificationService.saveToken(response.user.id);
+      } catch (e) {
+        AppLogger.w(
+          '[AuthStateNotifier] Non-blocking FCM token save failed: $e',
+        );
+      }
 
       AppLogger.d(
         '[AuthStateNotifier] Tokens stored successfully. Updating Riverpod state to user: ${response.user.email}',
@@ -147,8 +153,14 @@ class AuthStateNotifier extends AsyncNotifier<UserModel?> {
       await _storage.saveAccessToken(response.accessToken);
       await _storage.saveRefreshToken(response.refreshToken);
 
-      // Save FCM Registration Token to backend
-      await NotificationService.saveToken(response.user.id);
+      // Save FCM Registration Token to backend (non-blocking)
+      try {
+        await NotificationService.saveToken(response.user.id);
+      } catch (e) {
+        AppLogger.w(
+          '[AuthStateNotifier] Non-blocking FCM token save failed: $e',
+        );
+      }
 
       state = AsyncValue.data(response.user);
       return const Success(null);

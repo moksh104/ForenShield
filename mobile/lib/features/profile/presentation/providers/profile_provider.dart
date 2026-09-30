@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/services/upload_service.dart';
 import '../../../../core/config/api_config.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../../authentication/providers/auth_state_provider.dart';
 import '../../data/datasources/profile_remote_data_source.dart';
 import '../../data/repositories/mock_profile_repository.dart';
@@ -93,7 +94,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       failure: (exception) {
         state = state.copyWith(
           status: ProfileStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.profileLoad,
+          ),
         );
       },
     );
@@ -121,7 +125,8 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         if (!mounted) return;
         state = state.copyWith(
           status: ProfileStatus.error,
-          errorMessage: 'Failed to upload image',
+          errorMessage:
+              'We couldn\'t upload your photo right now. Please try again.',
         );
         return;
       }
@@ -146,7 +151,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       failure: (e) {
         state = state.copyWith(
           status: ProfileStatus.error,
-          errorMessage: e.toString(),
+          errorMessage: AppErrorMessages.from(
+            e,
+            context: AppErrorContext.profileSave,
+          ),
         );
       },
     );
@@ -173,7 +181,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       failure: (exception) {
         state = state.copyWith(
           status: ProfileStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.profileLoad,
+          ),
         );
       },
     );

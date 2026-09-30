@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../../core/extensions/build_context_extension.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../../../routes/route_constants.dart';
 import '../../../authentication/providers/auth_state_provider.dart';
 import '../providers/settings_provider.dart';
@@ -30,18 +32,12 @@ class SettingsScreen extends ConsumerStatefulWidget {
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isLoggingOut = false;
 
+  /// Shows a success notification. Prefer context.showSuccessSnackBar for
+  /// error/info variants — this helper is kept for legacy callers that expect
+  /// a success-coloured snack without importing the extension explicitly.
   void _notify(String message) {
     if (!mounted) return;
-    final foren =
-        Theme.of(context).extension<ForenColors>() ?? ForenColors.dark;
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        duration: const Duration(seconds: 2),
-        backgroundColor: foren.success.t500,
-      ),
-    );
+    context.showSuccessSnackBar(message);
   }
 
   // ── Account Dialogs ────────────────────────────────────────────────────────
@@ -105,13 +101,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             onPressed: () {
               if (newCtrl.text.isNotEmpty && newCtrl.text == confirmCtrl.text) {
                 Navigator.pop(ctx);
-                _notify('Password updated successfully');
+                context.showSuccessSnackBar('Password changed successfully.');
               } else {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(
-                    content: const Text('Passwords do not match'),
-                    backgroundColor: foren.critical.t500,
-                  ),
+                context.showErrorSnackBar(
+                  'Passwords don\'t match. Please check and try again.',
                 );
               }
             },
@@ -125,9 +118,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _handleLogout() async {
     final confirmed = await SettingsDialog.showConfirmation(
       context: context,
-      title: 'Confirm Logout',
-      message: 'Are you sure you want to end your current session?',
-      confirmText: 'Logout',
+      title: 'Sign Out',
+      message:
+          'You\'ll need to sign in again to access your account. Are you sure?',
+      confirmText: 'Sign Out',
       isDestructive: true,
     );
 
@@ -137,6 +131,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     await ref.read(authStateProvider.notifier).logout();
     if (!mounted) return;
 
+    context.showSuccessSnackBar('You\'re signed out.');
     context.goNamed(RouteConstants.login);
   }
 
@@ -206,12 +201,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
             onPressed: () async {
               if (passwordCtrl.text.isEmpty) {
-                ScaffoldMessenger.of(ctx).showSnackBar(
-                  SnackBar(
-                    content: const Text('Password is required'),
-                    backgroundColor: foren.critical.t500,
-                  ),
-                );
+                context.showErrorSnackBar('Password is required.');
                 return;
               }
 
@@ -231,10 +221,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               } catch (e) {
                 if (!mounted) return;
                 setState(() => _isLoggingOut = false);
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(e.toString()),
-                    backgroundColor: foren.critical.t500,
+                context.showErrorSnackBar(
+                  AppErrorMessages.from(
+                    e,
+                    context: AppErrorContext.deleteAccount,
                   ),
                 );
               }

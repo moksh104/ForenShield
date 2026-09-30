@@ -118,7 +118,7 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Text(
-                  'No telemetry yet',
+                  'No mission data available yet.',
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),

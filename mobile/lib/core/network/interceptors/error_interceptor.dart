@@ -42,7 +42,11 @@ class ErrorInterceptor extends Interceptor {
           return const NetworkException();
         }
         if (error.error != null && error.error is FormatException) {
-          return const SerializationException();
+          final fe = error.error as FormatException;
+          AppLogger.w('Response format error: ${fe.message}');
+          return SerializationException(
+            'Failed to process server response: ${fe.message}',
+          );
         }
         return const ApiException('An unexpected error occurred');
 

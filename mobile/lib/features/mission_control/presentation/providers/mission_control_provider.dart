@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/config/api_config.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../data/datasources/mission_control_remote_data_source.dart';
 import '../../data/repositories/mission_control_repository_impl.dart';
 import '../../data/repositories/mock_mission_control_repository.dart';
@@ -94,7 +95,10 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
       failure: (exception) {
         state = state.copyWith(
           status: MissionControlStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.missionControl,
+          ),
         );
       },
     );
@@ -115,7 +119,10 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
       failure: (exception) {
         state = state.copyWith(
           status: MissionControlStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.missionControl,
+          ),
         );
       },
     );

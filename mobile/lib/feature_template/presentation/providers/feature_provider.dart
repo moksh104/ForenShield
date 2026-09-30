@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'feature_state.dart';
 import '../../domain/usecases/get_feature.dart';
 import '../../../core/models/failure.dart' as core_fail;
+import '../../../core/utils/app_error_messages.dart';
 
 // Note: In a real implementation, you would use Dependency Injection (e.g. get_it or a provider block)
 // to inject the UseCases. We leave them uninitialized here for template purposes.
@@ -30,7 +31,7 @@ class FeatureNotifier extends StateNotifier<FeatureState> {
         state = state.copyWith(isLoading: false, features: features);
       },
       failure: (exception) {
-        String msg = exception.toString();
+        String msg = AppErrorMessages.from(exception);
         if (exception is core_fail.Failure) {
           msg = exception.message;
         }
@@ -47,7 +48,7 @@ class FeatureNotifier extends StateNotifier<FeatureState> {
         state = state.copyWith(features: features, errorMessage: null);
       },
       failure: (exception) {
-        String msg = exception.toString();
+        String msg = AppErrorMessages.from(exception);
         if (exception is core_fail.Failure) {
           msg = exception.message;
         }

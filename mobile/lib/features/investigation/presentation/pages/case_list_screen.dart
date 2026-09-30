@@ -573,7 +573,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
               ),
               const SizedBox(height: AppSpacing.sm),
               Text(
-                'No cases found matching criteria.',
+                'No investigations found.',
                 style: TextStyle(color: foren.textDisabled),
               ),
               const SizedBox(height: AppSpacing.md),

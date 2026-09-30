@@ -42,8 +42,11 @@ class ForenFirebaseService {
 
       final token = await messaging.getToken();
 
+      final maskedToken = token != null && token.length > 8
+          ? '${token.substring(0, 8)}…[REDACTED]'
+          : '[null]';
       debugPrint("================================================");
-      debugPrint("FCM TOKEN: $token");
+      debugPrint("FCM TOKEN (masked): $maskedToken");
       debugPrint("================================================");
 
       // Handle Terminated state (app launched from a notification tap when terminated)

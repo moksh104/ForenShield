@@ -19,11 +19,14 @@ class AcademyHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
 
     return Container(
-      decoration: const BoxDecoration(
+      decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: [Color(0xFF0F172A), Color(0xFF1E293B)],
+          colors: isDark
+              ? const [Color(0xFF0F172A), Color(0xFF1E293B)]
+              : const [Color(0xFFF1F5F9), Color(0xFFE2E8F0)],
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
         ),

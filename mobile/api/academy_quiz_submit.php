@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * ForenShield — Academy Quiz Submission (Phase 19 — Server-authoritative)
  *

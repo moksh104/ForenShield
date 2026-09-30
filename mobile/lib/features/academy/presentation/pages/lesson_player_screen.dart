@@ -2,9 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/extensions/build_context_extension.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../../../routes/route_constants.dart';
 import '../../domain/entities/lesson_entity.dart';
 import '../providers/course_provider.dart';
@@ -43,7 +45,12 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
         }
       },
       failure: (_) {
-        if (mounted) setState(() => _isLoading = false);
+        if (mounted) {
+          setState(() => _isLoading = false);
+          context.showErrorSnackBar(
+            'We couldn\'t load this lesson right now. Please try again.',
+          );
+        }
       },
     );
   }
@@ -73,24 +80,14 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
     if (!mounted) return;
     setState(() => _isMarking = false);
 
-    final foren = Theme.of(context).extension<ForenColors>()!;
-
     result.when(
       success: (updated) {
         setState(() => _lesson = updated);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text('Lesson Marked Complete! +50 XP'),
-            backgroundColor: foren.success.t500,
-          ),
-        );
+        context.showSuccessSnackBar('Lesson completed. +50 XP');
       },
       failure: (e) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.toString()),
-            backgroundColor: foren.critical.t500,
-          ),
+        context.showErrorSnackBar(
+          AppErrorMessages.from(e, context: AppErrorContext.academy),
         );
       },
     );
@@ -102,9 +99,25 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
     final foren = theme.extension<ForenColors>()!;
     final academyColor = foren.academy.t500;
 
+    final isDark = theme.brightness == Brightness.dark;
+
     if (_isLoading) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
+        appBar: AppBar(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          systemOverlayStyle: isDark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+            color: theme.colorScheme.onSurface,
+            onPressed: () => context.pop(),
+          ),
+        ),
         body: Center(child: CircularProgressIndicator(color: academyColor)),
       );
     }
@@ -113,10 +126,23 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
     if (lesson == null) {
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
-        appBar: AppBar(backgroundColor: theme.scaffoldBackgroundColor),
+        appBar: AppBar(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          elevation: 0,
+          scrolledUnderElevation: 0,
+          surfaceTintColor: Colors.transparent,
+          systemOverlayStyle: isDark
+              ? SystemUiOverlayStyle.light
+              : SystemUiOverlayStyle.dark,
+          leading: IconButton(
+            icon: const Icon(Icons.arrow_back_ios_new, size: 18),
+            color: theme.colorScheme.onSurface,
+            onPressed: () => context.pop(),
+          ),
+        ),
         body: Center(
           child: Text(
-            'Lesson not found.',
+            'We couldn\'t load this lesson right now. Please try again.',
             style: TextStyle(color: foren.textDisabled),
           ),
         ),
@@ -128,6 +154,11 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
       appBar: AppBar(
         backgroundColor: theme.colorScheme.surface,
         elevation: 0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        systemOverlayStyle: isDark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
         leading: IconButton(
           icon: const Icon(Icons.arrow_back_ios_new, size: 18),
           color: theme.colorScheme.onSurface,
@@ -317,9 +348,7 @@ class _CodeSnippetCard extends StatelessWidget {
               InkWell(
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: code));
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Code copied to clipboard!')),
-                  );
+                  context.showInfoSnackBar('Code copied to clipboard.');
                 },
                 child: Row(
                   children: [

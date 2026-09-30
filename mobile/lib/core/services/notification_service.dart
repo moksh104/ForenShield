@@ -48,7 +48,7 @@ class ForenNotification {
 
 /// Production-ready Notification Service for FCM token sync, topic management, and notifications API.
 class NotificationService {
-  static final Dio _dio = Dio(
+  static Dio get _dio => Dio(
     BaseOptions(
       baseUrl: ApiConfig.baseUrl,
       connectTimeout: const Duration(seconds: 10),
@@ -60,7 +60,9 @@ class NotificationService {
   static Future<String?> retrieveToken() async {
     try {
       final token = await FirebaseMessaging.instance.getToken();
-      debugPrint('NotificationService: Retrieved FCM Token: $token');
+      debugPrint(
+        'NotificationService: FCM Token retrieved: ${token != null && token.isNotEmpty ? '[PRESENT]' : '[NONE]'}',
+      );
       return token;
     } catch (e) {
       debugPrint('NotificationService: Error retrieving FCM Token: $e');

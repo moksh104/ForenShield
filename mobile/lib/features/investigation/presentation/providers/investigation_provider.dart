@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../data/datasources/investigation_remote_data_source.dart';
 import '../../data/repositories/investigation_repository_impl.dart';
 import '../../domain/entities/investigation_entity.dart';
@@ -117,7 +118,10 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
       failure: (exception) {
         state = state.copyWith(
           status: InvestigationStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.investigation,
+          ),
         );
       },
     );
@@ -146,7 +150,10 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
       failure: (exception) {
         state = state.copyWith(
           status: InvestigationStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.investigation,
+          ),
         );
       },
     );

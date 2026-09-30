@@ -25,7 +25,7 @@ class AuthValidator {
       return 'Please confirm your password';
     }
     if (value != original) {
-      return 'Passwords do not match';
+      return 'Passwords don\'t match. Please check and try again.';
     }
     return null;
   }

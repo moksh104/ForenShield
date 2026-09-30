@@ -1,4 +1,4 @@
-﻿<?php
+<?php
 /**
  * ForenShield — XP Service (Phase 19 — Concurrency-safe)
  *

@@ -11,6 +11,7 @@
 library;
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'app_tokens.dart';
 import 'app_typography.dart';
 
@@ -265,8 +266,13 @@ class ForenTheme {
         backgroundColor: neutralBgBase,
         foregroundColor: neutralTextPrimary,
         elevation: ForenElevation.level0,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
         centerTitle: false,
         titleTextStyle: textTheme.headlineSmall,
+        systemOverlayStyle: brightness == Brightness.dark
+            ? SystemUiOverlayStyle.light
+            : SystemUiOverlayStyle.dark,
       ),
 
       cardTheme: CardThemeData(

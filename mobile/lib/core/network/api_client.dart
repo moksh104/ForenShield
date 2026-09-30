@@ -1,25 +1,29 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart' show kDebugMode;
-import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 import '../config/api_config.dart';
 import 'interceptors/auth_interceptor.dart';
 import 'interceptors/error_interceptor.dart';
 import 'interceptors/retry_interceptor.dart';
+import 'interceptors/sanitized_logging_interceptor.dart';
+import 'transformers/safe_json_transformer.dart';
 import '../storage/storage_service.dart';
 
 /// Dio HTTP client for the ForenShield PHP REST API.
 ///
 /// Configured with:
 /// - Base URL from [ApiConfig.baseUrl] (injected via `--dart-define` or .env)
+/// - [SafeJsonTransformer] — strips unexpected BOM/whitespace before parsing JSON.
 /// - [AuthInterceptor] — attaches the JWT Bearer token to all non-auth requests
 ///   and automatically retries after a 401 by exchanging the refresh token.
+/// - [RetryInterceptor] — retries transient network errors for idempotent requests.
 /// - [ErrorInterceptor] — normalises all Dio errors into [ApiException].
-/// - [PrettyDioLogger] — human-readable request/response log (dev builds only).
+/// - [SanitizedLoggingInterceptor] — masks sensitive tokens and credentials (dev builds only).
 class ApiClient {
   late final Dio _dio;
 
   ApiClient() {
     _dio = Dio(_baseOptions);
+    _dio.transformer = SafeJsonTransformer();
     _setupInterceptors();
   }
 
@@ -41,16 +45,8 @@ class ApiClient {
       AuthInterceptor(StorageService()),
       RetryInterceptor(dio: _dio),
       ErrorInterceptor(),
-      // PrettyDioLogger is only active in debug builds.
-      // Release builds never log request/response bodies.
-      if (kDebugMode)
-        PrettyDioLogger(
-          requestHeader: true,
-          requestBody: true,
-          responseBody: true,
-          error: true,
-          compact: true,
-        ),
+      // Redacts passwords, JWTs, and refresh tokens from debug logs
+      if (kDebugMode) SanitizedLoggingInterceptor(),
     ]);
   }
 

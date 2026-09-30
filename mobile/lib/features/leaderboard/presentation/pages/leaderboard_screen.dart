@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../providers/leaderboard_providers.dart';
 import '../widgets/leaderboard_card.dart';
 import '../widgets/leaderboard_tile.dart';
@@ -169,7 +170,7 @@ class _LeaderboardTabState extends ConsumerState<_LeaderboardTab> {
     return leaderboardAsync.when(
       loading: () => const Center(child: CircularProgressIndicator()),
       error: (err, _) => _ErrorView(
-        message: err.toString(),
+        message: AppErrorMessages.from(err),
         onRetry: () => ref.invalidate(leaderboardProvider(args)),
       ),
       data: (entries) {

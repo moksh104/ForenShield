@@ -99,6 +99,7 @@ class AuthInterceptor extends Interceptor {
           'Attempting automatic JWT refresh via POST /refresh_token.php...',
         );
 
+        _refreshDio.options.baseUrl = ApiConfig.baseUrl;
         final response = await _refreshDio.post(
           ApiEndpoints.refresh,
           data: {'refreshToken': refreshToken},
@@ -168,6 +169,7 @@ class AuthInterceptor extends Interceptor {
     );
 
     try {
+      _retryDio.options.baseUrl = ApiConfig.baseUrl;
       final response = await _retryDio.request<dynamic>(
         requestOptions.path,
         data: requestOptions.data,

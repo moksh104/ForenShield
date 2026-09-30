@@ -8,6 +8,7 @@ import '../../../../routes/route_constants.dart';
 import '../../../../shared/widgets/foren_brand_header.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../shared/states/empty_state.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../../domain/entities/simulation_scenario.dart';
 import '../../providers/simulation_provider.dart';
 
@@ -255,7 +256,10 @@ class _SimulationLabScreenState extends ConsumerState<SimulationLabScreen> {
                       padding: const EdgeInsets.all(40),
                       child: EmptyState(
                         title: 'Failed to load scenarios',
-                        message: err.toString(),
+                        message: AppErrorMessages.from(
+                          err,
+                          context: AppErrorContext.simulation,
+                        ),
                         icon: Icons.error_outline,
                       ),
                     ),

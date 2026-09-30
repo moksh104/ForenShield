@@ -49,7 +49,7 @@ class FormValidators {
     }
 
     if (value != password) {
-      return 'Passwords do not match';
+      return 'Passwords don\'t match. Please check and try again.';
     }
 
     return null;

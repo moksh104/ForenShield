@@ -1,5 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/providers/core_providers.dart';
+import '../../../../core/utils/app_error_messages.dart';
 import '../data/datasources/mitre_remote_data_source.dart';
 import '../data/repositories/mitre_repository.dart';
 import '../models/mitre_technique_model.dart';
@@ -78,7 +79,10 @@ class MitreNotifier extends StateNotifier<MitreState> {
       failure: (exception) {
         state = state.copyWith(
           status: MitreStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.mitre,
+          ),
         );
       },
     );
@@ -101,7 +105,10 @@ class MitreNotifier extends StateNotifier<MitreState> {
       failure: (exception) {
         state = state.copyWith(
           status: MitreStatus.error,
-          errorMessage: exception.toString(),
+          errorMessage: AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.mitre,
+          ),
         );
       },
     );

@@ -7,7 +7,7 @@ import '../../../core/effects/particle_background.dart';
 import '../../../core/theme/app_radius.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/theme/foren_theme.dart';
-import '../../../core/exceptions/app_exceptions.dart';
+import '../../../core/utils/app_error_messages.dart';
 import '../../../core/validators/form_validators.dart';
 import '../../../routes/route_constants.dart';
 import '../../../core/logger/app_logger.dart';
@@ -72,9 +72,10 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
       failure: (exception) {
         AppLogger.w('[LoginScreen] Login returned failure result: $exception');
         setState(() {
-          _errorMessage = exception is AppException
-              ? exception.userMessage
-              : exception.toString();
+          _errorMessage = AppErrorMessages.from(
+            exception,
+            context: AppErrorContext.login,
+          );
         });
       },
     );

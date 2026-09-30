@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -8,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../../core/extensions/build_context_extension.dart';
 import '../../../../routes/route_constants.dart';
 import '../../providers/reports_provider.dart';
 import '../../../../core/services/upload_service.dart';
@@ -105,13 +107,8 @@ class ReportDetailScreen extends ConsumerWidget {
                   Expanded(
                     child: ElevatedButton.icon(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: const Text(
-                              'Exporting report artifact to PDF / JSON format...',
-                            ),
-                            backgroundColor: foren.success.t500,
-                          ),
+                        context.showInfoSnackBar(
+                          'Exporting report artifact to PDF / JSON format...',
                         );
                       },
                       style: ElevatedButton.styleFrom(
@@ -141,11 +138,7 @@ class ReportDetailScreen extends ConsumerWidget {
                         if (!context.mounted) return;
 
                         if (file != null) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Uploading attachment...'),
-                            ),
-                          );
+                          context.showInfoSnackBar('Uploading attachment...');
                           final compressed = await uploadService.compressImage(
                             file,
                           );
@@ -157,22 +150,12 @@ class ReportDetailScreen extends ConsumerWidget {
                           if (!context.mounted) return;
 
                           if (url != null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text(
-                                  'Attachment uploaded successfully! URL: $url',
-                                ),
-                                backgroundColor: foren.success.t500,
-                              ),
+                            context.showSuccessSnackBar(
+                              'Attachment uploaded successfully.',
                             );
                           } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: const Text(
-                                  'Failed to upload attachment',
-                                ),
-                                backgroundColor: foren.critical.t500,
-                              ),
+                            context.showErrorSnackBar(
+                              'Failed to upload attachment. Please try again.',
                             );
                           }
                         }
