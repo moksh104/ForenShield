@@ -1,44 +1,70 @@
 import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/models/simulation_action_result_model.dart';
+import '../domain/entities/investigation_handoff.dart';
+import '../domain/entities/simulation_attempt.dart';
+import '../domain/entities/simulation_node.dart';
 import '../domain/entities/simulation_scenario.dart';
-import '../domain/entities/terminal_line.dart';
 import '../providers/simulation_provider.dart';
-import '../data/datasources/simulation_mock_data.dart';
 
 class SimulationRunnerState {
   final SimulationScenario? scenario;
-  final List<TerminalLine> terminalLines;
-  final List<SimulationObjective> objectives;
+  final SimulationAttempt? attempt;
+  final SimulationNode? currentNode;
+  final List<Map<String, dynamic>> discoveredEvidence;
+  final SimulationActionResult? lastActionResult;
+  final InvestigationHandoff? investigationHandoff;
   final int secondsElapsed;
+  final bool isLoading;
+  final String? errorMessage;
   final bool isCompleted;
+  final bool isSuccess;
+  final int xpAwarded;
 
   const SimulationRunnerState({
     this.scenario,
-    this.terminalLines = const [],
-    this.objectives = const [],
+    this.attempt,
+    this.currentNode,
+    this.discoveredEvidence = const [],
+    this.lastActionResult,
+    this.investigationHandoff,
     this.secondsElapsed = 0,
+    this.isLoading = false,
+    this.errorMessage,
     this.isCompleted = false,
+    this.isSuccess = false,
+    this.xpAwarded = 0,
   });
 
-  bool get allObjectivesCompleted =>
-      objectives.isNotEmpty && objectives.every((o) => o.isCompleted);
-
-  int get completedObjectivesCount =>
-      objectives.where((o) => o.isCompleted).length;
+  int get score => attempt?.score ?? 100;
 
   SimulationRunnerState copyWith({
     SimulationScenario? scenario,
-    List<TerminalLine>? terminalLines,
-    List<SimulationObjective>? objectives,
+    SimulationAttempt? attempt,
+    SimulationNode? currentNode,
+    List<Map<String, dynamic>>? discoveredEvidence,
+    SimulationActionResult? lastActionResult,
+    InvestigationHandoff? investigationHandoff,
     int? secondsElapsed,
+    bool? isLoading,
+    String? errorMessage,
     bool? isCompleted,
+    bool? isSuccess,
+    int? xpAwarded,
   }) {
     return SimulationRunnerState(
       scenario: scenario ?? this.scenario,
-      terminalLines: terminalLines ?? this.terminalLines,
-      objectives: objectives ?? this.objectives,
+      attempt: attempt ?? this.attempt,
+      currentNode: currentNode ?? this.currentNode,
+      discoveredEvidence: discoveredEvidence ?? this.discoveredEvidence,
+      lastActionResult: lastActionResult ?? this.lastActionResult,
+      investigationHandoff: investigationHandoff ?? this.investigationHandoff,
       secondsElapsed: secondsElapsed ?? this.secondsElapsed,
+      isLoading: isLoading ?? this.isLoading,
+      errorMessage: errorMessage,
       isCompleted: isCompleted ?? this.isCompleted,
+      isSuccess: isSuccess ?? this.isSuccess,
+      xpAwarded: xpAwarded ?? this.xpAwarded,
     );
   }
 }
@@ -49,179 +75,134 @@ class SimulationRunnerNotifier extends StateNotifier<SimulationRunnerState> {
   final String _scenarioId;
 
   SimulationRunnerNotifier(this._ref, this._scenarioId)
-    : super(const SimulationRunnerState()) {
-    _initScenario();
+    : super(const SimulationRunnerState(isLoading: true)) {
+    initScenario();
   }
 
-  Future<void> _initScenario() async {
+  Future<void> initScenario({bool forceNew = false}) async {
     _timer?.cancel();
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
+    final repository = _ref.read(simulationRepositoryProvider);
+
+    // 1. Fetch scenarios list to find metadata
+    final scenariosResult = await repository.getScenarios();
     SimulationScenario? foundScenario;
-
-    // Fetch from provider to get the real DB scenario
-    final scenariosAsync = _ref.read(simulationScenariosProvider);
-    if (scenariosAsync.hasValue && scenariosAsync.value != null) {
-      foundScenario = scenariosAsync.value!.firstWhere(
-        (s) => s.id == _scenarioId,
-        orElse: () => SimulationMockData.scenarios.first,
-      );
-    } else {
-      foundScenario = SimulationMockData.scenarios.firstWhere(
-        (s) => s.id == _scenarioId,
-        orElse: () => SimulationMockData.scenarios.first,
-      );
-    }
-
-    final initialLines = foundScenario.initialTerminalHistory
-        .map(
-          (text) => TerminalLine(
-            text: text,
-            type: TerminalLineType.system,
-            timestamp: DateTime.now(),
-          ),
-        )
-        .toList();
-
-    state = SimulationRunnerState(
-      scenario: foundScenario,
-      terminalLines: initialLines,
-      objectives: foundScenario.objectives,
-      secondsElapsed: 0,
-      isCompleted: foundScenario.isCompleted,
+    scenariosResult.when(
+      success: (list) {
+        foundScenario = list.cast<SimulationScenario?>().firstWhere(
+          (s) => s?.id == _scenarioId,
+          orElse: () => null,
+        );
+      },
+      failure: (_) {},
     );
 
-    _startTimer();
+    // 2. Start or Resume Attempt on Backend
+    final startResult = await repository.startAttempt(
+      _scenarioId,
+      forceNew: forceNew,
+    );
+
+    startResult.when(
+      success: (data) {
+        final attempt = data.attempt;
+        final currentNode = data.currentNode;
+        final isFinished =
+            currentNode.isTerminal ||
+            attempt.status == SimulationAttemptStatus.completed ||
+            attempt.status == SimulationAttemptStatus.failed;
+
+        state = SimulationRunnerState(
+          scenario: foundScenario,
+          attempt: attempt,
+          currentNode: currentNode,
+          discoveredEvidence: data.discoveredEvidence,
+          secondsElapsed: 0,
+          isLoading: false,
+          isCompleted: isFinished,
+          isSuccess:
+              currentNode.isSuccess ||
+              attempt.status == SimulationAttemptStatus.completed,
+          xpAwarded: attempt.xpEarned,
+        );
+
+        if (!isFinished) {
+          _startTimer();
+        }
+      },
+      failure: (error) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: error.toString().replaceAll('Exception: ', ''),
+        );
+      },
+    );
   }
 
   void _startTimer() {
+    _timer?.cancel();
     _timer = Timer.periodic(const Duration(seconds: 1), (_) {
       if (!mounted) return;
       state = state.copyWith(secondsElapsed: state.secondsElapsed + 1);
     });
   }
 
-  void executeCommand(String rawInput) {
-    final input = rawInput.trim();
-    if (input.isEmpty) return;
+  Future<void> chooseAction(String actionId) async {
+    final attempt = state.attempt;
+    if (attempt == null || state.isCompleted || state.isLoading) return;
 
-    final updatedLines = List<TerminalLine>.from(state.terminalLines);
-    final now = DateTime.now();
+    state = state.copyWith(isLoading: true, errorMessage: null);
 
-    // Add user input line
-    updatedLines.add(
-      TerminalLine(
-        text: 'root@forenshield-vm:~# $input',
-        type: TerminalLineType.input,
-        timestamp: now,
-      ),
+    final repository = _ref.read(simulationRepositoryProvider);
+    final result = await repository.submitAction(attempt.id, actionId);
+
+    result.when(
+      success: (actionResult) {
+        // Merge newly unlocked evidence
+        final existingEv = List<Map<String, dynamic>>.from(
+          state.discoveredEvidence,
+        );
+        for (final newEv in actionResult.unlockedEvidence) {
+          if (!existingEv.any((e) => e['id'] == newEv['id'])) {
+            existingEv.add(newEv);
+          }
+        }
+
+        final isFinished = actionResult.isFinished;
+        if (isFinished) {
+          _timer?.cancel();
+          // Invalidate scenarios provider so completion status & XP update in main list
+          _ref.invalidate(simulationScenariosProvider);
+        }
+
+        state = state.copyWith(
+          attempt: actionResult.attempt,
+          currentNode: actionResult.nextNode,
+          lastActionResult: actionResult,
+          discoveredEvidence: existingEv,
+          investigationHandoff: actionResult.investigationHandoff,
+          isCompleted: isFinished,
+          isSuccess: actionResult.isSuccess,
+          xpAwarded: actionResult.xpAwarded,
+          isLoading: false,
+        );
+      },
+      failure: (error) {
+        state = state.copyWith(
+          isLoading: false,
+          errorMessage: error.toString().replaceAll('Exception: ', ''),
+        );
+      },
     );
-
-    // Command parser & mock response generator
-    final lower = input.toLowerCase();
-    String responseText = '';
-    TerminalLineType responseType = TerminalLineType.output;
-
-    if (lower == 'help') {
-      responseText = '''
-Available Diagnostic & Remediation Commands:
-  netstat -an                      List active network connections and ports
-  pkill -f <name>                  Terminate target process by name
-  kill <pid>                       Terminate process by PID
-  iptables -A INPUT -p tcp ...     Configure firewall block rule
-  cat <filepath>                   Inspect target system log file
-  grep <keyword> <file>            Search pattern in log files
-  clear                            Clear terminal screen console
-''';
-    } else if (lower == 'clear') {
-      state = state.copyWith(terminalLines: []);
-      return;
-    } else if (lower.contains('netstat')) {
-      responseText = '''
-Active Internet connections (servers and established)
-Proto Recv-Q Send-Q Local Address           Foreign Address         State
-tcp        0      0 127.0.0.1:22            0.0.0.0:*               LISTEN
-tcp        0      0 192.168.1.45:4444       198.51.100.42:8080      ESTABLISHED
-tcp        0      0 192.168.1.45:80         0.0.0.0:*               LISTEN
-[ALERT] Suspicious connection to 198.51.100.42 on port 4444 (PID 4092: ransomware_agent)
-''';
-      responseType = TerminalLineType.output;
-    } else if (lower.contains('pkill') || lower.contains('kill')) {
-      responseText = '''
-[SUCCESS] Signal SIGKILL (9) sent to process 4092 [ransomware_agent].
-Process terminated successfully. Memory lock released.
-''';
-      responseType = TerminalLineType.success;
-    } else if (lower.contains('iptables')) {
-      responseText = '''
-[SUCCESS] Rule added to chain INPUT:
-  target: DROP, prot: tcp, dport: 4444 from 0.0.0.0/0
-Firewall rules updated cleanly. Port 4444 blocked.
-''';
-      responseType = TerminalLineType.success;
-    } else if (lower.contains('cat')) {
-      responseText = '''
-[LOG INSPECT] /var/log/nginx/access.log:
-192.168.1.100 - - [26/Jul/2026:14:02:11 +0000] "GET /api/user?id=1%27%20OR%201=1-- HTTP/1.1" 200 4520
-''';
-    } else if (lower.contains('grep')) {
-      responseText = '''
-[GREP MATCH] /var/log/auth.log:
-Jul 26 13:58:02 BASTION-01 sshd[1284]: Failed password for root from 198.51.100.42 port 52210 ssh2
-Jul 26 13:58:05 BASTION-01 sshd[1289]: Failed password for root from 198.51.100.42 port 52212 ssh2
-''';
-    } else {
-      responseText =
-          'bash: command not found: $input. Type "help" for valid lab commands.';
-      responseType = TerminalLineType.error;
-    }
-
-    updatedLines.add(
-      TerminalLine(text: responseText, type: responseType, timestamp: now),
-    );
-
-    // Check objective completion rules
-    final updatedObjectives = state.objectives.map((obj) {
-      if (!obj.isCompleted && lower.contains(obj.targetCommandKeyword)) {
-        return obj.copyWith(isCompleted: true);
-      }
-      return obj;
-    }).toList();
-
-    final allDone = updatedObjectives.every((o) => o.isCompleted);
-
-    state = state.copyWith(
-      terminalLines: updatedLines,
-      objectives: updatedObjectives,
-      isCompleted: allDone,
-    );
-
-    if (allDone && !state.scenario!.isCompleted) {
-      _notifyBackendCompletion();
-    }
   }
 
-  Future<void> _notifyBackendCompletion() async {
-    try {
-      await _ref
-          .read(simulationRepositoryProvider)
-          .completeScenario(_scenarioId);
-      // Refresh scenarios list to update XP and completion checkmarks globally
-      _ref.invalidate(simulationScenariosProvider);
-    } catch (e) {
-      // Error handling can be added if needed
-    }
+  Future<void> restartScenario() async {
+    await initScenario(forceNew: true);
   }
 
-  void completeLabManually() {
-    state = state.copyWith(
-      objectives: state.objectives
-          .map((o) => o.copyWith(isCompleted: true))
-          .toList(),
-      isCompleted: true,
-    );
-    if (!state.scenario!.isCompleted) {
-      _notifyBackendCompletion();
-    }
+  void clearError() {
+    state = state.copyWith(errorMessage: null);
   }
 
   @override

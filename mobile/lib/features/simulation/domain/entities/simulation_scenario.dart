@@ -14,18 +14,18 @@ class SimulationObjective {
     required this.id,
     required this.title,
     required this.description,
-    required this.targetCommandKeyword,
-    required this.hint,
+    this.targetCommandKeyword = '',
+    this.hint = '',
     this.isCompleted = false,
   });
 
   factory SimulationObjective.fromJson(Map<String, dynamic> json) {
     return SimulationObjective(
       id: (json['id'] ?? '').toString(),
-      title: json['title'] as String? ?? '',
-      description: json['description'] as String? ?? '',
-      targetCommandKeyword: json['targetCommandKeyword'] as String? ?? '',
-      hint: json['hint'] as String? ?? '',
+      title: (json['title'] ?? '').toString(),
+      description: (json['description'] ?? '').toString(),
+      targetCommandKeyword: (json['targetCommandKeyword'] ?? '').toString(),
+      hint: (json['hint'] ?? '').toString(),
       isCompleted: json['isCompleted'] as bool? ?? false,
     );
   }
@@ -53,6 +53,29 @@ class SimulationObjective {
   }
 }
 
+class SimulationActiveAttempt {
+  final String attemptId;
+  final String currentNodeId;
+  final int score;
+  final String status;
+
+  const SimulationActiveAttempt({
+    required this.attemptId,
+    required this.currentNodeId,
+    required this.score,
+    required this.status,
+  });
+
+  factory SimulationActiveAttempt.fromJson(Map<String, dynamic> json) {
+    return SimulationActiveAttempt(
+      attemptId: (json['attemptId'] ?? '').toString(),
+      currentNodeId: (json['currentNodeId'] ?? '').toString(),
+      score: (json['score'] as num?)?.toInt() ?? 100,
+      status: (json['status'] ?? 'in_progress').toString(),
+    );
+  }
+}
+
 class SimulationScenario {
   final String id;
   final String title;
@@ -61,9 +84,13 @@ class SimulationScenario {
   final ScenarioDifficulty difficulty;
   final int estimatedMinutes;
   final int xpReward;
+  final int passingScore;
+  final String entryNodeId;
+  final String? investigationCaseId;
   final List<String> initialTerminalHistory;
   final List<SimulationObjective> objectives;
   final bool isCompleted;
+  final SimulationActiveAttempt? activeAttempt;
 
   const SimulationScenario({
     required this.id,
@@ -73,25 +100,33 @@ class SimulationScenario {
     required this.difficulty,
     required this.estimatedMinutes,
     required this.xpReward,
+    this.passingScore = 70,
+    this.entryNodeId = 'node_start',
+    this.investigationCaseId,
     required this.initialTerminalHistory,
     required this.objectives,
     this.isCompleted = false,
+    this.activeAttempt,
   });
 
   factory SimulationScenario.fromJson(Map<String, dynamic> json) {
     return SimulationScenario(
       id: (json['id'] ?? '').toString(),
-      title: json['title'] as String? ?? '',
-      description: json['description'] as String? ?? '',
+      title: (json['title'] ?? '').toString(),
+      description: (json['description'] ?? '').toString(),
       category: _parseCategory(json['category'] as String?),
       difficulty: _parseDifficulty(json['difficulty'] as String?),
-      estimatedMinutes: (json['estimatedMinutes'] as num?)?.toInt() ?? 0,
-      xpReward: (json['xpReward'] as num?)?.toInt() ?? 0,
+      estimatedMinutes: (json['estimatedMinutes'] as num?)?.toInt() ?? 10,
+      xpReward: (json['xpReward'] as num?)?.toInt() ?? 100,
+      passingScore: (json['passingScore'] as num?)?.toInt() ?? 70,
+      entryNodeId: (json['entryNodeId'] ?? 'node_start').toString(),
+      investigationCaseId: json['investigationCaseId']?.toString(),
       initialTerminalHistory:
-          (json['initialTerminalHistory'] as List<dynamic>?)
-              ?.map((e) => e.toString())
-              .toList() ??
-          const [],
+          (json['initialTerminalHistory'] is List)
+              ? (json['initialTerminalHistory'] as List<dynamic>)
+                  .map((e) => e.toString())
+                  .toList()
+              : const [],
       objectives:
           (json['objectives'] as List<dynamic>?)
               ?.map(
@@ -100,6 +135,12 @@ class SimulationScenario {
               .toList() ??
           const [],
       isCompleted: json['isCompleted'] as bool? ?? false,
+      activeAttempt:
+          json['activeAttempt'] != null
+              ? SimulationActiveAttempt.fromJson(
+                json['activeAttempt'] as Map<String, dynamic>,
+              )
+              : null,
     );
   }
 
@@ -114,17 +155,20 @@ class SimulationScenario {
       case 'malware':
         return ScenarioCategory.malware;
       default:
-        return ScenarioCategory.network;
+        return ScenarioCategory.webSec;
     }
   }
 
   static ScenarioDifficulty _parseDifficulty(String? val) {
     switch (val) {
       case 'easy':
+      case 'beginner':
         return ScenarioDifficulty.easy;
       case 'medium':
+      case 'intermediate':
         return ScenarioDifficulty.medium;
       case 'hard':
+      case 'advanced':
         return ScenarioDifficulty.hard;
       case 'critical':
         return ScenarioDifficulty.critical;
