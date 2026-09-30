@@ -48,15 +48,18 @@ class _SimulationLabScreenState extends ConsumerState<SimulationLabScreen> {
       filteredScenarios = scenariosAsync.value!;
       if (_selectedTab != 'All Scenarios') {
         filteredScenarios = filteredScenarios.where((s) {
-          if (_selectedTab == 'Network Security')
+          if (_selectedTab == 'Network Security') {
             return s.category == ScenarioCategory.network;
-          if (_selectedTab == 'Web Security')
+          }
+          if (_selectedTab == 'Web Security') {
             return s.category == ScenarioCategory.webSec;
+          }
           if (_selectedTab == 'DFIR') {
             return s.category == ScenarioCategory.dfir;
           }
-          if (_selectedTab == 'Malware Analysis')
+          if (_selectedTab == 'Malware Analysis') {
             return s.category == ScenarioCategory.malware;
+          }
           return true;
         }).toList();
       }
@@ -280,6 +283,7 @@ class _SimulationLabScreenState extends ConsumerState<SimulationLabScreen> {
   ) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    final primaryColor = theme.colorScheme.primary;
 
     Color difficultyBg;
     Color difficultyText;
@@ -398,15 +402,48 @@ class _SimulationLabScreenState extends ConsumerState<SimulationLabScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  ' min',
+                  '${scenario.estimatedMinutes} min',
                   style: TextStyle(
                     color: foren.textSecondary,
                     fontSize: 11,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(width: AppSpacing.lg),
-                if (scenario.isCompleted) ...[
+                const SizedBox(width: AppSpacing.md),
+                if (scenario.activeAttempt != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.15),
+                      borderRadius: AppRadius.borderRadiusXs,
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.4),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.play_arrow_rounded,
+                          size: 12,
+                          color: primaryColor,
+                        ),
+                        const SizedBox(width: 2),
+                        Text(
+                          'Resume (${scenario.activeAttempt!.score} pts)',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ] else if (scenario.isCompleted) ...[
                   Icon(
                     Icons.check_circle_rounded,
                     size: 14,

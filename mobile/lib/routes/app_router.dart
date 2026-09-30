@@ -14,7 +14,7 @@ import '../features/academy/presentation/pages/course_detail_screen.dart';
 import '../features/academy/presentation/pages/lesson_player_screen.dart';
 import '../features/academy/presentation/pages/quiz_screen.dart';
 import '../features/academy/presentation/pages/learning_progress_screen.dart';
-import '../features/simulation/screens/simulation_lab_screen.dart';
+import '../features/simulation/presentation/pages/simulation_lab_screen.dart';
 import '../features/simulation/presentation/pages/scenario_runner_screen.dart';
 import '../features/simulation/presentation/pages/scenario_debrief_screen.dart';
 import '../features/reports/presentation/pages/report_detail_screen.dart';
