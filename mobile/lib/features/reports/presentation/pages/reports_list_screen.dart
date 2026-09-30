@@ -66,49 +66,125 @@ class ReportsListScreen extends ConsumerWidget {
         ),
       ),
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            // 1. Analytics dashboard header
-            ReportsDashboardHeader(reports: reports),
+        child: RefreshIndicator(
+          color: AppColors.primary,
+          onRefresh: () async {
+            await ref.read(reportsProvider.notifier).loadReports();
+          },
+          child: ListView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            children: [
+              // 1. Analytics dashboard header
+              ReportsDashboardHeader(reports: reports),
 
-            const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.lg),
 
-            // 2. Incident density heat map
-            const SecurityHeatMapWidget(),
+              // 2. Incident density heat map
+              const SecurityHeatMapWidget(),
 
-            const SizedBox(height: AppSpacing.xl),
+              const SizedBox(height: AppSpacing.xl),
 
-            // 3. Reports catalog title
-            Text(
-              'Incident reports',
-              style: theme.textTheme.labelMedium?.copyWith(
-                color: foren.textSecondary,
-                fontWeight: FontWeight.w700,
+              // 3. Reports catalog title
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Incident reports',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: foren.textSecondary,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  Text(
+                    '${reports.length} Published',
+                    style: TextStyle(
+                      color: foren.textSecondary,
+                      fontSize: 11,
+                      fontFamily: 'monospace',
+                    ),
+                  ),
+                ],
               ),
-            ),
 
-            const SizedBox(height: AppSpacing.xs),
+              const SizedBox(height: AppSpacing.xs),
 
-            // 4. Reports list cards
-            ...reports.map((report) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: _ReportCard(
-                  reportNumber: report.caseNumber,
-                  title: report.title,
-                  category: report.category,
-                  severity: report.severity,
-                  generatedAt: report.generatedAt,
-                  summary: report.summary,
-                  accentColor: _severityColor(report.severity, foren),
-                  onTap: () {
-                    context.push('${RouteConstants.reportDetail}/${report.id}');
-                  },
-                ),
-              );
-            }),
-          ],
+              // 4. Empty State or Reports list cards
+              if (reports.isEmpty)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xl),
+                  child: GlassEffect(
+                    borderRadius: AppRadius.borderRadiusLg,
+                    border: Border.all(color: foren.borderSubtle),
+                    child: Padding(
+                      padding: const EdgeInsets.all(AppSpacing.xl),
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.shield_outlined,
+                            size: 48,
+                            color: foren.textSecondary,
+                          ),
+                          const SizedBox(height: AppSpacing.md),
+                          Text(
+                            'No Incident Reports Published Yet',
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          Text(
+                            'Complete an investigation case in the Investigation Lab and formulate a final verdict to generate an authoritative incident report.',
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: foren.textSecondary,
+                              height: 1.4,
+                            ),
+                          ),
+                          const SizedBox(height: AppSpacing.lg),
+                          FilledButton.icon(
+                            onPressed: () {
+                              context.push(RouteConstants.investigation);
+                            },
+                            style: FilledButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              foregroundColor: theme.scaffoldBackgroundColor,
+                            ),
+                            icon: const Icon(Icons.travel_explore, size: 18),
+                            label: const Text(
+                              'OPEN INVESTIGATION LAB',
+                              style: TextStyle(
+                                fontWeight: FontWeight.w800,
+                                fontFamily: 'monospace',
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                )
+              else
+                ...reports.map((report) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: _ReportCard(
+                      reportNumber: report.caseNumber,
+                      title: report.title,
+                      category: report.category,
+                      severity: report.severity,
+                      generatedAt: report.generatedAt,
+                      summary: report.summary,
+                      score: report.score,
+                      xpEarned: report.xpEarned,
+                      accentColor: _severityColor(report.severity, foren),
+                      onTap: () {
+                        context.push('${RouteConstants.reportDetail}/${report.id}');
+                      },
+                    ),
+                  );
+                }),
+            ],
+          ),
         ),
       ),
     );
@@ -135,6 +211,8 @@ class _ReportCard extends StatefulWidget {
   final String severity;
   final String generatedAt;
   final String summary;
+  final int score;
+  final int xpEarned;
   final Color accentColor;
   final VoidCallback onTap;
 
@@ -145,6 +223,8 @@ class _ReportCard extends StatefulWidget {
     required this.severity,
     required this.generatedAt,
     required this.summary,
+    this.score = 100,
+    this.xpEarned = 0,
     required this.accentColor,
     required this.onTap,
   });
@@ -199,19 +279,43 @@ class _ReportCardState extends State<_ReportCard> {
                           ),
                         ),
                         child: Text(
-                          widget.severity,
+                          widget.severity.toUpperCase(),
                           style: theme.textTheme.labelSmall?.copyWith(
                             color: widget.accentColor,
                             fontWeight: FontWeight.w700,
+                            fontFamily: 'monospace',
                           ),
                         ),
                       ),
+                      if (widget.xpEarned > 0) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 6,
+                            vertical: 3,
+                          ),
+                          decoration: BoxDecoration(
+                            color: foren.success.t500.withValues(alpha: 0.12),
+                            borderRadius: AppRadius.borderRadiusXs,
+                          ),
+                          child: Text(
+                            '+${widget.xpEarned} XP',
+                            style: TextStyle(
+                              color: foren.success.t500,
+                              fontSize: 9,
+                              fontWeight: FontWeight.w800,
+                              fontFamily: 'monospace',
+                            ),
+                          ),
+                        ),
+                      ],
                       const Spacer(),
                       Text(
                         widget.reportNumber,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: AppColors.primary,
                           fontWeight: FontWeight.w700,
+                          fontFamily: 'monospace',
                         ),
                       ),
                     ],
@@ -235,6 +339,8 @@ class _ReportCardState extends State<_ReportCard> {
                   const SizedBox(height: AppSpacing.sm),
                   Text(
                     widget.summary,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: foren.textSecondary,
                       height: 1.4,
@@ -253,11 +359,12 @@ class _ReportCardState extends State<_ReportCard> {
                         widget.generatedAt,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: foren.textSecondary,
+                          fontFamily: 'monospace',
                         ),
                       ),
                       const Spacer(),
                       Text(
-                        'Open report',
+                        'Open report →',
                         style: theme.textTheme.labelMedium?.copyWith(
                           color: theme.colorScheme.primary,
                           fontWeight: FontWeight.w700,
