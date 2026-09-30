@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../../../../core/logger/app_logger.dart';
 import '../../../../core/providers/app_preferences_provider.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../routes/route_constants.dart';
+import '../../../authentication/providers/auth_state_provider.dart';
 import '../widgets/background_grid.dart';
 import '../widgets/loading_bar.dart';
 import '../widgets/splash_logo.dart';
@@ -18,16 +20,46 @@ class SplashScreen extends ConsumerStatefulWidget {
 }
 
 class _SplashScreenState extends ConsumerState<SplashScreen> {
-  Future<void> _onLoadingComplete() async {
-    await Future.delayed(const Duration(milliseconds: 200));
-    if (!mounted) return;
+  bool _hasNavigated = false;
 
-    final hasSeenOnboarding = await ref.read(hasSeenOnboardingProvider.future);
-    if (mounted) {
+  Future<void> _onLoadingComplete() async {
+    if (_hasNavigated || !mounted) return;
+    _hasNavigated = true;
+
+    try {
+      final authState = ref.read(authStateProvider);
+      final user = authState.isLoading
+          ? await ref.read(authStateProvider.future)
+          : authState.value;
+
+      if (!mounted) return;
+
+      if (user != null) {
+        AppLogger.d(
+          '[SplashScreen] Active session verified for ${user.email}. Routing to Mission Control.',
+        );
+        context.go(RouteConstants.missionControl);
+        return;
+      }
+
+      final hasSeenOnboardingAsync = ref.read(hasSeenOnboardingProvider);
+      final hasSeenOnboarding = hasSeenOnboardingAsync.isLoading
+          ? await ref.read(hasSeenOnboardingProvider.future)
+          : (hasSeenOnboardingAsync.value ?? false);
+
+      if (!mounted) return;
+
       if (hasSeenOnboarding) {
+        AppLogger.d('[SplashScreen] No active session. Routing to Login.');
         context.go(RouteConstants.login);
       } else {
+        AppLogger.d('[SplashScreen] First time user. Routing to Onboarding.');
         context.go(RouteConstants.onboarding);
+      }
+    } catch (e) {
+      AppLogger.w('[SplashScreen] Auth initialization check error: $e');
+      if (mounted) {
+        context.go(RouteConstants.login);
       }
     }
   }

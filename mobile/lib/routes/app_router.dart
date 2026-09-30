@@ -20,7 +20,6 @@ import '../features/simulation/presentation/pages/scenario_debrief_screen.dart';
 import '../features/reports/presentation/pages/report_detail_screen.dart';
 import '../features/reports/presentation/pages/reports_list_screen.dart';
 import '../features/investigation/screens/investigation_lab_screen.dart';
-import '../features/home/presentation/pages/home_screen.dart';
 import '../features/investigation/presentation/pages/case_detail_screen.dart';
 import '../features/investigation/presentation/pages/evidence_viewer_screen.dart';
 import '../features/investigation/presentation/pages/investigation_timeline_screen.dart';
@@ -99,7 +98,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
       GoRoute(
         name: 'dashboard',
         path: RouteConstants.dashboard,
-        builder: (context, state) => const HomeScreen(),
+        redirect: (context, state) => RouteConstants.missionControl,
       ),
       GoRoute(
         name: 'missionControl',

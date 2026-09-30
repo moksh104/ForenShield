@@ -132,7 +132,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     if (!mounted) return;
 
     context.showSuccessSnackBar('You\'re signed out.');
-    context.goNamed(RouteConstants.login);
+    context.go(RouteConstants.login);
   }
 
   Future<void> _handleDataExport() async {

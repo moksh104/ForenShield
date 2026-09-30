@@ -66,8 +66,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
     result.when(
       success: (_) {
         AppLogger.d(
-          '[LoginScreen] Login returned success result. AuthGuard redirect will handle navigation.',
+          '[LoginScreen] Login returned success result. Navigating to Home.',
         );
+        if (mounted) {
+          context.go(RouteConstants.missionControl);
+        }
       },
       failure: (exception) {
         AppLogger.w('[LoginScreen] Login returned failure result: $exception');

@@ -80,6 +80,7 @@ class ProfileScreen extends ConsumerWidget {
 
                   // Settings Gear Icon
                   GestureDetector(
+                    behavior: HitTestBehavior.opaque,
                     onTap: () => context.push(RouteConstants.settings),
                     child: SizedBox(
                       width: 36,

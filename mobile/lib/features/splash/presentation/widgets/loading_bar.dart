@@ -29,13 +29,9 @@ class _LoadingBarState extends State<LoadingBar>
       CurvedAnimation(parent: _controller, curve: Curves.easeInOutCubic),
     );
 
-    Future.delayed(const Duration(milliseconds: 150), () {
+    _controller.forward().then((_) {
       if (mounted) {
-        _controller.forward().then((_) {
-          if (mounted) {
-            widget.onComplete?.call();
-          }
-        });
+        widget.onComplete?.call();
       }
     });
   }

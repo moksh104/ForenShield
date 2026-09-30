@@ -8,7 +8,6 @@ import '../../../../core/components/foren_navigation.dart';
 import '../../../../routes/route_constants.dart';
 
 import '../widgets/home_header.dart';
-import '../widgets/continue_learning_card.dart';
 import '../widgets/core_experience_card.dart';
 import '../widgets/recent_activity_section.dart';
 import '../widgets/mission_control_entry.dart';
@@ -28,9 +27,6 @@ class HomeScreen extends ConsumerWidget {
             const HomeHeader(),
             const SizedBox(height: AppSpacing.lg),
 
-            const ContinueLearningCard(),
-            const SizedBox(height: AppSpacing.xl),
-
             const MissionControlEntry(),
             const SizedBox(height: AppSpacing.xl),
 
@@ -47,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
         onTap: (index) {
           switch (index) {
             case 0:
-              // Already on home
+              context.go(RouteConstants.missionControl);
               break;
             case 1:
               context.go(RouteConstants.academy);

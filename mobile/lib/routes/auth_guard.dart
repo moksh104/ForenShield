@@ -35,9 +35,14 @@ class AuthGuard {
     final hasSeenOnboardingAsync = notifier.hasSeenOnboarding;
     final authState = notifier.authState;
 
-    // 2. Wait for critical state to initialize.
+    // 2. Allow SplashScreen to display and perform its session-aware completion navigation.
+    if (isSplash) {
+      return null;
+    }
+
+    // 3. For all other routes, wait for critical state to initialize.
     if (hasSeenOnboardingAsync.isLoading || authState.isLoading) {
-      return isSplash ? null : RouteConstants.splash;
+      return RouteConstants.splash;
     }
 
     final hasSeenOnboarding = hasSeenOnboardingAsync.value ?? false;
@@ -49,45 +54,32 @@ class AuthGuard {
       'user: ${authState.value?.email}',
     );
 
-    // 3. Enforce Authentication Flow for Authenticated Users FIRST
+    // 4. Enforce Authentication Flow for Authenticated Users
     if (isLoggedIn) {
-      if (isSplash || isOnboarding || isAuthRoute) {
+      if (isOnboarding || isAuthRoute) {
         AppLogger.d(
-          '[AuthGuard] Authenticated user on non-protected page "$location". Redirecting to Dashboard.',
+          '[AuthGuard] Authenticated user on non-protected page "$location". Redirecting to Home (Mission Control).',
         );
-        return RouteConstants.dashboard;
+        return RouteConstants.missionControl;
       }
       return null;
     }
 
-    // 4. Enforce Onboarding Flow for Unauthenticated Users
+    // 5. Enforce Onboarding Flow for Unauthenticated Users
     if (!hasSeenOnboarding) {
-      if (!isOnboarding && !isSplash) {
+      if (!isOnboarding) {
         AppLogger.d(
           '[AuthGuard] Unauthenticated user needs onboarding. Redirecting to Onboarding.',
         );
         return RouteConstants.onboarding;
       }
-      if (isSplash) {
-        AppLogger.d(
-          '[AuthGuard] Splash route with uncompleted onboarding. Redirecting to Onboarding.',
-        );
-        return RouteConstants.onboarding;
-      }
       return null;
     }
 
-    // 5. Unauthenticated users accessing protected routes must be redirected to login.
-    if (isProtectedRoute || (!isAuthRoute && !isSplash && !isOnboarding)) {
+    // 6. Unauthenticated users accessing protected routes must be redirected to login.
+    if (isProtectedRoute || !isAuthRoute) {
       AppLogger.d(
         '[AuthGuard] Unauthenticated user attempting to access protected route "$location". Redirecting to Login.',
-      );
-      return RouteConstants.login;
-    }
-
-    if (isSplash || isOnboarding) {
-      AppLogger.d(
-        '[AuthGuard] Onboarding complete. Redirecting splash/onboarding to Login.',
       );
       return RouteConstants.login;
     }

@@ -69,6 +69,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
       page: page,
       unreadOnly: unreadOnly,
     );
+    if (!mounted) return;
     if (result.isSuccess) {
       final data =
           (result
@@ -92,6 +93,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
 
   Future<void> markAsRead(int notificationId) async {
     final result = await _repo.markAsRead(notificationId: notificationId);
+    if (!mounted) return;
     if (result.isSuccess) {
       final updatedList = state.notifications.map((n) {
         if (n.id == notificationId) {
@@ -109,6 +111,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
 
   Future<void> markAllAsRead() async {
     final result = await _repo.markAsRead(markAll: true);
+    if (!mounted) return;
     if (result.isSuccess) {
       final updatedList = state.notifications
           .map((n) => n.copyWith(isRead: true))
