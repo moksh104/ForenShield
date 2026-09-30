@@ -1,6 +1,7 @@
 import '../../../../core/utils/result.dart';
 import '../entities/evidence_entity.dart';
 import '../entities/investigation_entity.dart';
+import '../../data/models/verdict_result_model.dart';
 
 /// Contract interface for Investigation Lab repository.
 abstract class InvestigationRepository {
@@ -22,8 +23,13 @@ abstract class InvestigationRepository {
   Future<Result<EvidenceEntity>> markEvidenceReviewed(String evidenceId);
 
   /// Submits investigation verdict choice.
-  Future<Result<int>> submitVerdict({
+  /// Returns a [VerdictResult] carrying server-evaluated score, XP, and achievements.
+  Future<Result<VerdictResult>> submitVerdict({
     required String caseId,
     required int selectedVerdictIndex,
   });
+
+  /// Records that the user has started working on a case.
+  /// Idempotent — does nothing if progress already exists.
+  Future<void> markCaseStarted(String caseId);
 }

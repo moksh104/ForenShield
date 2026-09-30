@@ -9,6 +9,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../data/models/verdict_result_model.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../providers/investigation_provider.dart';
 
@@ -27,7 +28,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
   bool _isLoading = true;
   int? _selectedIndex;
   bool _isSubmitted = false;
-  int _scorePercent = 0;
+  VerdictResult? _verdictResult;
 
   @override
   void initState() {
@@ -62,15 +63,40 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
     final result = await submitUseCase(caseId: c.id, selectedVerdictIndex: idx);
 
     result.when(
-      success: (score) {
+      success: (verdictResult) {
         if (mounted) {
           setState(() {
-            _scorePercent = score;
+            _verdictResult = verdictResult;
             _isSubmitted = true;
           });
+          // Show achievement snackbar if new ones unlocked
+          if (verdictResult.newAchievements.isNotEmpty && mounted) {
+            final foren = Theme.of(context).extension<ForenColors>()!;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                  '🏆 Achievement unlocked: ${verdictResult.newAchievements.first}',
+                ),
+                backgroundColor: foren.success.t500,
+                duration: const Duration(seconds: 4),
+              ),
+            );
+          }
         }
       },
-      failure: (_) {},
+      failure: (err) {
+        if (mounted) {
+          final foren = Theme.of(context).extension<ForenColors>()!;
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                'Could not submit verdict. Please check your connection and try again.',
+              ),
+              backgroundColor: foren.critical.t500,
+            ),
+          );
+        }
+      },
     );
   }
 
@@ -124,8 +150,12 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
     }
 
     if (_isSubmitted) {
-      final isCorrect = _selectedIndex == verdict.correctOptionIndex;
-
+      final vr = _verdictResult;
+      final verdict = _caseDetail?.verdict;
+      final isCorrect = vr?.isCorrect ?? false;
+      final scorePercent = vr?.score ?? 0;
+      final xpEarned = vr?.xpEarned ?? 0;
+      final wasDuplicate = vr?.wasDuplicate ?? false;
       return Scaffold(
         backgroundColor: theme.scaffoldBackgroundColor,
         body: ParticleBackground(
@@ -203,14 +233,14 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                             TweenAnimationBuilder<double>(
                               tween: Tween<double>(
                                 begin: 0,
-                                end: _scorePercent.toDouble(),
+                                end: scorePercent.toDouble(),
                               ),
                               duration: const Duration(milliseconds: 1200),
                               curve: Curves.easeOutCubic,
                               builder: (context, animatedVal, child) {
                                 return Text(
                                   isCorrect
-                                      ? 'ACCURACY: ${animatedVal.toInt()}% · REWARD: +${verdict.xpReward} XP'
+                                      ? 'ACCURACY: ${animatedVal.toInt()}%${wasDuplicate ? '' : ' · +$xpEarned XP EARNED'}'
                                       : 'SCORE: ${animatedVal.toInt()}% · REVIEW EVIDENCE ARTIFACTS',
                                   style: TextStyle(
                                     color: primaryColor,
@@ -238,7 +268,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                                 ),
                               ),
                               child: Text(
-                                verdict.explanationText,
+                                verdict?.explanationText ?? '',
                                 style: TextStyle(
                                   color: theme.colorScheme.onSurface,
                                   fontSize: 13,

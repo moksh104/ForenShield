@@ -5,6 +5,7 @@ import '../models/case_model.dart';
 import '../models/evidence_model.dart';
 import '../models/timeline_model.dart';
 import '../models/verdict_model.dart';
+import '../models/verdict_result_model.dart';
 
 /// Remote Data Source for Investigation Lab API endpoints.
 class InvestigationRemoteDataSource {
@@ -81,23 +82,46 @@ class InvestigationRemoteDataSource {
     throw const ApiException('Invalid evidence data received');
   }
 
-  /// Submits verdict decision.
-  Future<int> submitVerdict({
+  /// Records case as started (creates a user_case_progress row if none exists).
+  Future<void> markCaseStarted(String caseId) async {
+    if (ApiConfig.useMockApi) return;
+    try {
+      await _apiClient.post<Map<String, dynamic>>(
+        '/investigation_progress.php',
+        data: {'case_id': caseId, 'action': 'start'},
+      );
+    } catch (_) {
+      // Non-critical — failure to mark started should not block navigation.
+    }
+  }
+
+  /// Submits verdict decision — returns server-evaluated [VerdictResult].
+  Future<VerdictResult> submitVerdict({
     required String caseId,
     required int selectedVerdictIndex,
   }) async {
     if (ApiConfig.useMockApi) {
-      return selectedVerdictIndex == 1 ? 100 : 40;
+      final isCorrect = selectedVerdictIndex == 1;
+      return VerdictResult(
+        score: isCorrect ? 100 : 40,
+        isCorrect: isCorrect,
+        xpEarned: isCorrect ? 300 : 0,
+        bonusXp: 0,
+        wasDuplicate: false,
+        newAchievements: const [],
+      );
     }
     final response = await _apiClient.post<Map<String, dynamic>>(
       '/investigation_verdict.php',
       data: {'case_id': caseId, 'selected_verdict_index': selectedVerdictIndex},
     );
-    if (response.data != null && response.data!['score'] != null) {
-      return response.data!['score'] as int;
+    if (response.data != null) {
+      return VerdictResult.fromJson(response.data!);
     }
     throw const ApiException('Invalid verdict submission response');
   }
+
+  // ── Fallback / Offline Data ──────────────────────────────────────────────
 
   static const List<EvidenceModel> _fallbackEvidence = [
     EvidenceModel(

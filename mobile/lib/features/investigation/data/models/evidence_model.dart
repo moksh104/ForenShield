@@ -13,17 +13,20 @@ class EvidenceModel extends EvidenceEntity {
   });
 
   factory EvidenceModel.fromJson(Map<String, dynamic> json) {
+    // PHP APIs return 'metadata_map' (matching the DB column name).
+    // Support both 'metadata_map' (API response) and 'metadata' (legacy/fallback).
+    final rawMeta =
+        (json['metadata_map'] as Map<String, dynamic>?) ??
+        (json['metadata'] as Map<String, dynamic>?) ??
+        const <String, dynamic>{};
+
     return EvidenceModel(
       id: (json['id'] ?? '').toString(),
       title: json['title'] as String? ?? '',
       type: json['type'] as String? ?? 'text',
       fileUrl: json['file_url'] as String?,
       contentText: json['content_text'] as String? ?? '',
-      metadataMap:
-          (json['metadata'] as Map<String, dynamic>?)?.map(
-            (k, v) => MapEntry(k, v.toString()),
-          ) ??
-          const {},
+      metadataMap: rawMeta.map((k, v) => MapEntry(k, v.toString())),
       isReviewed: json['is_reviewed'] as bool? ?? false,
       timestamp: json['timestamp'] as String? ?? '',
     );
@@ -36,7 +39,7 @@ class EvidenceModel extends EvidenceEntity {
       'type': type,
       'file_url': fileUrl,
       'content_text': contentText,
-      'metadata': metadataMap,
+      'metadata_map': metadataMap,
       'is_reviewed': isReviewed,
       'timestamp': timestamp,
     };

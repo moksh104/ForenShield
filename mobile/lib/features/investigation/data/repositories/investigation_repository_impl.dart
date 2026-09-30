@@ -4,6 +4,7 @@ import '../../domain/entities/evidence_entity.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../../domain/repositories/investigation_repository.dart';
 import '../datasources/investigation_remote_data_source.dart';
+import '../models/verdict_result_model.dart';
 
 /// Implementation of [InvestigationRepository].
 class InvestigationRepositoryImpl implements InvestigationRepository {
@@ -71,20 +72,29 @@ class InvestigationRepositoryImpl implements InvestigationRepository {
   }
 
   @override
-  Future<Result<int>> submitVerdict({
+  Future<Result<VerdictResult>> submitVerdict({
     required String caseId,
     required int selectedVerdictIndex,
   }) async {
     try {
-      final score = await _remoteDataSource.submitVerdict(
+      final result = await _remoteDataSource.submitVerdict(
         caseId: caseId,
         selectedVerdictIndex: selectedVerdictIndex,
       );
-      return Success(score);
+      return Success(result);
     } on AppException catch (e) {
       return Failure(e);
     } catch (e) {
       return Failure(ApiException('Failed to submit verdict: $e'));
+    }
+  }
+
+  @override
+  Future<void> markCaseStarted(String caseId) async {
+    try {
+      await _remoteDataSource.markCaseStarted(caseId);
+    } catch (_) {
+      // Non-critical — silently ignore
     }
   }
 }

@@ -5,7 +5,7 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
-// import routes
+import '../../../../routes/route_constants.dart';
 import '../../../../shared/states/empty_state.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../providers/investigation_provider.dart';
@@ -40,6 +40,8 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
             _caseDetail = data;
             _isLoading = false;
           });
+          // Mark case as started (non-critical, fire-and-forget)
+          repo.markCaseStarted(widget.caseId);
         }
       },
       failure: (_) {
@@ -219,7 +221,7 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                     ),
                   ),
                   Text(
-                    ' ITEMS',
+                    '${caseDetail.evidenceList.length} ITEMS',
                     style: TextStyle(
                       color: primaryColor,
                       fontSize: 11,
@@ -241,7 +243,8 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                 Column(
                   children: caseDetail.evidenceList.map((ev) {
                     return GestureDetector(
-                      onTap: () => context.push('/evidence/'),
+                      onTap: () => context.push(
+                        '${RouteConstants.evidenceViewer}/${ev.id}'),
                       child: Container(
                         margin: const EdgeInsets.only(bottom: AppSpacing.sm),
                         padding: const EdgeInsets.all(AppSpacing.md),
@@ -272,7 +275,7 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
-                                    'Type:  • ',
+                                    'Type: ${ev.type.toUpperCase()} • ',
                                     style: TextStyle(
                                       color: foren.textSecondary,
                                       fontSize: 11,
@@ -386,7 +389,8 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                       }),
                       if (caseDetail.timeline.length > 3)
                         TextButton(
-                          onPressed: () => context.push('/timeline/'),
+                          onPressed: () => context.push(
+                              '${RouteConstants.caseTimeline}/${caseDetail.id}'),
                           child: const Text('View Full Timeline'),
                         ),
                     ],
@@ -415,51 +419,77 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                   icon: Icons.gavel,
                 )
               else
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  decoration: BoxDecoration(
-                    color: foren.success.t500.withValues(
-                      alpha: isDarkTheme(context) ? 0.05 : 1.0,
-                    ),
-                    borderRadius: AppRadius.borderRadiusLg,
-                    border: Border.all(
-                      color: foren.success.t500.withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(AppSpacing.md),
+                      decoration: BoxDecoration(
+                        color: primaryColor.withValues(alpha: 0.05),
+                        borderRadius: AppRadius.borderRadiusLg,
+                        border: Border.all(
+                          color: primaryColor.withValues(alpha: 0.25),
+                        ),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Icon(
-                            Icons.verified,
-                            color: foren.success.t500,
-                            size: 20,
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.gavel,
+                                color: primaryColor,
+                                size: 18,
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Text(
+                                'VERDICT READY',
+                                style: TextStyle(
+                                  color: primaryColor,
+                                  fontWeight: FontWeight.w800,
+                                  fontSize: 12,
+                                  letterSpacing: 1.0,
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(width: AppSpacing.sm),
+                          const SizedBox(height: AppSpacing.sm),
                           Text(
-                            'CONCLUSION REACHED',
+                            caseDetail.verdict!.summaryText,
                             style: TextStyle(
-                              color: foren.success.t500,
-                              fontWeight: FontWeight.w800,
-                              fontSize: 12,
-                              letterSpacing: 1.0,
+                              color: theme.colorScheme.onSurface,
+                              fontSize: 13,
+                              height: 1.4,
                             ),
                           ),
                         ],
                       ),
-                      const SizedBox(height: AppSpacing.sm),
-                      Text(
-                        caseDetail.verdict!.explanationText,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface,
-                          fontSize: 14,
-                          height: 1.4,
+                    ),
+                    const SizedBox(height: AppSpacing.md),
+                    ElevatedButton.icon(
+                      onPressed: () => context.push(
+                        '${RouteConstants.caseVerdict}/${caseDetail.id}'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: primaryColor,
+                        foregroundColor: theme.colorScheme.onPrimary,
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 14,
+                        ),
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: AppRadius.borderRadiusMd,
                         ),
                       ),
-                    ],
-                  ),
+                      icon: const Icon(Icons.gavel, size: 18),
+                      label: const Text(
+                        'FORMULATE VERDICT',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w800,
+                          fontFamily: 'monospace',
+                          letterSpacing: 0.8,
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
             ],
           ),
