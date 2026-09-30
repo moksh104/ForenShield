@@ -14,11 +14,16 @@ class EvidenceModel extends EvidenceEntity {
 
   factory EvidenceModel.fromJson(Map<String, dynamic> json) {
     // PHP APIs return 'metadata_map' (matching the DB column name).
-    // Support both 'metadata_map' (API response) and 'metadata' (legacy/fallback).
-    final rawMeta =
-        (json['metadata_map'] as Map<String, dynamic>?) ??
-        (json['metadata'] as Map<String, dynamic>?) ??
-        const <String, dynamic>{};
+    // When the DB value is NULL, PHP returns [] (empty JSON array) instead of {}.
+    // We must safely handle Map, empty List, and null without throwing TypeError.
+    Map<String, dynamic> rawMeta = const <String, dynamic>{};
+    final metaRaw = json['metadata_map'] ?? json['metadata'];
+    if (metaRaw is Map<String, dynamic>) {
+      rawMeta = metaRaw;
+    } else if (metaRaw is Map) {
+      rawMeta = Map<String, dynamic>.from(metaRaw);
+    }
+    // If metaRaw is a List (e.g. empty [] from PHP) or null, rawMeta stays {}.
 
     return EvidenceModel(
       id: (json['id'] ?? '').toString(),

@@ -81,7 +81,7 @@ foreach ($evidenceRaw as $eRow) {
         'title' => $eRow['title'],
         'type' => $eRow['evidence_type'],
         'content_text' => $eRow['content_text'],
-        'metadata_map' => $eRow['metadata_map'] ? json_decode($eRow['metadata_map'], true) : [],
+        'metadata_map' => $eRow['metadata_map'] ? json_decode($eRow['metadata_map'], true) : (object)[],
         'is_reviewed' => true, // Simplification for now, we don't track per-evidence review in user progress currently
         'timestamp' => $eRow['evidence_timestamp']
     ];
