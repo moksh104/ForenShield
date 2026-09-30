@@ -9,6 +9,9 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_radius.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/theme/foren_theme.dart';
+import '../../../../core/extensions/build_context_extension.dart';
+import '../../../../routes/route_constants.dart';
+import '../../../reports/providers/reports_provider.dart';
 import '../../data/models/verdict_result_model.dart';
 import '../../domain/entities/investigation_entity.dart';
 import '../providers/investigation_provider.dart';
@@ -29,6 +32,7 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
   int? _selectedIndex;
   bool _isSubmitted = false;
   VerdictResult? _verdictResult;
+  bool _isGeneratingReport = false;
 
   @override
   void initState() {
@@ -98,6 +102,29 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
         }
       },
     );
+  }
+
+  Future<void> _generateReport() async {
+    final c = _caseDetail;
+    if (c == null) return;
+    setState(() => _isGeneratingReport = true);
+    try {
+      final report = await ref.read(reportsProvider.notifier).generateReport(c.id);
+      if (!mounted) return;
+      if (report != null) {
+        context.push('${RouteConstants.reportDetail}/${report.id}');
+      } else {
+        context.showErrorSnackBar('Could not generate incident report. Please try again.');
+      }
+    } catch (e) {
+      if (mounted) {
+        context.showErrorSnackBar('Failed to generate report: $e');
+      }
+    } finally {
+      if (mounted) {
+        setState(() => _isGeneratingReport = false);
+      }
+    }
   }
 
   @override
@@ -278,26 +305,65 @@ class _VerdictScreenState extends ConsumerState<VerdictScreen> {
                               ),
                             ),
                             const SizedBox(height: AppSpacing.xl),
-                            ElevatedButton(
-                              onPressed: () => context.pop(),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: invColor,
-                                foregroundColor: theme.scaffoldBackgroundColor,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: OutlinedButton(
+                                    onPressed: () => context.pop(),
+                                    style: OutlinedButton.styleFrom(
+                                      side: BorderSide(color: foren.borderSubtle),
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 13,
+                                      ),
+                                      shape: const RoundedRectangleBorder(
+                                        borderRadius: AppRadius.borderRadiusMd,
+                                      ),
+                                    ),
+                                    child: Text(
+                                      'LABORATORY',
+                                      style: TextStyle(
+                                        color: theme.colorScheme.onSurface,
+                                        fontWeight: FontWeight.w700,
+                                        fontFamily: 'monospace',
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
                                 ),
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: AppRadius.borderRadiusMd,
-                                ),
-                              ),
-                              child: const Text(
-                                'RETURN TO LABORATORY',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w800,
-                                  fontFamily: 'monospace',
-                                ),
-                              ),
+                                if (isCorrect) ...[
+                                  const SizedBox(width: AppSpacing.md),
+                                  Expanded(
+                                    child: ElevatedButton.icon(
+                                      onPressed: _isGeneratingReport ? null : _generateReport,
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: invColor,
+                                        foregroundColor: theme.scaffoldBackgroundColor,
+                                        padding: const EdgeInsets.symmetric(
+                                          vertical: 13,
+                                        ),
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: AppRadius.borderRadiusMd,
+                                        ),
+                                      ),
+                                      icon: _isGeneratingReport
+                                          ? const SizedBox(
+                                              width: 14,
+                                              height: 14,
+                                              child: CircularProgressIndicator(strokeWidth: 2),
+                                            )
+                                          : const Icon(Icons.description_outlined, size: 16),
+                                      label: Text(
+                                        _isGeneratingReport ? 'GENERATING…' : 'INCIDENT REPORT',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w800,
+                                          fontFamily: 'monospace',
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ],
                             ),
                           ],
                         ),

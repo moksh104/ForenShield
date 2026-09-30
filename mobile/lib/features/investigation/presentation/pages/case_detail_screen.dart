@@ -8,6 +8,7 @@ import '../../../../core/theme/foren_theme.dart';
 import '../../../../routes/route_constants.dart';
 import '../../../../shared/states/empty_state.dart';
 import '../../domain/entities/investigation_entity.dart';
+import '../../../reports/providers/reports_provider.dart';
 import '../providers/investigation_provider.dart';
 import '../widgets/threat_level_badge.dart';
 
@@ -466,29 +467,80 @@ class _CaseDetailScreenState extends ConsumerState<CaseDetailScreen> {
                       ),
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    ElevatedButton.icon(
-                      onPressed: () => context.push(
-                        '${RouteConstants.caseVerdict}/${caseDetail.id}'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: primaryColor,
-                        foregroundColor: theme.colorScheme.onPrimary,
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 14,
+                    if (caseDetail.isSolved) ...[
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final report = await ref.read(reportsProvider.notifier).generateReport(caseDetail.id);
+                          if (!context.mounted) return;
+                          if (report != null) {
+                            context.push('${RouteConstants.reportDetail}/${report.id}');
+                          } else {
+                            context.push('${RouteConstants.caseVerdict}/${caseDetail.id}');
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: foren.success.t500,
+                          foregroundColor: theme.scaffoldBackgroundColor,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: AppRadius.borderRadiusMd,
+                          ),
                         ),
-                        shape: const RoundedRectangleBorder(
-                          borderRadius: AppRadius.borderRadiusMd,
+                        icon: const Icon(Icons.description_outlined, size: 18),
+                        label: const Text(
+                          'VIEW INCIDENT REPORT',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'monospace',
+                            letterSpacing: 0.8,
+                          ),
                         ),
                       ),
-                      icon: const Icon(Icons.gavel, size: 18),
-                      label: const Text(
-                        'FORMULATE VERDICT',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w800,
-                          fontFamily: 'monospace',
-                          letterSpacing: 0.8,
+                      const SizedBox(height: AppSpacing.sm),
+                      OutlinedButton.icon(
+                        onPressed: () => context.push('${RouteConstants.caseVerdict}/${caseDetail.id}'),
+                        style: OutlinedButton.styleFrom(
+                          side: BorderSide(color: foren.borderSubtle),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: AppRadius.borderRadiusMd,
+                          ),
+                        ),
+                        icon: const Icon(Icons.gavel, size: 16),
+                        label: Text(
+                          'REVIEW VERDICT',
+                          style: TextStyle(
+                            color: theme.colorScheme.onSurface,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'monospace',
+                          ),
                         ),
                       ),
-                    ),
+                    ] else ...[
+                      ElevatedButton.icon(
+                        onPressed: () => context.push(
+                          '${RouteConstants.caseVerdict}/${caseDetail.id}'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: primaryColor,
+                          foregroundColor: theme.colorScheme.onPrimary,
+                          padding: const EdgeInsets.symmetric(
+                            vertical: 14,
+                          ),
+                          shape: const RoundedRectangleBorder(
+                            borderRadius: AppRadius.borderRadiusMd,
+                          ),
+                        ),
+                        icon: const Icon(Icons.gavel, size: 18),
+                        label: const Text(
+                          'FORMULATE VERDICT',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontFamily: 'monospace',
+                            letterSpacing: 0.8,
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
             ],

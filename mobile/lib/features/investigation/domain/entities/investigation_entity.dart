@@ -63,6 +63,8 @@ class InvestigationEntity extends Equatable {
     this.verdict,
   });
 
+  bool get isSolved => status.toLowerCase() == 'solved' || progress >= 1.0;
+
   InvestigationEntity copyWith({
     String? status,
     double? progress,
