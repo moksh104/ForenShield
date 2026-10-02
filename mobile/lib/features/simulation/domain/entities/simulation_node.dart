@@ -129,7 +129,10 @@ class SimulationNode {
       type: SimulationNodeType.fromString(json['type'] as String?),
       title: (json['title'] ?? '').toString(),
       narrative: (json['narrative'] ?? '').toString(),
-      contextData: (json['context_data'] as Map<String, dynamic>?) ?? const {},
+      contextData:
+          json['context_data'] is Map<String, dynamic>
+              ? json['context_data'] as Map<String, dynamic>
+              : const {},
       availableActions:
           (json['available_actions'] as List<dynamic>?)
               ?.map((e) => SimulationAction.fromJson(e as Map<String, dynamic>))

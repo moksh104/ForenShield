@@ -82,8 +82,10 @@ class CourseNotifier extends StateNotifier<CourseState> {
     loadCourses();
   }
 
-  Future<void> loadCourses() async {
-    state = state.copyWith(status: CourseStatus.loading);
+  Future<void> loadCourses({bool forceLoading = false}) async {
+    if (state.courses.isEmpty || forceLoading) {
+      state = state.copyWith(status: CourseStatus.loading);
+    }
     final result = await _loadCoursesUseCase(
       category: state.selectedCategory,
       searchQuery: state.searchQuery,
@@ -99,13 +101,15 @@ class CourseNotifier extends StateNotifier<CourseState> {
         );
       },
       failure: (exception) {
-        state = state.copyWith(
-          status: CourseStatus.error,
-          errorMessage: AppErrorMessages.from(
-            exception,
-            context: AppErrorContext.academy,
-          ),
-        );
+        if (state.courses.isEmpty) {
+          state = state.copyWith(
+            status: CourseStatus.error,
+            errorMessage: AppErrorMessages.from(
+              exception,
+              context: AppErrorContext.academy,
+            ),
+          );
+        }
       },
     );
   }
@@ -140,17 +144,17 @@ class CourseNotifier extends StateNotifier<CourseState> {
 
   void filterCategory(String category) {
     state = state.copyWith(selectedCategory: category);
-    loadCourses();
+    loadCourses(forceLoading: true);
   }
 
   void search(String query) {
     state = state.copyWith(searchQuery: query);
-    loadCourses();
+    loadCourses(forceLoading: true);
   }
 }
 
 final courseProvider =
-    StateNotifierProvider.autoDispose<CourseNotifier, CourseState>((ref) {
+    StateNotifierProvider<CourseNotifier, CourseState>((ref) {
       final useCase = ref.watch(loadCoursesUseCaseProvider);
       return CourseNotifier(useCase);
     });

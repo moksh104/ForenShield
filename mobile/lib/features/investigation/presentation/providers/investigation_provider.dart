@@ -95,8 +95,10 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
     loadCases();
   }
 
-  Future<void> loadCases() async {
-    state = state.copyWith(status: InvestigationStatus.loading);
+  Future<void> loadCases({bool forceLoading = false}) async {
+    if (state.cases.isEmpty || forceLoading) {
+      state = state.copyWith(status: InvestigationStatus.loading);
+    }
     final result = await _loadCasesUseCase(
       statusFilter: state.selectedStatusFilter,
       priorityFilter: state.selectedPriorityFilter,
@@ -116,13 +118,15 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
         );
       },
       failure: (exception) {
-        state = state.copyWith(
-          status: InvestigationStatus.error,
-          errorMessage: AppErrorMessages.from(
-            exception,
-            context: AppErrorContext.investigation,
-          ),
-        );
+        if (state.cases.isEmpty) {
+          state = state.copyWith(
+            status: InvestigationStatus.error,
+            errorMessage: AppErrorMessages.from(
+              exception,
+              context: AppErrorContext.investigation,
+            ),
+          );
+        }
       },
     );
   }
@@ -161,22 +165,22 @@ class InvestigationNotifier extends StateNotifier<InvestigationState> {
 
   void filterStatus(String status) {
     state = state.copyWith(selectedStatusFilter: status);
-    loadCases();
+    loadCases(forceLoading: true);
   }
 
   void filterPriority(String priority) {
     state = state.copyWith(selectedPriorityFilter: priority);
-    loadCases();
+    loadCases(forceLoading: true);
   }
 
   void search(String query) {
     state = state.copyWith(searchQuery: query);
-    loadCases();
+    loadCases(forceLoading: true);
   }
 }
 
 final investigationProvider =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
       InvestigationNotifier,
       InvestigationState
     >((ref) {

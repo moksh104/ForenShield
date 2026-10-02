@@ -324,7 +324,13 @@ class _SimulationLabScreenState extends ConsumerState<SimulationLabScreen> {
 
     return GestureDetector(
       onTap: () {
-        context.push('${RouteConstants.simulationRun}/${scenario.id}');
+        // Scenarios with objectives use the terminal-based runner.
+        // Scenarios without (API-backed node-graph) use the branching runner.
+        if (scenario.objectives.isNotEmpty) {
+          context.push('${RouteConstants.terminalRun}/${scenario.id}');
+        } else {
+          context.push('${RouteConstants.simulationRun}/${scenario.id}');
+        }
       },
       child: Container(
         padding: const EdgeInsets.all(AppSpacing.md),
@@ -471,6 +477,41 @@ class _SimulationLabScreenState extends ConsumerState<SimulationLabScreen> {
                       color: foren.textSecondary,
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+                if (scenario.objectives.isNotEmpty) ...[
+                  const SizedBox(width: AppSpacing.sm),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 6,
+                      vertical: 2,
+                    ),
+                    decoration: BoxDecoration(
+                      color: primaryColor.withValues(alpha: 0.1),
+                      borderRadius: AppRadius.borderRadiusXs,
+                      border: Border.all(
+                        color: primaryColor.withValues(alpha: 0.3),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          Icons.terminal_rounded,
+                          size: 11,
+                          color: primaryColor,
+                        ),
+                        const SizedBox(width: 3),
+                        Text(
+                          'Terminal Shell',
+                          style: TextStyle(
+                            color: primaryColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],

@@ -156,7 +156,10 @@ class SimulationAttempt {
               ?.map((e) => e.toString())
               .toList() ??
           const [],
-      stateFlags: (json['state_flags'] as Map<String, dynamic>?) ?? const {},
+      stateFlags:
+          json['state_flags'] is Map<String, dynamic>
+              ? json['state_flags'] as Map<String, dynamic>
+              : const {},
       startedAt: parseTime(json['started_at']),
       lastActivityAt: parseTime(json['last_activity_at']),
       completedAt:

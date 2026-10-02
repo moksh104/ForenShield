@@ -365,12 +365,16 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                             fontFamily: 'Outfit',
                           ),
                         ),
-                        Text(
-                          'View All',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                        GestureDetector(
+                          onTap: () =>
+                              context.push(RouteConstants.profileStats),
+                          child: Text(
+                            'View All',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -460,12 +464,15 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
                             fontFamily: 'Outfit',
                           ),
                         ),
-                        Text(
-                          'View All',
-                          style: TextStyle(
-                            color: primaryColor,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w600,
+                        GestureDetector(
+                          onTap: () => _showAllActivityBottomSheet(context),
+                          child: Text(
+                            'View All',
+                            style: TextStyle(
+                              color: primaryColor,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
                           ),
                         ),
                       ],
@@ -974,6 +981,7 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
     required Color iconColor,
     required Color badgeBg,
     required Color badgeTextColor,
+    VoidCallback? onTap,
   }) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
@@ -988,12 +996,17 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
         ? badgeTextColor.withValues(alpha: 0.15)
         : badgeBg;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: 12,
-      ),
-      child: Row(
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap ?? () => _showAllActivityBottomSheet(context),
+        borderRadius: AppRadius.borderRadiusMd,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(
+            horizontal: AppSpacing.md,
+            vertical: 12,
+          ),
+          child: Row(
         children: [
           Container(
             width: 36,
@@ -1048,6 +1061,8 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
           Icon(Icons.chevron_right_rounded, size: 18, color: textSecondary),
         ],
       ),
+    ),
+    ),
     );
   }
 
@@ -1163,6 +1178,130 @@ class _CaseListScreenState extends ConsumerState<CaseListScreen> {
           },
         );
       },
+    );
+  }
+
+  void _showAllActivityBottomSheet(BuildContext context) {
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final colorScheme = theme.colorScheme;
+    final primaryColor = colorScheme.primary;
+    final borderColor = colorScheme.outlineVariant;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: colorScheme.surface,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(ctx).size.height * 0.75,
+          ),
+          padding: const EdgeInsets.all(AppSpacing.lg),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(
+                    color: colorScheme.outlineVariant,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'All Investigation Activity',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      fontFamily: 'Outfit',
+                      fontSize: 18,
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close, size: 20),
+                    onPressed: () => Navigator.pop(ctx),
+                  ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                'Complete audit trail of your forensic case engagements.',
+                style: TextStyle(
+                  color: isDark
+                      ? AppColors.textSecondary
+                      : const Color(0xFF64748B),
+                  fontSize: 12,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Expanded(
+                child: ListView(
+                  physics: const BouncingScrollPhysics(),
+                  children: [
+                    _buildRecentActivityRow(
+                      context,
+                      title: 'Completed: Phishing Email Analysis',
+                      subtitle: 'Score: 85% • 24 Apr 2025',
+                      score: '85%',
+                      icon: Icons.check_circle_outline,
+                      iconBg: const Color(0xFFF0FDF4),
+                      iconColor: const Color(0xFF16A34A),
+                      badgeBg: const Color(0xFFF0FDF4),
+                      badgeTextColor: const Color(0xFF16A34A),
+                    ),
+                    Divider(height: 1, thickness: 1, color: borderColor),
+                    _buildRecentActivityRow(
+                      context,
+                      title: 'Started: USB Forensics Investigation',
+                      subtitle: 'In Progress • 24 Apr 2025',
+                      score: '60%',
+                      icon: Icons.folder_open_outlined,
+                      iconBg: const Color(0xFFEFF6FF),
+                      iconColor: primaryColor,
+                      badgeBg: const Color(0xFFEFF6FF),
+                      badgeTextColor: primaryColor,
+                    ),
+                    Divider(height: 1, thickness: 1, color: borderColor),
+                    _buildRecentActivityRow(
+                      context,
+                      title: 'Evidence Flagged: Memory Dump Analysis',
+                      subtitle: 'Verdict Passed • 22 Apr 2025',
+                      score: '92%',
+                      icon: Icons.biotech_outlined,
+                      iconBg: const Color(0xFFFAF5FF),
+                      iconColor: const Color(0xFF9333EA),
+                      badgeBg: const Color(0xFFFAF5FF),
+                      badgeTextColor: const Color(0xFF9333EA),
+                    ),
+                    Divider(height: 1, thickness: 1, color: borderColor),
+                    _buildRecentActivityRow(
+                      context,
+                      title: 'Initial Triage: Network Intrusion PCAP',
+                      subtitle: '3 Indicators Extracted • 20 Apr 2025',
+                      score: '78%',
+                      icon: Icons.hub_outlined,
+                      iconBg: const Color(0xFFFFF7ED),
+                      iconColor: const Color(0xFFEA580C),
+                      badgeBg: const Color(0xFFFFF7ED),
+                      badgeTextColor: const Color(0xFFEA580C),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

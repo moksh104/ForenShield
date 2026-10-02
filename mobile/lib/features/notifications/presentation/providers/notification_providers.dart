@@ -130,7 +130,7 @@ class NotificationNotifier extends StateNotifier<NotificationState> {
 }
 
 final notificationStateProvider =
-    StateNotifierProvider.autoDispose<NotificationNotifier, NotificationState>((
+    StateNotifierProvider<NotificationNotifier, NotificationState>((
       ref,
     ) {
       final repo = ref.watch(notificationRepositoryProvider);

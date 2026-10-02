@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -23,15 +24,17 @@ Future<void> main() async {
   // Initialize local storage before the app starts.
   await StorageService.init();
 
-  // Initialize Firebase & Messaging
-  try {
-    debugPrint('MAIN: Initializing Firebase...');
-    await Firebase.initializeApp();
-    FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
-    await ForenFirebaseService.initialize();
-  } catch (e, stackTrace) {
-    debugPrint('MAIN: Firebase initialization error: $e');
-    debugPrint(stackTrace.toString());
+  // Initialize Firebase & Messaging (Native platforms)
+  if (!kIsWeb) {
+    try {
+      debugPrint('MAIN: Initializing Firebase...');
+      await Firebase.initializeApp();
+      FirebaseMessaging.onBackgroundMessage(firebaseBackgroundHandler);
+      await ForenFirebaseService.initialize();
+    } catch (e, stackTrace) {
+      debugPrint('MAIN: Firebase initialization error: $e');
+      debugPrint(stackTrace.toString());
+    }
   }
 
   runApp(const ProviderScope(child: ForenShieldApp()));

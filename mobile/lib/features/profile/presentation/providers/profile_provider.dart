@@ -82,8 +82,10 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
     loadProfile();
   }
 
-  Future<void> loadProfile() async {
-    state = state.copyWith(status: ProfileStatus.loading);
+  Future<void> loadProfile({bool forceLoading = false}) async {
+    if (state.profile == null || forceLoading) {
+      state = state.copyWith(status: ProfileStatus.loading);
+    }
     final result = await _loadProfileUseCase();
     if (!mounted) return;
 
@@ -92,13 +94,15 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         state = state.copyWith(status: ProfileStatus.success, profile: profile);
       },
       failure: (exception) {
-        state = state.copyWith(
-          status: ProfileStatus.error,
-          errorMessage: AppErrorMessages.from(
-            exception,
-            context: AppErrorContext.profileLoad,
-          ),
-        );
+        if (state.profile == null) {
+          state = state.copyWith(
+            status: ProfileStatus.error,
+            errorMessage: AppErrorMessages.from(
+              exception,
+              context: AppErrorContext.profileLoad,
+            ),
+          );
+        }
       },
     );
   }
@@ -192,7 +196,7 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
 }
 
 final profileProvider =
-    StateNotifierProvider.autoDispose<ProfileNotifier, ProfileState>((ref) {
+    StateNotifierProvider<ProfileNotifier, ProfileState>((ref) {
       final useCase = ref.watch(loadProfileUseCaseProvider);
       return ProfileNotifier(useCase, ref);
     });

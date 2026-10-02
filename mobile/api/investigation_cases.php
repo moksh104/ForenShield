@@ -20,18 +20,17 @@ if ($authorization && preg_match('/Bearer\s+(\S+)/', $authorization, $matches)) 
     } catch (Exception $e) {}
 }
 
-$db = getDb();
+// ── Fast Cache (30s TTL) ──
+$cacheFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'foren_cases_' . ($userId ?? 0) . '.json';
+$isRefresh = isset($_GET['refresh']) || (isset($_SERVER['HTTP_CACHE_CONTROL']) && strpos($_SERVER['HTTP_CACHE_CONTROL'], 'no-cache') !== false);
 
-if ($userId) {
-    try {
-        $check = $db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type = 'investigation'");
-        $check->execute(['user_id' => $userId]);
-        if ((int)$check->fetchColumn() === 0) {
-            $stmt = $db->prepare("INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id, '🕵 New Case Assigned', 'USB Forensics Investigation case #101 assigned to your queue.', 'investigation', FALSE)");
-            $stmt->execute(['user_id' => $userId]);
-        }
-    } catch (Exception $e) {}
+if (!$isRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile) < 30)) {
+    header('X-Cache: HIT');
+    echo file_get_contents($cacheFile);
+    exit;
 }
+
+$db = getDb();
 
 $sql = "
 SELECT 
@@ -50,6 +49,7 @@ SELECT
     ucp.status as user_status
 FROM cases c
 LEFT JOIN user_case_progress ucp ON c.id = ucp.case_id AND ucp.user_id = :user_id
+ORDER BY c.id ASC
 ";
 
 $stmt = $db->prepare($sql);
@@ -58,15 +58,9 @@ $casesRaw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $cases = [];
 foreach ($casesRaw as $row) {
-    // Preserve DB objectives array exactly.
     $objectives = $row['objectives'] ? json_decode($row['objectives'], true) : [];
-
-    // 'status' goes to Case status (Global case state)
-    // 'progress' goes to user_case_progress.progress (User specific)
     $progress = isset($row['progress']) ? (float)$row['progress'] : 0.0;
     
-    // We return empty arrays for evidenceList, timeline, suspects, and null for verdict 
-    // to save bandwidth on list endpoints as requested.
     $cases[] = [
         'id' => $row['id'],
         'case_code' => $row['case_code'],
@@ -86,4 +80,8 @@ foreach ($casesRaw as $row) {
     ];
 }
 
-echo json_encode($cases);
+$jsonOutput = json_encode($cases);
+@file_put_contents($cacheFile, $jsonOutput);
+
+header('X-Cache: MISS');
+echo $jsonOutput;

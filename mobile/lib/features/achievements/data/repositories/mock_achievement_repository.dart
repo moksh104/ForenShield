@@ -44,8 +44,9 @@ class MockAchievementRepository implements AchievementRepository {
     return _mockAchievements.where((a) {
       if (category != 'all' && a.category != category) return false;
       if (search.isNotEmpty &&
-          !a.title.toLowerCase().contains(search.toLowerCase()))
+          !a.title.toLowerCase().contains(search.toLowerCase())) {
         return false;
+      }
       return true;
     }).toList();
   }

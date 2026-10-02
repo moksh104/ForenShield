@@ -17,6 +17,7 @@ import '../features/academy/presentation/pages/learning_progress_screen.dart';
 import '../features/simulation/presentation/pages/simulation_lab_screen.dart';
 import '../features/simulation/presentation/pages/scenario_runner_screen.dart';
 import '../features/simulation/presentation/pages/scenario_debrief_screen.dart';
+import 'package:forenshield/features/simulation/presentation/pages/terminal_runner_screen.dart';
 import '../features/reports/presentation/pages/report_detail_screen.dart';
 import '../features/reports/presentation/pages/reports_list_screen.dart';
 import '../features/investigation/screens/investigation_lab_screen.dart';
@@ -166,6 +167,14 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) {
           final id = state.pathParameters['id'] ?? '';
           return ScenarioDebriefScreen(scenarioId: id);
+        },
+      ),
+      GoRoute(
+        name: 'terminalRunner',
+        path: '${RouteConstants.terminalRun}/:id',
+        builder: (context, state) {
+          final id = state.pathParameters['id'] ?? '';
+          return TerminalRunnerScreen(scenarioId: id);
         },
       ),
       GoRoute(

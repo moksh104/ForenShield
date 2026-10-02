@@ -145,9 +145,10 @@ $attempt['selected_actions'] = is_string($attempt['selected_actions'])
     ? json_decode($attempt['selected_actions'], true) 
     : ($attempt['selected_actions'] ?? []);
 $attempt['discovered_evidence_ids'] = $discoveredIds;
-$attempt['state_flags'] = is_string($attempt['state_flags']) 
-    ? json_decode($attempt['state_flags'], true) 
-    : ($attempt['state_flags'] ?? (object)[]);
+$stateRaw = is_string($attempt['state_flags'])
+    ? json_decode($attempt['state_flags'], true)
+    : ($attempt['state_flags'] ?? []);
+$attempt['state_flags'] = (is_array($stateRaw) && empty($stateRaw)) ? (object)[] : $stateRaw;
 
 echo json_encode([
     'success' => true,

@@ -357,7 +357,7 @@ class _EvidenceViewerScreenState extends ConsumerState<EvidenceViewerScreen> {
                             color: theme.colorScheme.surface,
                             borderRadius: AppRadius.borderRadiusLg,
                             border: Border.all(
-                              color: theme.colorScheme.error.withOpacity(0.5),
+                              color: theme.colorScheme.error.withValues(alpha: 0.5),
                             ),
                           ),
                           child: Text(

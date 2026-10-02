@@ -81,8 +81,10 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
   }
 
   /// Loads initial dashboard data.
-  Future<void> loadDashboard() async {
-    state = state.copyWith(status: MissionControlStatus.loading);
+  Future<void> loadDashboard({bool forceLoading = false}) async {
+    if (state.data == null || forceLoading) {
+      state = state.copyWith(status: MissionControlStatus.loading);
+    }
     final result = await _loadDashboardUseCase();
     if (!mounted) return;
     result.when(
@@ -93,13 +95,16 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
         );
       },
       failure: (exception) {
-        state = state.copyWith(
-          status: MissionControlStatus.error,
-          errorMessage: AppErrorMessages.from(
-            exception,
-            context: AppErrorContext.missionControl,
-          ),
-        );
+        // If data is already present, keep showing it without wiping the screen
+        if (state.data == null) {
+          state = state.copyWith(
+            status: MissionControlStatus.error,
+            errorMessage: AppErrorMessages.from(
+              exception,
+              context: AppErrorContext.missionControl,
+            ),
+          );
+        }
       },
     );
   }
@@ -131,7 +136,7 @@ class MissionControlNotifier extends StateNotifier<MissionControlState> {
 
 /// Main StateNotifierProvider for Mission Control.
 final missionControlProvider =
-    StateNotifierProvider.autoDispose<
+    StateNotifierProvider<
       MissionControlNotifier,
       MissionControlState
     >((ref) {

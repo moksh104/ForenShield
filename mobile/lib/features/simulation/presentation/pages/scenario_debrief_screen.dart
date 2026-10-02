@@ -277,7 +277,7 @@ class ScenarioDebriefScreen extends ConsumerWidget {
                         width: double.infinity,
                         child: FilledButton.icon(
                           onPressed: () {
-                            context.push('/investigation/${handoff.caseId}');
+                            context.push('${RouteConstants.caseDetail}/${handoff.caseId}');
                           },
                           style: FilledButton.styleFrom(
                             backgroundColor: foren.investigation.t500,

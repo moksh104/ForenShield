@@ -2,6 +2,7 @@
 
 require_once __DIR__ . '/cors.php';
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/rank_service.php';
 
 use Firebase\JWT\JWT;
 use Firebase\JWT\Key;
@@ -37,37 +38,81 @@ if (!$userId) {
     exit;
 }
 
-$db = getDb();
-$stmt = $db->prepare('SELECT id, full_name, email, phone, avatar_url, created_at FROM users WHERE id = :id');
-$stmt->execute(['id' => $userId]);
-$user = $stmt->fetch(PDO::FETCH_ASSOC);
+// ── Fast Cache (30s TTL) ──
+$cacheFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'foren_prof_' . $userId . '.json';
+$isRefresh = isset($_GET['refresh']) || (isset($_SERVER['HTTP_CACHE_CONTROL']) && strpos($_SERVER['HTTP_CACHE_CONTROL'], 'no-cache') !== false);
 
-if (!$user) {
+if (!$isRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile) < 30)) {
+    header('X-Cache: HIT');
+    echo file_get_contents($cacheFile);
+    exit;
+}
+
+$db = getDb();
+
+// ── Unified Profile Query ──
+$sql = "
+WITH 
+  u AS (
+    SELECT id, full_name, email, phone, avatar_url, created_at FROM users WHERE id = :user_id
+  ),
+  ls AS (
+    SELECT total_xp, investigations_completed, courses_completed, current_streak
+    FROM leaderboard_stats WHERE user_id = :user_id
+  ),
+  ach AS (
+    SELECT COALESCE(json_agg(json_build_object(
+      'id', a.code,
+      'title', a.title,
+      'description', a.description,
+      'icon_name', a.icon,
+      'xp_reward', a.xp_reward,
+      'unlocked_date', ua.unlocked_at,
+      'is_unlocked', true
+    )), '[]'::json) AS badges
+    FROM user_achievements ua
+    JOIN achievements a ON ua.achievement_id = a.id
+    WHERE ua.user_id = :user_id
+  ),
+  xph AS (
+    SELECT COALESCE(json_agg(json_build_object(
+      'id', x.id,
+      'title', x.action,
+      'source', x.source_module,
+      'xp_amount', x.xp_earned,
+      'timestamp', x.created_at
+    )), '[]'::json) AS history
+    FROM (
+      SELECT id, action, source_module, xp_earned, created_at
+      FROM xp_transactions
+      WHERE user_id = :user_id
+      ORDER BY created_at DESC
+      LIMIT 5
+    ) x
+  )
+SELECT 
+  u.*,
+  ls.total_xp,
+  ls.investigations_completed,
+  ls.courses_completed,
+  ls.current_streak,
+  (SELECT badges FROM ach) AS badges,
+  (SELECT history FROM xph) AS xp_history
+FROM u
+LEFT JOIN ls ON TRUE;
+";
+
+$stmt = $db->prepare($sql);
+$stmt->execute(['user_id' => $userId]);
+$row = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$row) {
     http_response_code(404);
     echo json_encode(['error' => 'User not found.']);
     exit;
 }
 
-try {
-    $check = $db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type = 'achievement'");
-    $check->execute(['user_id' => $userId]);
-    if ((int)$check->fetchColumn() === 0) {
-        $stmt = $db->prepare("INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id, '🏆 Achievement Unlocked', 'First Responder badge unlocked! +100 XP awarded.', 'achievement', FALSE)");
-        $stmt->execute(['user_id' => $userId]);
-    }
-} catch (Exception $e) {
-    // Ignore trigger check failure
-}
-
-require_once __DIR__ . '/rank_service.php';
-
-ensureLeaderboardEntry($db, $userId, $user['full_name']);
-
-$stmtStats = $db->prepare('SELECT * FROM leaderboard_stats WHERE user_id = :user_id');
-$stmtStats->execute(['user_id' => $userId]);
-$stats = $stmtStats->fetch(PDO::FETCH_ASSOC);
-
-$totalXp = (int)($stats['total_xp'] ?? 0);
+$totalXp = (int)($row['total_xp'] ?? 0);
 $level = getLevelForXp($totalXp);
 $nextLevelXp = $level * 500;
 
@@ -77,42 +122,35 @@ elseif ($level == 4) $rankTitle = 'Specialist';
 elseif ($level == 3) $rankTitle = 'Investigator';
 elseif ($level == 2) $rankTitle = 'Analyst';
 
-// Fetch XP history
-$stmtXp = $db->prepare('SELECT id, action as title, source_module as source, xp_earned as xp_amount, created_at as timestamp FROM xp_transactions WHERE user_id = :user_id ORDER BY created_at DESC LIMIT 5');
-$stmtXp->execute(['user_id' => $userId]);
-$xpHistory = $stmtXp->fetchAll(PDO::FETCH_ASSOC) ?: [];
-
-// Fetch achievements
-$stmtAch = $db->prepare('SELECT a.code as id, a.title, a.description, a.icon as icon_name, a.xp_reward, ua.unlocked_at as unlocked_date FROM user_achievements ua JOIN achievements a ON ua.achievement_id = a.id WHERE ua.user_id = :user_id');
-$stmtAch->execute(['user_id' => $userId]);
-$badgesRaw = $stmtAch->fetchAll(PDO::FETCH_ASSOC) ?: [];
-$badges = array_map(function($b) {
-    $b['is_unlocked'] = true;
-    return $b;
-}, $badgesRaw);
+$badges = json_decode($row['badges'] ?? '[]', true) ?: [];
+$xpHistory = json_decode($row['xp_history'] ?? '[]', true) ?: [];
 
 $response = [
-    'id' => (string)$user['id'],
-    'full_name' => $user['full_name'],
-    'email' => $user['email'],
-    'phone' => $user['phone'] ?? '',
+    'id' => (string)$row['id'],
+    'full_name' => $row['full_name'],
+    'email' => $row['email'],
+    'phone' => $row['phone'] ?? '',
     'role' => 'Forensic Specialist',
-    'avatar_url' => $user['avatar_url'] ?? '',
+    'avatar_url' => $row['avatar_url'] ?? '',
     'xp_points' => $totalXp,
     'rank_title' => $rankTitle,
-    'member_since' => date('M Y', strtotime($user['created_at'])),
+    'member_since' => date('M Y', strtotime($row['created_at'])),
     'account_status' => 'Active / Verified',
     'level' => $level,
     'next_level_xp' => $nextLevelXp,
     'stats' => [
-        'total_learning_hours' => 0.0, // Replace with actual if tracked
-        'cases_solved' => (int)($stats['investigations_completed'] ?? 0),
-        'courses_completed' => (int)($stats['courses_completed'] ?? 0),
-        'current_streak_days' => (int)($stats['current_streak'] ?? 0),
-        'security_score' => 100 // Default or calculate
+        'total_learning_hours' => 0.0,
+        'cases_solved' => (int)($row['investigations_completed'] ?? 0),
+        'courses_completed' => (int)($row['courses_completed'] ?? 0),
+        'current_streak_days' => (int)($row['current_streak'] ?? 0),
+        'security_score' => 100
     ],
     'badges' => $badges,
     'xp_history' => $xpHistory
 ];
 
-echo json_encode($response);
+$jsonOutput = json_encode($response);
+@file_put_contents($cacheFile, $jsonOutput);
+
+header('X-Cache: MISS');
+echo $jsonOutput;

@@ -115,10 +115,9 @@ class CisaKevNotifier extends StateNotifier<CisaKevState> {
 
 // ── Provider ──────────────────────────────────────────────────────────────────
 
-/// Main autoDispose StateNotifierProvider for the CISA KEV feed.
-/// Automatically disposes when the widget tree no longer watches it.
+/// Main StateNotifierProvider for the CISA KEV feed.
 final cisaKevProvider =
-    StateNotifierProvider.autoDispose<CisaKevNotifier, CisaKevState>((ref) {
+    StateNotifierProvider<CisaKevNotifier, CisaKevState>((ref) {
       final repository = ref.watch(cisaKevRepositoryProvider);
       return CisaKevNotifier(repository);
     });

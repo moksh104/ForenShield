@@ -119,9 +119,10 @@ $discoveredEvidence = is_string($attempt['discovered_evidence_ids'])
     ? json_decode($attempt['discovered_evidence_ids'], true) 
     : ($attempt['discovered_evidence_ids'] ?? []);
 
-$stateFlags = is_string($attempt['state_flags']) 
-    ? json_decode($attempt['state_flags'], true) 
+$stateFlags = is_string($attempt['state_flags'])
+    ? json_decode($attempt['state_flags'], true)
     : ($attempt['state_flags'] ?? []);
+if (!is_array($stateFlags)) $stateFlags = [];
 
 $currentScore = (int)$attempt['score'];
 
@@ -323,7 +324,7 @@ echo json_encode([
         'xp_earned' => (int)$attempt['xp_earned'] + $xpAwarded,
         'selected_actions' => $selectedActions,
         'discovered_evidence_ids' => $discoveredEvidence,
-        'state_flags' => $stateFlags
+        'state_flags' => empty($stateFlags) ? (object)[] : $stateFlags
     ],
     'action_taken' => $actionRecord,
     'consequence' => $selectedAction['consequence_summary'] ?? '',

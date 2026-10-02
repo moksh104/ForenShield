@@ -21,18 +21,17 @@ if ($authorization && preg_match('/Bearer\s+(\S+)/', $authorization, $matches)) 
     }
 }
 
-$db = getDb();
+// ── Fast Cache (30s TTL) ──
+$cacheFile = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'foren_courses_' . ($userId ?? 0) . '.json';
+$isRefresh = isset($_GET['refresh']) || (isset($_SERVER['HTTP_CACHE_CONTROL']) && strpos($_SERVER['HTTP_CACHE_CONTROL'], 'no-cache') !== false);
 
-if ($userId) {
-    try {
-        $check = $db->prepare("SELECT COUNT(*) FROM notifications WHERE user_id = :user_id AND type = 'academy'");
-        $check->execute(['user_id' => $userId]);
-        if ((int)$check->fetchColumn() === 0) {
-            $stmt = $db->prepare("INSERT INTO notifications (user_id, title, message, type, is_read) VALUES (:user_id, '📚 New Course Available', 'Digital Forensics Fundamentals course is now unlocked! +500 XP available.', 'academy', FALSE)");
-            $stmt->execute(['user_id' => $userId]);
-        }
-    } catch (Exception $e) {}
+if (!$isRefresh && file_exists($cacheFile) && (time() - filemtime($cacheFile) < 30)) {
+    header('X-Cache: HIT');
+    echo file_get_contents($cacheFile);
+    exit;
 }
+
+$db = getDb();
 
 $sql = "
 SELECT 
@@ -51,6 +50,7 @@ SELECT
     ucp.completion_percentage
 FROM courses c
 LEFT JOIN user_course_progress ucp ON c.id = ucp.course_id AND ucp.user_id = :user_id
+ORDER BY c.id ASC
 ";
 
 $stmt = $db->prepare($sql);
@@ -59,9 +59,6 @@ $coursesRaw = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 $courses = [];
 foreach ($coursesRaw as $row) {
-    // Determine is_enrolled and completion_percentage explicitly 
-    // to distinguish "not enrolled" from "enrolled at 0%"
-    // If ucp.is_enrolled is null, there is no progress record => not enrolled
     $isEnrolled = isset($row['is_enrolled']) ? (bool)$row['is_enrolled'] : false;
     $completionPercentage = isset($row['completion_percentage']) ? (float)$row['completion_percentage'] : 0.0;
 
@@ -83,4 +80,8 @@ foreach ($coursesRaw as $row) {
     ];
 }
 
-echo json_encode($courses);
+$jsonOutput = json_encode($courses);
+@file_put_contents($cacheFile, $jsonOutput);
+
+header('X-Cache: MISS');
+echo $jsonOutput;

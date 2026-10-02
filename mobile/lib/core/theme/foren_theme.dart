@@ -123,9 +123,9 @@ class ForenColors extends ThemeExtension<ForenColors> {
     borderDefault: ForenNeutralLight.borderDefault,
     textSecondary: ForenNeutralLight.textSecondary,
     textDisabled: ForenNeutralLight.textDisabled,
-    codeBlockBackground: ForenNeutralDark.bgBase,
-    codeBlockForeground: ForenNeutralDark.textPrimary,
-    codeBlockMuted: ForenNeutralDark.textSecondary,
+    codeBlockBackground: ForenNeutralLight.bgSurfaceRaised1,
+    codeBlockForeground: ForenNeutralLight.textPrimary,
+    codeBlockMuted: ForenNeutralLight.textSecondary,
   );
 
   @override

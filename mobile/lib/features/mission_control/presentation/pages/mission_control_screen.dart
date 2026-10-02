@@ -545,14 +545,31 @@ class _MissionControlScreenState extends ConsumerState<MissionControlScreen> {
                     padding: const EdgeInsets.symmetric(
                       horizontal: AppSpacing.lg,
                     ),
-                    child: Text(
-                      'Recent Activity',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        color: colorScheme.onSurface,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w700,
-                        fontFamily: 'Outfit',
-                      ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Recent Activity',
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: colorScheme.onSurface,
+                            fontSize: 16,
+                            fontWeight: FontWeight.w700,
+                            fontFamily: 'Outfit',
+                          ),
+                        ),
+                        GestureDetector(
+                          onTap: () =>
+                              context.push(RouteConstants.notifications),
+                          child: Text(
+                            'View All',
+                            style: TextStyle(
+                              color: colorScheme.primary,
+                              fontSize: 13,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   const SizedBox(height: AppSpacing.sm),

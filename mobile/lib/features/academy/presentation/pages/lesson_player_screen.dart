@@ -194,7 +194,8 @@ class _LessonPlayerScreenState extends ConsumerState<LessonPlayerScreen> {
                     const SizedBox(height: AppSpacing.lg),
 
                     // Code Snippet Block
-                    if (lesson.codeSnippet != null) ...[
+                    if (lesson.codeSnippet != null &&
+                        lesson.codeSnippet!.trim().isNotEmpty) ...[
                       Text(
                         'Command / Code Example',
                         style: TextStyle(
@@ -321,7 +322,10 @@ class _CodeSnippetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     final foren = theme.extension<ForenColors>()!;
+
+    final lang = language.isEmpty ? 'bash' : language;
 
     return Container(
       padding: const EdgeInsets.all(AppSpacing.md),
@@ -336,46 +340,60 @@ class _CodeSnippetCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                language.toUpperCase(),
-                style: TextStyle(
-                  color: foren.academy.t300,
-                  fontSize: 10,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'monospace',
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                decoration: BoxDecoration(
+                  color: (isDark ? const Color(0xFF0284C7) : const Color(0xFF2563EB)).withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: Text(
+                  lang.toUpperCase(),
+                  style: TextStyle(
+                    color: isDark ? const Color(0xFF38BDF8) : const Color(0xFF0284C7),
+                    fontSize: 10,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'monospace',
+                    letterSpacing: 0.6,
+                  ),
                 ),
               ),
               InkWell(
+                borderRadius: BorderRadius.circular(4),
                 onTap: () {
                   Clipboard.setData(ClipboardData(text: code));
                   context.showInfoSnackBar('Code copied to clipboard.');
                 },
-                child: Row(
-                  children: [
-                    Icon(Icons.copy, size: 12, color: foren.codeBlockMuted),
-                    const SizedBox(width: AppSpacing.xs),
-                    Text(
-                      'Copy',
-                      style: TextStyle(
-                        color: foren.codeBlockMuted,
-                        fontSize: 10,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.copy_rounded, size: 12, color: foren.codeBlockMuted),
+                      const SizedBox(width: AppSpacing.xs),
+                      Text(
+                        'Copy',
+                        style: TextStyle(
+                          color: foren.codeBlockMuted,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: AppSpacing.xs),
+          const SizedBox(height: AppSpacing.sm),
           SingleChildScrollView(
             scrollDirection: Axis.horizontal,
             child: Text(
               code,
               style: TextStyle(
                 color: foren.codeBlockForeground,
-                fontSize: 12,
+                fontSize: 12.5,
                 fontFamily: 'monospace',
-                height: 1.4,
+                height: 1.45,
+                fontWeight: FontWeight.w500,
               ),
             ),
           ),
